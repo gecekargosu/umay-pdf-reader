@@ -5,6 +5,7 @@
     <!-- Ana ekran -->
     <string name="pdf_sec">PDF Seç</string>
     <string name="kitaplarim">Kitaplarım</string>
+    <string name="ara">Kitaplarda ara…</string>
     <string name="bos_kutuphane">Henüz PDF yok.\n\"PDF Seç\" ile ders PDF\'ini içeri al.</string>
     <string name="ayarlar">Ayarlar</string>
     <string name="sohbet">Sohbet</string>
@@ -69,5 +70,5 @@
 
     <!-- İlerleme -->
     <string name="metin_cikariliyor">Metin çıkarılıyor: %1$d / %2$d sayfa</string>
-    <string name="ocr_yapiliyor">Taranmış sayfalar okunuyor (OCR): %1$d sayfa</string>
+    <string name="ocr_yapiliyor">Taranmış sayfalar okunuyor (OCR): %1$d / %2$d sayfa</string>
 </resources>

@@ -51,6 +51,13 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         }
         binding.btnChat.setOnClickListener { openChatForLastBook() }
 
+        // Kitaplarda arama
+        binding.searchInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) = applyFilter()
+        })
+
         requestNotifPermissionIfNeeded()
     }
 
@@ -67,11 +74,21 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
 
     private fun reload() {
         books = BookStore.loadBooks(this)
-        adapter.submit(books)
+        applyFilter()
         binding.emptyText.visibility = if (books.isEmpty()) View.VISIBLE else View.GONE
         binding.bookList.visibility = if (books.isEmpty()) View.GONE else View.VISIBLE
+        binding.searchInput.visibility = if (books.isEmpty()) View.GONE else View.VISIBLE
         // Devam eden çıkarmaları sürdür
         books.forEach { BookStore.ensureExtracting(this, it.id) }
+    }
+
+    /** Arama filtresi uygular (Türkçe karakter duyarsız). */
+    private fun applyFilter() {
+        val q = binding.searchInput.text.toString().trim()
+        val filtered = if (q.isEmpty()) books else books.filter { book ->
+            TextUtil.normalize(book.title).contains(TextUtil.normalize(q))
+        }
+        adapter.submit(filtered)
     }
 
     private fun choosePdf() {
@@ -182,7 +199,7 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
 
     override fun onProgress(bookId: String, done: Int, total: Int, stage: String) {
         runOnUiThread {
-            val prefix = if (stage == "ocr") getString(R.string.ocr_yapiliyor, total)
+            val prefix = if (stage == "ocr") getString(R.string.ocr_yapiliyor, done, total)
             else getString(R.string.metin_cikariliyor, done, total)
             binding.progressText.visibility = View.VISIBLE
             binding.progressText.text = prefix

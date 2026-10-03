@@ -132,6 +132,11 @@ object BookStore {
         val books = loadBooks(ctx).filterNot { it.id == id }
         saveBooks(ctx, books)
         File(booksDir(ctx), id).deleteRecursively()
+        // Kitaba ait okuma ilerlemesi de temizlensin (büyüklenme sızıntısı)
+        AppPrefs.clearProgress(ctx, id)
+        if (AppPrefs.getString(ctx, AppPrefs.KEY_LAST_BOOK) == id) {
+            AppPrefs.putString(ctx, AppPrefs.KEY_LAST_BOOK, "")
+        }
     }
 
     private fun queryDisplayName(ctx: Context, uri: Uri): String? {
@@ -169,13 +174,17 @@ object BookStore {
 
     private fun needsOcr(ctx: Context, bookId: String): Boolean {
         val book = loadBooks(ctx).firstOrNull { it.id == bookId } ?: return false
-        // Hiç dosyası olmayan ya da boş metni olan sayfa var mı?
+        // Hiç dosyası OLMAYAN ya da BOŞ metni olan (OCR başarısız kalmış)
+        // sayfa var mı? Boş sayfalar bir sonraki açılışta tekrar denenir.
         for (i in 0 until book.pageCount) {
             val f = pageFile(ctx, bookId, i)
-            if (!f.exists()) return true
+            if (!f.exists() || f.length() == 0L) return true
         }
         return false
     }
+
+    /** Bu kitap için çıkarma/OCR hâlâ arka planda sürüyor mu? */
+    fun isExtracting(ctx: Context, bookId: String): Boolean = extracting.contains(bookId)
 
     private fun extractBook(ctx: Context, bookId: String) {
         val book = loadBooks(ctx).firstOrNull { it.id == bookId } ?: return
@@ -233,7 +242,9 @@ object BookStore {
 
                     f.writeText(text)
                     done++
-                    ExtractionBus.progress(bookId, done, total, "text")
+                    // OCR aşaması ayrı bir aşama olarak bildirilsin ki
+                    // ekranlar "OCR: n/m sayfa" gösterebilsin.
+                    ExtractionBus.progress(bookId, done, total, if (needsOcr) "ocr" else "text")
                 }
             }
         } finally {

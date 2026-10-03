@@ -6,10 +6,14 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
 import android.os.IBinder
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -79,6 +83,7 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
 
         openRenderer()
         initControls()
+        initZoom()
 
         // Servisi başlat ve bağlan
         startService(Intent(this, ReadService::class.java))
@@ -146,6 +151,7 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
                 bmp.eraseColor(Color.WHITE)
                 p.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                 runOnUiThread {
+                    resetZoom()   // yeni sayfada yakınlaştırma sıfırlanır
                     binding.pageImage.setImageBitmap(bmp)
                 }
             } catch (e: Exception) {
@@ -157,6 +163,70 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
     }
 
     private val Int.dp: Int get() = (this * resources.displayMetrics.density).toInt()
+
+    // ── Yakınlaştırma (pinch-to-zoom + sürükle + çift dokunuş) ──
+
+    private var imageScale = 1f
+    private var imageOffsetX = 0f
+    private var imageOffsetY = 0f
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
+    private var lastTapAt = 0L
+
+    private val scaleDetector =
+        ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                imageScale = (imageScale * detector.scaleFactor).coerceIn(1f, 8f)
+                applyImageMatrix()
+                return true
+            }
+        })
+
+    private fun initZoom() {
+        binding.pageImage.scaleType = ImageView.ScaleType.MATRIX
+        binding.pageImage.setOnTouchListener { v, ev ->
+            scaleDetector.onTouchEvent(ev)
+            when (ev.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    lastTouchX = ev.x
+                    lastTouchY = ev.y
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (!scaleDetector.isInProgress && imageScale > 1f) {
+                        imageOffsetX += ev.x - lastTouchX
+                        imageOffsetY += ev.y - lastTouchY
+                        lastTouchX = ev.x
+                        lastTouchY = ev.y
+                        applyImageMatrix()
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Çift dokunuş: yakınlaştırmayı sıfırla
+                    val now = System.currentTimeMillis()
+                    if (now - lastTapAt < 300) resetZoom()
+                    lastTapAt = now
+                    v.performClick()
+                }
+            }
+            true
+        }
+    }
+
+    private fun resetZoom() {
+        imageScale = 1f
+        imageOffsetX = 0f
+        imageOffsetY = 0f
+        applyImageMatrix()
+    }
+
+    private fun applyImageMatrix() {
+        val m = Matrix()
+        val cx = binding.pageImage.width / 2f
+        val cy = binding.pageImage.height / 2f
+        m.postScale(imageScale, imageScale, cx, cy)
+        m.postTranslate(imageOffsetX, imageOffsetY)
+        binding.pageImage.imageMatrix = m
+    }
 
     // ── Kontroller ───────────────────────────────────────────
 
@@ -363,7 +433,9 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
         runOnUiThread {
             if (service?.playing != true) {
                 binding.pageStatus.visibility = View.VISIBLE
-                binding.pageStatus.text = getString(R.string.metin_cikariliyor, done, total)
+                binding.pageStatus.text = if (stage == "ocr")
+                    getString(R.string.ocr_yapiliyor, done, total)
+                else getString(R.string.metin_cikariliyor, done, total)
             }
         }
     }

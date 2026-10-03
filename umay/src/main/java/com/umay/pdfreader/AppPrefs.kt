@@ -18,6 +18,7 @@ object AppPrefs {
     const val KEY_API_MODEL = "api_model"
     const val KEY_TRANSLATE_MODEL_DOWNLOADED = "translate_model_ready"
     const val KEY_LAST_BOOK = "last_book"
+    const val KEY_PLAYING = "playing"   // servis öldürülürse otomatik devam için
 
     // İlerleme anahtarı önekleri
     private const val PROG_PAGE = "prog_page_"

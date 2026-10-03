@@ -99,6 +99,22 @@ class ReadService : Service() {
             onDone = { id -> mainHandler.post { onUtteranceDone(id) } },
             onError = { id -> mainHandler.post { id?.let { onUtteranceDone(it) } } }
         )
+
+        // Sistem servisi öldürmüşse (ekran kapalıyken okuma sırasında)
+        // kaldığımız sayfadan otomatik devam et.
+        restoreAfterSystemKill()
+    }
+
+    /** Sistem servisi öldürdüyse son durumu geri yükler ve okumayı sürdürür. */
+    private fun restoreAfterSystemKill() {
+        if (bookId != null) return
+        if (!AppPrefs.getBool(this, AppPrefs.KEY_PLAYING, false)) return
+        val last = AppPrefs.getString(this, AppPrefs.KEY_LAST_BOOK)
+        if (last.isBlank()) return
+        if (BookStore.loadBooks(this).none { it.id == last }) return
+        val (page, sentence) = AppPrefs.loadProgress(this, last) ?: Pair(0, 0)
+        openBook(last, page, sentence)
+        play()   // TTS hazır olunca onReady üzerinden başlar
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
@@ -112,12 +128,13 @@ class ReadService : Service() {
             ACTION_PREV -> prevPage()
             ACTION_STOP -> { pause(); bookId = null; stopSelf() }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     override fun onDestroy() {
         pauseInternal()
         cancelSleepTimer()
+        AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, false)
         try { tts?.shutdown() } catch (_: Exception) {}
         super.onDestroy()
     }
@@ -220,6 +237,7 @@ class ReadService : Service() {
         if (bookId == null) return
         if (playing) return
         playing = true
+        AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, true)
         acquireWakeLock()
         startAsForeground()
         scheduleSleepTimer()
@@ -234,6 +252,7 @@ class ReadService : Service() {
             // yine de kaydet
         }
         playing = false
+        AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, false)
         speakJob?.cancel()
         speakJob = null
         tts?.stop()
@@ -290,9 +309,17 @@ class ReadService : Service() {
     private fun needsTranslation(text: String) =
         TextUtil.needsTranslation(text, translateEnabled)
 
-    /** Sayfa metnini bekler; çıkarım arka planda sürüyorsa biter. */
+    /** Sayfa metnini bekler; çıkarım arka planda sürüyorsa bite kadar bekler. */
     private suspend fun awaitPageText(bid: String, page: Int): String? {
-        repeat(300) { // ~120 sn
+        // 1) Çıkarım/OCR sürüyorsa bitmesini bekle (metin birazdan gelir)
+        var guard = 0
+        while (BookStore.isExtracting(this, bid) && guard < 1800) { // en fazla 12 dk
+            BookStore.pageText(this, bid, page)?.let { return it }
+            delay(400)
+            guard++
+        }
+        // 2) Çıkarım bitti: metin hâlâ yoksa kısa bir tampon süresi daha
+        repeat(150) { // ~60 sn
             val t = BookStore.pageText(this, bid, page)
             if (t != null) return t
             delay(400)

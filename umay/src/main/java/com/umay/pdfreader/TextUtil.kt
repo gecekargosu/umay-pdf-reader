@@ -102,8 +102,13 @@ object TextUtil {
 
     data class Hit(val page: Int, val sentence: String, val score: Double)
 
-    private fun normalize(s: String): String =
-        s.lowercase(Locale.ROOT)
+    /** Türkçe küçük harfe çevirip karakterleri sadeleştirir (arama anahtarı). */
+    private val trLocale = Locale.forLanguageTag("tr-TR")
+
+    /** Türkçe karakterleri sadeleştiren küçük harfli normalizasyon. */
+    fun normalize(s: String): String =
+        // tr locale: "İ" doğru şekilde "i" olur (ROOT'da nokta + i kalırdı)
+        s.lowercase(trLocale)
             .replace("ı", "i").replace("ş", "s").replace("ğ", "g")
             .replace("ç", "c").replace("ö", "o").replace("ü", "u")
 

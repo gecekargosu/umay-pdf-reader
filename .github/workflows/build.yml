@@ -28,6 +28,12 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon
 
+      - name: Run Unit Tests
+        run: ./gradlew :umay:testDebugUnitTest --no-daemon
+
+      - name: Build Umay Release APK
+        run: ./gradlew :umay:assembleRelease --no-daemon
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -41,3 +47,21 @@ jobs:
           name: umay-pdf-reader-debug
           path: umay/build/outputs/apk/debug/umay-debug.apk
           retention-days: 7
+
+      - name: Upload Umay Release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: umay-pdf-reader-release
+          path: umay/build/outputs/apk/release/umay-release.apk
+          retention-days: 30
+
+      - name: Upload test + build reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            umay/build/reports/
+            app/build/reports/
+          retention-days: 7
+          if-no-files-found: ignore

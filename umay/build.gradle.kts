@@ -11,8 +11,8 @@ android {
         applicationId = "com.umay.pdfreader"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         // APK boyutu: sadece telefonlarda kullanılan mimariler
         ndk {
@@ -23,6 +23,9 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            // Geçici yayın imzası: debug anahtarı ile imzalanır, hemen kurulabilir.
+            // Gerçek yayına geçince buraya kendi .jks anahtarın konur (git'e girmez).
+            signingConfig = signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,4 +62,7 @@ dependencies {
 
     // Opsiyonel online sohbet (API anahtarı ile)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Birim testleri (TextUtil: cümle ayırma, arama, özet)
+    testImplementation("junit:junit:4.13.2")
 }

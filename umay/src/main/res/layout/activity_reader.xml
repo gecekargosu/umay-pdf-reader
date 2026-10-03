@@ -60,7 +60,7 @@
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:contentDescription="Sayfa"
-            android:scaleType="fitCenter" />
+            android:scaleType="matrix" />
 
         <TextView
             android:id="@+id/pageStatus"
