@@ -122,8 +122,8 @@ object BookStore {
 
                 ensureExtracting(ctx, id)
                 onDone(Result.success(book))
-            } catch (e: Exception) {
-                onDone(Result.failure(e))
+            } catch (t: Throwable) {
+                onDone(Result.failure(Exception(t.message ?: t.javaClass.simpleName, t)))
             }
         }
     }
@@ -162,8 +162,10 @@ object BookStore {
             executor.execute {
                 try {
                     extractBook(ctx, bookId)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } catch (t: Throwable) {
+                    // Exception YAKA Error'lar da var (ör. ExceptionInInitializerError);
+                    // uygulama çökmesin, çıkarma bir sonraki açılışta tekrar denensin.
+                    t.printStackTrace()
                 } finally {
                     extracting.remove(bookId)
                     ExtractionBus.finished(bookId)
@@ -190,6 +192,10 @@ object BookStore {
         val book = loadBooks(ctx).firstOrNull { it.id == bookId } ?: return
         val src = sourceFile(ctx, bookId)
         if (!src.exists()) return
+
+        // Güvenlik: PDFBox resource'ları hazırlı değilse şimdi hazırla
+        // (Application onCreate'de yapılsa da savunma olarak).
+        UmayApp.initPdfBox(ctx)
 
         var renderer: PdfRenderer? = null
         var rendererPfd: ParcelFileDescriptor? = null

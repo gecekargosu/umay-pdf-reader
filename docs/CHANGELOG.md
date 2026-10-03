@@ -41,3 +41,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) · Sürümler: 
 - Offline EN→TR çeviri (ML Kit)
 - Sohbet: offline arama/özet + opsiyonel Gemini/OpenAI
 - Ayarlar: ses, hız, çeviri, API anahtarı, ses testi
+
+## [1.1.1] — 2026-10-03 (hotfix)
+
+### Düzeltildi
+- **PDFBox açılış crash'i** (cihazda ilk denemede yakalandı):
+  `ExceptionInInitializerError: GlyphList 'com/tom_roush/pdfbox/resources/glyphlist/glyphlist.txt' not found`
+  - `UmayApp` (Application) eklendi: `PDFBoxResourceLoader.init(context)` çağrılmadığı için
+    resource dosyaları hiç hazırlanmıyordu → ilk metin çıkarmada çöküyordu.
+  - `BookStore.extractBook` artık `Throwable` yakalıyor: `ExceptionInInitializerError` bir
+    `Exception` **değil**, `Error`'dı — eski `catch (e: Exception)` yakalamıyordu, servis
+    thread'i uygulamayı çökertiyordu. Artık çıkarma başarısız olsa bile uygulama yaşar ve
+    bir sonraki açılışta tekrar denenir.
+  - Çıkarmadan hemen önce savunma olarak `initPdfBox()` tekrar çağrılır (idempotent).
