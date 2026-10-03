@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Umay PDF Okuyucu</string>
+
+    <!-- Ana ekran -->
+    <string name="pdf_sec">PDF Seç</string>
+    <string name="kitaplarim">Kitaplarım</string>
+    <string name="bos_kutuphane">Henüz PDF yok.\n\"PDF Seç\" ile ders PDF\'ini içeri al.</string>
+    <string name="ayarlar">Ayarlar</string>
+    <string name="sohbet">Sohbet</string>
+    <string name="sayfa">Sayfa</string>
+
+    <!-- Devam sorusu -->
+    <string name="devam_sorusu">Son kaldığın %1$d. sayfadan devam edelim mi?</string>
+    <string name="devam_et">Devam Et</string>
+    <string name="bastan_basla">Baştan Başla</string>
+    <string name="yeni_dosya">Yeni Dosya Yükle</string>
+
+    <!-- Okuma ekranı -->
+    <string name="oynat">Oynat</string>
+    <string name="duraklat">Duraklat</string>
+    <string name="onceki">Önceki</string>
+    <string name="sonraki">Sonraki</string>
+    <string name="hız">Hız</string>
+    <string name="ses">Ses</string>
+    <string name="ses_kadin">Kadın</string>
+    <string name="ses_erkek">Erkek</string>
+    <string name="ses_otomatik">Otomatik</string>
+    <string name="uyku_zamanlayici">Uyku Zamanlayıcı</string>
+    <string name="kapali">Kapalı</string>
+    <string name="sayfada_bitir">Bu sayfada bitir</string>
+    <string name="cevir_oku">İngilizce\'yi Türkçe Oku</string>
+    <string name="sayfaya_git">Git</string>
+    <string name="metin_hazirlaniyor">Sayfa metni hazırlanıyor, lütfen bekle…</string>
+    <string name="metin_yok">Bu sayfada okunacak metin bulunamadı.</string>
+    <string name="tts_hazir_degil">Ses motoru hazırlanıyor…</string>
+    <string name="kitap_bitti">Kitap bitti 🎉</string>
+    <string name="sayfa_gosterilemiyor">Sayfa gösterilemiyor</string>
+
+    <!-- Ayarlar -->
+    <string name="ayarlar_baslik">Ayarlar</string>
+    <string name="ay_ses_secimi">Ses (Kadın / Erkek)</string>
+    <string name="ay_okuma_hizi">Okuma Hızı</string>
+    <string name="ay_ceviri">İngilizce PDF\'i Türkçe oku (offline çeviri)</string>
+    <string name="ay_ceviri_aciklama">İlk kullanımda ~35MB çeviri modeli indirilir, sonra internet gerekmez.</string>
+    <string name="ay_api_baslik">Yapay Zekâ Sohbet (opsiyonel)</string>
+    <string name="ay_api_key">API Anahtarı</string>
+    <string name="ay_api_key_aciklama">Boş bırakırsan sohbet çevrimdışı çalışır (PDF içi arama). İleride ücretsiz bir anahtar girerek gerçek sohbet açabilirsin.</string>
+    <string name="ay_api_model">Model / Adres</string>
+    <string name="ay_api_model_aciklama">Örn: gemini-2.0-flash veya OpenAI-uyumlu bir adres</string>
+    <string name="ay_kaydet">Kaydet</string>
+    <string name="ay_kaydedildi">Ayarlar kaydedildi</string>
+    <string name="ay_tts_test">Ses motorunu test et</string>
+
+    <!-- Sohbet -->
+    <string name="sohbet_baslik">Sohbet</string>
+    <string name="sohbet_input">PDF\'e bir şey sor…</string>
+    <string name="gonder">Gönder</string>
+    <string name="sohbet_offline">Çevrimdışı mod — PDF içinde arama yapıyor</string>
+    <string name="sohbet_online">AI bağlı</string>
+    <string name="sohbet_offline_ipucu">İpucu: \"özet yaz\", \"ikinci yasalar ne zaman\", gibi sorular sorabilirsin.</string>
+    <string name="sohbet_hazir">Sorunu yaz ve gönder. PDF\'in metninde arayıp cevap vereceğim.</string>
+
+    <!-- Bildirim -->
+    <string name="bildirim_baslik">Okunuyor</string>
+    <string name="bildirim_duraklat">Duraklat</string>
+    <string name="bildirim_devam">Devam</string>
+    <string name="bildirim_durdur">Durdur</string>
+
+    <!-- İlerleme -->
+    <string name="metin_cikariliyor">Metin çıkarılıyor: %1$d / %2$d sayfa</string>
+    <string name="ocr_yapiliyor">Taranmış sayfalar okunuyor (OCR): %1$d sayfa</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.UmayPdf" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/umay_accent</item>
+        <item name="colorPrimaryVariant">@color/umay_accent_dark</item>
+        <item name="colorOnPrimary">#04121A</item>
+        <item name="colorSecondary">@color/umay_accent</item>
+        <item name="android:windowBackground">@color/umay_bg</item>
+        <item name="android:statusBarColor">@color/umay_bg</item>
+        <item name="android:navigationBarColor">@color/umay_bg</item>
+        <item name="android:textColorPrimary">@color/umay_text</item>
+        <item name="android:textColorSecondary">@color/umay_text_dim</item>
+    </style>
+</resources>

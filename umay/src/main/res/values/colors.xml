@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="umay_bg">#0B1220</color>
+    <color name="umay_panel">#141E30</color>
+    <color name="umay_panel2">#1B2A44</color>
+    <color name="umay_accent">#22D3EE</color>
+    <color name="umay_accent_dark">#0891B2</color>
+    <color name="umay_text">#E5EFFF</color>
+    <color name="umay_text_dim">#8AA0C2</color>
+    <color name="umay_danger">#F87171</color>
+    <color name="umay_ok">#4ADE80</color>
+</resources>

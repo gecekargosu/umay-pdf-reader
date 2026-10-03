@@ -1,0 +1,42 @@
+# ═══ BUILD ÇIKTILARI ═══
+app/build/
+build/
+.gradle/
+local.properties
+
+# ═══ IDE DOSYALARI ═══
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# ═══ ANDROID STUDIO ═══
+*.hprof
+*.ap_
+*.dex
+
+# ═══ JAVA/KOTLIN ═══
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# ═══ OS DOSYALARI ═══
+.DS_Store
+Thumbs.db
+*~
+
+# ═══ GİZLİ DOSYALAR ═══
+*.jks
+*.keystore
+*.p12
+*.key
+*.pem
+.env
+*.env.local
+
+# ═══ LOG DOSYALARI ═══
+*.log
+
+# ═══ LOCAL CONFIG ═══
+google-services.json

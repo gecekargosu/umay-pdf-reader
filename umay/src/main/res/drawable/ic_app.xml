@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Basit uygulama ikonu: koyu zemin üzerinde cyan kitap -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#0B1220"
+        android:pathData="M0,0h24v24h-24z" />
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M6,4.5C6,3.67 6.67,3 7.5,3H18v16.5H7.5C6.67,19.5 6,20.17 6,21V4.5ZM8.5,5.5V18H15.5V5.5H8.5Z" />
+    <path
+        android:fillColor="#0891B2"
+        android:pathData="M16.5,5.5V18H18V4.5H7.5V5.5H16.5Z" />
+</vector>
