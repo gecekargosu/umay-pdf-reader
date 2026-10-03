@@ -224,9 +224,12 @@ class LockScreenActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {
                 val controller = currentController ?: return
                 val state = controller.playbackState
-                if (state != null && state.duration > 0) {
-                    val pos = (sb?.progress ?: 0) * state.duration / 100
-                    controller.transportControls.seekTo(pos.toLong())
+                // Şarkı süresi PlaybackState'te yok; MediaMetadata'dan okunur
+                val durationMs = controller.metadata
+                    ?.getLong(android.media.MediaMetadata.METADATA_KEY_DURATION) ?: 0L
+                if (state != null && durationMs > 0) {
+                    val pos = (sb?.progress ?: 0).toLong() * durationMs / 100
+                    controller.transportControls.seekTo(pos)
                 }
             }
         })
@@ -292,7 +295,7 @@ class LockScreenActivity : AppCompatActivity() {
             val line = reader.readLine()
             reader.close()
 
-            val parts = line.split("\s+".toRegex())
+            val parts = line.split("\\s+".toRegex())
             val idle = parts[4].toLong()
             val total = parts.drop(1).take(7).sumOf { it.toLong() }
 
@@ -529,7 +532,8 @@ class LockScreenActivity : AppCompatActivity() {
     private fun setupMediaSession() {
         try {
             mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-            val controllers = mediaSessionManager?.activeSessions
+            // getActiveSessions bir method (ComponentName ister), property değil
+            val controllers = mediaSessionManager?.getActiveSessions(null)
 
             if (!controllers.isNullOrEmpty()) {
                 currentController = controllers[0]

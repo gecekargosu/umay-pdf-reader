@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -60,10 +61,14 @@ class ChatActivity : AppCompatActivity() {
 
         updateModeChip()
 
-        // Sohbet edilecek PDF'in metni (kısmen çıkmış olabilir)
-        pages = BookStore.allPages(this, bookId)
-
         addMsg(false, getString(R.string.sohbet_hazir))
+    }
+
+    override fun onDestroy() {
+        // Activity kapanınca bekleyen cevap döngüsü ve scope yaşamasın
+        pendingJob?.cancel()
+        scope.cancel()
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -89,10 +94,8 @@ class ChatActivity : AppCompatActivity() {
         addMsg(true, q)
         val placeholder = addMsg(false, "…")
 
-        // Sayfalar çıkarılıyor olabilir; tazele
-        pages = BookStore.allPages(this, bookId)
-
         pendingJob = scope.launch {
+            // Sayfalar çıkarılıyor olabilir; tazele (IO thread'de)
             val answer = withContext(Dispatchers.IO) { answerFor(q) }
             placeholder.text = answer
             adapter.notifyItemChanged(messages.size - 1)
@@ -101,6 +104,9 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun answerFor(question: String): String {
+        // IO thread'inden çağrılır: tüm sayfa metinleri burada okunur
+        pages = BookStore.allPages(this, bookId)
+
         val apiKey = AppPrefs.lastApiKey
         val online = !apiKey.isNullOrBlank()
 

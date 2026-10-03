@@ -260,7 +260,7 @@ class MainActivity : AppCompatActivity() {
             val line = reader.readLine()
             reader.close()
 
-            val parts = line.split("\s+".toRegex())
+            val parts = line.split("\\s+".toRegex())
             val idle = parts[4].toLong()
             val total = parts.drop(1).take(7).sumOf { it.toLong() }
 

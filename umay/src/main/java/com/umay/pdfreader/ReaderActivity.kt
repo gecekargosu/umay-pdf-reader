@@ -173,7 +173,9 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
     private var lastTouchY = 0f
     private var lastTapAt = 0L
 
-    private val scaleDetector =
+    // DİKKAT: Activity henüz instantiate edilirken context hazır OLMAZ;
+    // bu yüzden detector lazy oluşturulur (ilk dokunuşta, onCreate sonrası).
+    private val scaleDetector by lazy {
         ScaleGestureDetector(this, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 imageScale = (imageScale * detector.scaleFactor).coerceIn(1f, 8f)
@@ -181,6 +183,7 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
                 return true
             }
         })
+    }
 
     private fun initZoom() {
         binding.pageImage.scaleType = ImageView.ScaleType.MATRIX

@@ -54,3 +54,25 @@ Format: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) · Sürümler: 
     thread'i uygulamayı çökertiyordu. Artık çıkarma başarısız olsa bile uygulama yaşar ve
     bir sonraki açılışta tekrar denenir.
   - Çıkarmadan hemen önce savunma olarak `initPdfBox()` tekrar çağrılır (idempotent).
+
+## [1.1.2] — 2026-10-03 (hotfix 2 — cihaz geri bildirimiyle)
+
+### Düzeltildi
+- **"Oku"ya basınca uygulamanın kapanması** (cihazdan gelen stack trace ile):
+  `ReaderActivity.<init>` → `NullPointerException` @ `ScaleGestureDetector.<init>`
+  - Neden: zoom için eklediğimiz `ScaleGestureDetector(this, …)` **sınıf seviyesinde**
+    tanımlıydı; Activity henüz context almadan çalışıyordu.
+  - Çözüm: `by lazy` ile ilk dokunuşa (onCreate sonrasına) ertelendi. Tarama yapıldı,
+    benzer kalıptan başka örnek yok.
+- **ChatActivity sızıntısı**: `scope`/`pendingJob` hiçbir yerde cancel edilmiyordu;
+  `onDestroy` eklendi. Sayfa metinleri (büyük kitaplarda yüzlerce dosya) artık ana
+  thread'de değil IO thread'inde okunuyor.
+- **`:app` (Jarvis) modülü hiç derlenmiyordu** (ilk günden beri, CI'ı da kırıyordu):
+  - `line.split("\s+")` → kaçış hatası (2 dosya) `"\\s+"` yapıldı
+  - `state.duration` → `PlaybackState`'te yok; `MediaMetadata` METADATA_KEY_DURATION
+    üzerinden süre okunacak şekilde düzeltildi
+  - `mediaSessionManager?.activeSessions` → method çağrısı `getActiveSessions(null)`
+
+### Kontrol
+- `gradlew testDebugUnitTest assembleDebug assembleRelease` → **BUILD SUCCESSFUL**
+  (iki modül, 14/14 test)
