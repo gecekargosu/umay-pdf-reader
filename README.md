@@ -7,20 +7,25 @@ okunsun, İngilizce kitap Türkçe seslendirilsin, PDF'e soru sor.
 | | |
 |---|---|
 | Paket | `com.umay.pdfreader` |
-| Sürüm | **1.1** (versionCode 2) |
+| Sürüm | **1.4** (versionCode 6) |
 | Min SDK | 26 (Android 8.0) — Target 34 |
 | Dil | Kotlin 1.9.10 · AGP 8.1.4 · Gradle 8.7 |
-| Kurulum | `umay-pdf-reader-1.1.apk` (release, debug anahtarıyla imzalı) |
+| Kurulum | `umay-pdf-reader-1.4.apk` (release, debug anahtarıyla imzalı) |
 
 > Bu depoda ikinci bir uygulama daha var: `app/` → **Jarvis Mobile** (HUD/lockscreen).
 > PDF okuyucu **`umay/`** modülüdür.
 
 ## Özellikler
 
+- 📷 **Kitap tarama** — kamerayla sayfa sayfa çek, **sayfa numarasına göre
+  sıralanıp tek PDF olsun**, kütüphaneye kitap olarak girsin ve okunsun
+- 🖼 **Fotoğraftan PDF** — galeriden seçtiğin fotoğraflar otomatik sıralanıp
+  A4 sayfalara dönüşür, OCR'e girer
 - 📚 **Kütüphane** — SAF ile PDF seç, kitap listesi, arama, "kaldığın yerden devam et"
 - 🔊 **Seslendirme** — ekran kapalıyken bile devam eder (foreground servis + wakelock),
   bildirimden oynat/duraklat/ileri/geri
-- 🎚 **Hız & ses** — 0.75x–2.0x, kadın/erkek/otomatik ses seçimi, ses testi
+- 🎚 **Hız & ses** — 0.5x–2.0x, kadın/erkek/otomatik ses seçimi, ses testi,
+  **ekolayzır** (Ayarlar paneli + okuma ekranındaki Ses paneli)
 - 🖨 **OCR** — taranmış (görsel) sayfalar ML Kit ile offline okunur, ilerleme gösterilir
 - 🌐 **Çeviri** — İngilizce PDF'i Türkçe oku (ML Kit offline, ~35MB model bir kez iner)
 - 💬 **Sohbet** — API anahtarı yoksa PDF içinde offline arama + özet; varsa
@@ -33,11 +38,11 @@ okunsun, İngilizce kitap Türkçe seslendirilsin, PDF'e soru sor.
 Release APK bu ortamda şuraya kopyalanır:
 
 ```
-/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.1.apk
+/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.4.apk
 ```
 
 Dosya yöneticisinden APK'ya bas → "Yükle". (Termux'tan: `termux-open
-/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.1.apk`)
+/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.4.apk`)
 
 Bilinmeyen kaynak izni ilk kurulumda sorulur — izin ver.
 
@@ -55,8 +60,9 @@ artifact adları: `umay-pdf-reader-release`, `umay-pdf-reader-debug`.
 
 ## Test
 
-`umay/src/test/.../TextUtilTest.kt` — 14 test: cümle ayırma, dil algılama,
-çevrimdışı arama, özet, normalizasyon.
+`umay/src/test/.../TextUtilTest.kt` — 32 test: cümle ayırma, dil algılama,
+çevrimdışı arama, özet, normalizasyon, sembol→konuşma, karaoke eşleşmesi,
+doğal dosya sıralaması, sohbet bağlamı seçimi.
 
 ```bash
 bash gradlew :umay:testDebugUnitTest

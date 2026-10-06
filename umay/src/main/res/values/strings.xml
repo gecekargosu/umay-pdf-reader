@@ -4,6 +4,64 @@
 
     <!-- Ana ekran -->
     <string name="pdf_sec">PDF Seç</string>
+    <string name="resimden_pdf">Resimlerden PDF Yap</string>
+
+    <!-- Kitap tarama (kamera) -->
+    <string name="tara_baslik">Kitap Tara (Kamera)</string>
+    <string name="tara_cek">Sayfa Çek</string>
+    <string name="tara_yap">PDF Yap → Kütüphaneye Ekle</string>
+    <string name="tara_bos">Henüz sayfa çekilmedi. Kitabın sayfalarını sırayla çek; PDF otomatik olarak sayfa numarasına göre sıralanır.</string>
+    <string name="tara_hazir">%1$d sayfa hazır — sırayı değiştirmek için × ile silebilirsin.</string>
+    <string name="tara_sayfa">Çekilen sayfa</string>
+    <string name="tara_sil">Bu sayfayı sil</string>
+    <string name="tara_kamera_yok">Kamera başlatılamadı</string>
+    <string name="tara_pdf_bos">Önce en az bir sayfa çek</string>
+    <string name="kitap_tara">Kitap Tara (Kamera)</string>
+    <string name="resim_cevriliyor">Resimler PDF\'e çevriliyor…</string>
+    <string name="sayfa_olusturuluyor">Sayfa %1$d / %2$d oluşturuluyor…</string>
+    <string name="buradan_oku">Bu sayfadan okumaya başla ▶</string>
+    <string name="yavaslat">Yavaşlat</string>
+    <string name="hizlandir">Hızlandır</string>
+    <string name="ceviri_kisa">Çeviri</string>
+
+    <!-- Kütüphane -->
+    <string name="kaldigin_yer">KALDIĞIN YERDEN DEVAM</string>
+    <string name="sayfa_ilerleme">Sayfa %1$d / %2$d</string>
+    <string name="henuz_okunmadi">%1$d sayfa • henüz okunmadı</string>
+
+    <!-- Dijital kitaplık (ADIM 2) -->
+    <string name="son_okunan">Son Okunan</string>
+    <string name="kutuphanem">Kütüphanem</string>
+    <string name="okundu_yuzde">%1$d%% okundu</string>
+    <string name="rozet_okundu">Okunma oranı: %1$d%%</string>
+    <string name="sort_recent">Son okunan</string>
+
+    <!-- Ses Renkleri paneli -->
+    <string name="panel_ses">Ses</string>
+    <string name="panel_perde">Perde (derin ↔ tiz)</string>
+    <string name="panel_perde_ipucu">Alçalt sesi derinleştirir, yükselttikçe tizleşir. Semboller her iki motorda da okunur.</string>
+    <string name="panel_hazir">Hazır ayarlar</string>
+    <string name="preset_dogal">Doğal</string>
+    <string name="preset_derin">Derin</string>
+    <string name="preset_cocuk">Çocuk</string>
+    <string name="preset_vurgulu">Vurgulu</string>
+    <string name="panel_ekolayzir">Ekolayzır</string>
+    <string name="panel_ekolayzir_ipucu">Yalnız doğal seste (Edge mp3) çalışır; yerleşik ses motorunda devre dışıdır.</string>
+    <string name="panel_ekolayzir_acik">Ekolayzır açık</string>
+    <string name="eq_bas">Bas</string>
+    <string name="eq_orta">Orta</string>
+    <string name="eq_tiz">Tiz</string>
+    <string name="panel_tamam">Tamam</string>
+
+    <!-- Kitap içi arama -->
+    <string name="ic_ara_hint">Kitap içinde ara</string>
+    <string name="ara_ipucu">Kelimeyi yaz, hangi sayfada geçtiğini bulayım.</string>
+    <string name="araniyor">Aranıyor…</string>
+    <string name="sonuc_yok">Sonuç bulunamadı.</string>
+    <string name="sonuc_sayi">%1$d sonuç — tıklayınca o sayfaya gider</string>
+    <string name="sort_alpha">Alfabetik</string>
+    <string name="sort_added">Eklenme</string>
+    <string name="dosya_aliniyor">Dosya içeri alınıyor…</string>
     <string name="kitaplarim">Kitaplarım</string>
     <string name="ara">Kitaplarda ara…</string>
     <string name="bos_kutuphane">Henüz PDF yok.\n\"PDF Seç\" ile ders PDF\'ini içeri al.</string>
@@ -38,6 +96,19 @@
     <string name="kitap_bitti">Kitap bitti 🎉</string>
     <string name="sayfa_gosterilemiyor">Sayfa gösterilemiyor</string>
 
+    <!-- Sayfa özeti + ses dalgası (ADIM 3) -->
+    <string name="ozet">Sayfa Özeti</string>
+    <string name="ozet_kisa">Özet</string>
+    <string name="ozet_aliniyor">Sayfa özeti alınıyor…</string>
+    <string name="ozet_hazir_degil">Özet henüz hazır değil.</string>
+    <string name="ozet_okunuyor">Özet seslendiriliyor ▶</string>
+    <string name="ozet_dinle">▶ Dinle</string>
+    <string name="ozet_kapat">Kapat</string>
+    <string name="ozet_yok">Bu sayfanın metni henüz çıkarılmadı (taranmış sayfada OCR sürüyor). Bitince tekrar dene.</string>
+    <string name="ozet_hata">Özet alınamadı: %1$s</string>
+    <string name="ozet_cevrimdisi">Çevrimdışı özet — Ayarlar\'a API anahtarı girersen Gemini ile ayrıntılı özet alınır.</string>
+    <string name="ses_dalgasi">Ses dalgası görselleştirici</string>
+
     <!-- Ayarlar -->
     <string name="ayarlar_baslik">Ayarlar</string>
     <string name="ay_ses_secimi">Ses (Kadın / Erkek)</string>
@@ -46,12 +117,23 @@
     <string name="ay_ceviri_aciklama">İlk kullanımda ~35MB çeviri modeli indirilir, sonra internet gerekmez.</string>
     <string name="ay_api_baslik">Yapay Zekâ Sohbet (opsiyonel)</string>
     <string name="ay_api_key">API Anahtarı</string>
-    <string name="ay_api_key_aciklama">Boş bırakırsan sohbet çevrimdışı çalışır (PDF içi arama). İleride ücretsiz bir anahtar girerek gerçek sohbet açabilirsin.</string>
+    <string name="ay_api_key_aciklama">Ücretsiz Gemini anahtarını aistudio.google.com al\'dan alabilirsin (AIza ile başlar). Boş bırakırsan sohbet çevrimdışı çalışır (PDF içi arama).</string>
     <string name="ay_api_model">Model / Adres</string>
-    <string name="ay_api_model_aciklama">Örn: gemini-2.0-flash veya OpenAI-uyumlu bir adres</string>
+    <string name="ay_api_model_aciklama">Boş bırakırsan uygun model otomatik bulunur. Örn: gemini-2.5-flash ya da OpenAI-uyumlu bir adres</string>
+    <string name="ay_api_test">Bağlantıyı test et</string>
+    <string name="ay_api_test_bekle">Test ediliyor…</string>
+    <string name="ay_api_test_bos">Önce API anahtarını gir</string>
+    <string name="ay_api_test_ok">✅ Bağlantı çalışıyor: %1$s</string>
     <string name="ay_kaydet">Kaydet</string>
     <string name="ay_kaydedildi">Ayarlar kaydedildi</string>
     <string name="ay_tts_test">Ses motorunu test et</string>
+    <string name="ay_eq_baslik">Ekolayzır (Bas / Orta / Tiz)</string>
+    <string name="ay_eq_bas">Bas</string>
+    <string name="ay_eq_orta">Orta</string>
+    <string name="ay_eq_tiz">Tiz</string>
+    <string name="ay_tts_motor">Ses Motoru</string>
+    <string name="tts_dogal">Doğal ses — Edge Neural (internet gerekir)</string>
+    <string name="tts_dogal_aciklama">ChatGPT/Edge kalitesinde ücretsiz Türkçe okuma. İnternet yoksa veya servis cevap vermezse otomatik olarak yerleşik sese döner, okuma durmaz.</string>
 
     <!-- Sohbet -->
     <string name="sohbet_baslik">Sohbet</string>
@@ -61,6 +143,8 @@
     <string name="sohbet_online">AI bağlı</string>
     <string name="sohbet_offline_ipucu">İpucu: \"özet yaz\", \"ikinci yasalar ne zaman\", gibi sorular sorabilirsin.</string>
     <string name="sohbet_hazir">Sorunu yaz ve gönder. PDF\'in metninde arayıp cevap vereceğim.</string>
+    <string name="sohbet_sayfa_baglami">Açık olduğun %1$d. sayfa sohbet bağlamına eklendi — o sayfa hakkında sorabilirsin.</string>
+    <string name="sohbet_metin_hazir_degil">Kitabın metni henüz çıkarılmadı (taranmış sayfalarda OCR sürüyor). Bitmesini bekle, sonra tekrar sor — ilerlemeyi okuma ekranında görebilirsin.</string>
 
     <!-- Bildirim -->
     <string name="bildirim_baslik">Okunuyor</string>

@@ -37,6 +37,9 @@ class ReadService : Service() {
         fun onState(page: Int, pageCount: Int, playing: Boolean, sentence: String?)
         fun onInfo(msg: String)
         fun onBookFinished()
+
+        /** ADIM 3: tek seferlik seslendirme (sayfa özeti) sürüyor mu? */
+        fun onExtraSpeaking(active: Boolean) {}
     }
 
     inner class LocalBinder : Binder() {
@@ -57,6 +60,10 @@ class ReadService : Service() {
     @Volatile var translateEnabled: Boolean = false
     @Volatile var sleepMinutes: Int = 0          // 0 = kapalı
     @Volatile var sleepAtPageEnd: Boolean = false
+
+    /** ADIM 3: sayfa özeti gibi okuma dışı tek seferlik seslendirme sürüyor mu? */
+    @Volatile var extraSpeaking: Boolean = false
+        private set
 
     var pageCount: Int = 0
         private set
@@ -216,6 +223,16 @@ class ReadService : Service() {
         AppPrefs.putBool(this, AppPrefs.KEY_TRANSLATE, enabled)
     }
 
+    /** Ses perdesi (Ses Renkleri paneli): 0.5 derin – 2.0 tiz. */
+    fun applyPitch(p: Float) {
+        tts?.applyPitch(p)   // TtsManager kalıcı olarak kaydeder
+    }
+
+    /** Ekolayzır kazançları (yalnız Edge/mp3 modunda etkili). */
+    fun setEqualizer(on: Boolean, low: Float, mid: Float, high: Float) {
+        tts?.setEqualizer(on, low, mid, high)
+    }
+
     fun applySleepMinutes(minutes: Int) {
         sleepMinutes = minutes
         sleepAtPageEnd = false
@@ -228,6 +245,45 @@ class ReadService : Service() {
         if (enabled) {
             sleepMinutes = 0
             cancelSleepTimer()
+        }
+    }
+
+    // ── ADIM 3: Tek seferlik seslendirme (Yapay zekâ sayfa özeti) ──
+
+    /**
+     * Verilen metni okuma akışından BAĞIMSIZ olarak bir kez seslendirir
+     * (okuma ekranındaki "▶ Dinle" butonu).
+     *
+     * - Okuma sürüyorsa önce duraklatılır (ikisi üst üste binmesin).
+     * - `utteranceId` = "summary" olduğu için parça ilerlemesine karışmaz;
+     *   bitince `onExtraSpeaking(false)` yayınlanır ve dalga çizgisi düz çizgiye döner.
+     * - Ekran açıkken kullanılmak üzere tasarlandı; servis öldürülürse
+     *   zaten yeni oturumda yeniden başlatılır.
+     */
+    fun speakSummary(text: String) {
+        if (text.isBlank()) return
+        wantPlay = false
+        if (playing) pauseInternal()
+        val engine = tts ?: return
+        if (!engine.isReady()) {
+            emitInfo("Ses motoru hazırlanıyor — biraz sonra tekrar dene.")
+            return
+        }
+        engine.applyRate(rate)
+        extraSpeaking = true
+        notifyExtraSpeaking(true)
+        engine.speak(text, ID_SUMMARY)
+    }
+
+    private fun clearExtraSpeaking() {
+        if (!extraSpeaking) return
+        extraSpeaking = false
+        notifyExtraSpeaking(false)
+    }
+
+    private fun notifyExtraSpeaking(active: Boolean) {
+        mainHandler.post {
+            listeners.toList().forEach { it.onExtraSpeaking(active) }
         }
     }
 
@@ -256,6 +312,7 @@ class ReadService : Service() {
         speakJob?.cancel()
         speakJob = null
         tts?.stop()
+        clearExtraSpeaking()   // özet seslendirmesi de dursun (dalga çizgisine yansır)
         cancelSleepTimer()
         releaseWakeLock()
         saveProgressNow()
@@ -338,9 +395,16 @@ class ReadService : Service() {
         val text = chunks[index]
         notifyState(text)
         tts?.speak(text, "$currentPage:$index")
+        // Sıradaki parçayı önceden indir (doğal seste bekleme kısalır)
+        tts?.prefetch(chunks.getOrNull(index + 1))
     }
 
     private fun onUtteranceDone(id: String) {
+        // ADIM 3: özet seslendirmesi bitti → dalga çizgisini durdur
+        if (id == ID_SUMMARY) {
+            clearExtraSpeaking()
+            return
+        }
         if (!playing) return
         val parts = id.split(":")
         if (parts.size != 2) return
@@ -533,5 +597,8 @@ class ReadService : Service() {
         const val ACTION_STOP = "stop"
         const val CHANNEL_ID = "umay_read"
         const val NOTIF_ID = 4711
+
+        /** ADIM 3: tek seferlik (özet) seslendirme parçacık kimliği. */
+        private const val ID_SUMMARY = "summary"
     }
 }

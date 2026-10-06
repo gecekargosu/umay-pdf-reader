@@ -19,10 +19,18 @@ object AppPrefs {
     const val KEY_TRANSLATE_MODEL_DOWNLOADED = "translate_model_ready"
     const val KEY_LAST_BOOK = "last_book"
     const val KEY_PLAYING = "playing"   // servis öldürülürse otomatik devam için
+    const val KEY_TTS_MODE = "tts_mode"  // builtin | edge (doğal neural ses)
+    const val KEY_SORT = "sort_mode"      // recent | alpha | added (kütüphane sıralama)
+    const val KEY_PITCH = "pitch"         // 0.5 .. 2.0 — ses perdesi
+    const val KEY_EQ_ON = "eq_on"         // ekolayzır açık mı (Edge/mp3 modu)
+    const val KEY_EQ_LOW = "eq_low"       // -100 .. +100 (alçak/bas)
+    const val KEY_EQ_MID = "eq_mid"       // -100 .. +100 (orta)
+    const val KEY_EQ_HIGH = "eq_high"     // -100 .. +100 (yüksek/tiz)
 
     // İlerleme anahtarı önekleri
     private const val PROG_PAGE = "prog_page_"
     private const val PROG_SENT = "prog_sent_"
+    private const val LAST_READ = "last_read_"
 
     private fun prefs(ctx: Context) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -82,6 +90,26 @@ object AppPrefs {
         prefs(ctx).edit()
             .remove(PROG_PAGE + bookId)
             .remove(PROG_SENT + bookId)
+            .apply()
+    }
+
+    // ── Son okuma zamanı (kütüphane sıralaması için) ────────
+
+    fun touchLastRead(ctx: Context, bookId: String) {
+        prefs(ctx).edit()
+            .putLong(LAST_READ + bookId, System.currentTimeMillis())
+            .apply()
+    }
+
+    fun lastRead(ctx: Context, bookId: String): Long =
+        prefs(ctx).getLong(LAST_READ + bookId, 0L)
+
+    /** Kitapla ilgili TÜM kayıtları temizler (ilerleme + son okuma). */
+    fun clearBookMeta(ctx: Context, bookId: String) {
+        prefs(ctx).edit()
+            .remove(PROG_PAGE + bookId)
+            .remove(PROG_SENT + bookId)
+            .remove(LAST_READ + bookId)
             .apply()
     }
 }

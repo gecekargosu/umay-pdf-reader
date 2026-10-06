@@ -30,11 +30,22 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/btnBack"
-            android:layout_toStartOf="@id/pageIndicator"
+            android:layout_toStartOf="@id/btnSearch"
             android:ellipsize="middle"
             android:singleLine="true"
             android:textColor="@color/umay_text"
             android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_toStartOf="@id/pageIndicator"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ic_ara_hint"
+            android:src="@drawable/ic_search"
+            app:tint="@color/umay_text_dim" />
 
         <TextView
             android:id="@+id/pageIndicator"
@@ -102,6 +113,7 @@
                 android:layout_marginStart="6dp"
                 android:background="@drawable/bg_input"
                 android:gravity="center"
+                android:imeOptions="actionGo"
                 android:inputType="number"
                 android:maxLength="5"
                 android:paddingStart="8dp"
@@ -132,6 +144,20 @@
                 android:progressTint="@color/umay_accent"
                 android:thumbTint="@color/umay_accent" />
         </LinearLayout>
+
+        <!-- Sayfa atlama sonrası: tam oradan okumaya başla -->
+        <TextView
+            android:id="@+id/btnReadHere"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="@string/buradan_oku"
+            android:textColor="#04121A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <!-- Oynatma tuşları -->
         <LinearLayout
@@ -167,32 +193,45 @@
                 android:contentDescription="@string/sonraki"
                 android:src="@drawable/ic_next" />
 
-            <!-- Hız -->
+            <!-- Hız: yavaşlat / hızlandır (0.5x – 2.0x) -->
+            <TextView
+                android:id="@+id/btnSpeedDown"
+                android:layout_width="34dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_button_secondary"
+                android:contentDescription="@string/yavaslat"
+                android:gravity="center"
+                android:text="−"
+                android:textColor="@color/umay_accent"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/btnSpeed"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/bg_button_secondary"
                 android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:text="1.0x"
                 android:textColor="@color/umay_accent"
                 android:textStyle="bold" />
 
-            <!-- Ses (kadın/erkek) -->
             <TextView
-                android:id="@+id/btnVoice"
-                android:layout_width="wrap_content"
+                android:id="@+id/btnSpeedUp"
+                android:layout_width="34dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/bg_button_secondary"
+                android:contentDescription="@string/hizlandir"
                 android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/ses_otomatik"
-                android:textColor="@color/umay_accent" />
+                android:text="＋"
+                android:textColor="@color/umay_accent"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Alt satır: uyku, çeviri, sohbet -->
@@ -224,9 +263,38 @@
                 android:gravity="center"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:text="@string/cevir_oku"
+                android:text="@string/ceviri_kisa"
                 android:textColor="@color/umay_text_dim"
                 android:textSize="13sp" />
+
+            <!-- Ses (kadın/erkek) -->
+            <TextView
+                android:id="@+id/btnVoice"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ses_otomatik"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+
+            <!-- Yapay zekâ sayfa özeti panelini aç/kapat (ADIM 3) -->
+            <TextView
+                android:id="@+id/btnSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ozet_kisa"
+                android:textColor="@color/umay_orange"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnChat"
@@ -239,6 +307,101 @@
                 android:text="@string/sohbet"
                 android:textColor="@color/umay_accent"
                 android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Ses dalgalanması (ADIM 3): okurken hareketli, duraklatınca düz çizgi -->
+        <com.umay.pdfreader.WaveformView
+            android:id="@+id/waveform"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/ses_dalgasi" />
+
+        <!-- Yapay zekâ sayfa özeti paneli (ADIM 3) -->
+        <LinearLayout
+            android:id="@+id/summaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/ozet"
+                    android:textColor="@color/umay_orange"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnSummaryClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/ozet_kapat"
+                    android:textColor="@color/umay_text_dim"
+                    android:textSize="13sp" />
+            </RelativeLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="132dp"
+                android:layout_marginTop="4dp"
+                android:fadeScrollbars="false">
+
+                <TextView
+                    android:id="@+id/summaryText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/ozet_aliniyor"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+            </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnSummaryListen"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_primary"
+                    android:gravity="center"
+                    android:text="@string/ozet_dinle"
+                    android:textColor="#04121A"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnSummaryChat"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/sohbet"
+                    android:textColor="@color/umay_accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Okunan metin önizleme -->

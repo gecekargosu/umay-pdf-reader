@@ -72,6 +72,30 @@
                 android:layout_marginTop="6dp" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/ay_tts_motor"
+                android:textColor="@color/umay_text"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchEdgeVoice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/tts_dogal"
+                android:textColor="@color/umay_text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/tts_dogal_aciklama"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+
+            <TextView
                 android:id="@+id/btnTestVoice"
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
@@ -82,6 +106,106 @@
                 android:paddingEnd="16dp"
                 android:text="@string/ay_tts_test"
                 android:textColor="@color/umay_accent" />
+        </LinearLayout>
+
+        <!-- Ekolayzır -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_panel"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/settingsEqSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ay_eq_baslik"
+                android:textColor="@color/umay_text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/panel_ekolayzir_ipucu"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/settingsEqLowLabel"
+                    android:layout_width="78dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ay_eq_bas"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+
+                <SeekBar
+                    android:id="@+id/settingsEqLow"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progressTint="@color/umay_accent"
+                    android:thumbTint="@color/umay_accent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/settingsEqMidLabel"
+                    android:layout_width="78dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ay_eq_orta"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+
+                <SeekBar
+                    android:id="@+id/settingsEqMid"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progressTint="@color/umay_accent"
+                    android:thumbTint="@color/umay_accent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/settingsEqHighLabel"
+                    android:layout_width="78dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ay_eq_tiz"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+
+                <SeekBar
+                    android:id="@+id/settingsEqHigh"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="40"
+                    android:progressTint="@color/umay_accent"
+                    android:thumbTint="@color/umay_accent" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Çeviri -->
@@ -158,6 +282,17 @@
                 android:text="@string/ay_api_key_aciklama"
                 android:textColor="@color/umay_text_dim"
                 android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/btnTestApi"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:text="@string/ay_api_test"
+                android:textColor="@color/umay_accent"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btnSave"

@@ -1,0 +1,133 @@
+### 20261005-1113 — 1.4: resim cozme onarimi + kamera tarama + Ayarlar ekolayzir + sohbet baglami
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.aapt2FromMavenOverride=/opt/android-sdk/build-tools/34.0.0/aapt2' is experimental.
+
+> Task :umay:preBuild UP-TO-DATE
+> Task :umay:preDebugBuild UP-TO-DATE
+> Task :umay:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :umay:generateDebugResValues UP-TO-DATE
+> Task :umay:generateDebugResources UP-TO-DATE
+> Task :umay:mergeDebugResources UP-TO-DATE
+> Task :umay:packageDebugResources UP-TO-DATE
+> Task :umay:parseDebugLocalResources UP-TO-DATE
+> Task :umay:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :umay:checkDebugAarMetadata UP-TO-DATE
+> Task :umay:mapDebugSourceSetPaths UP-TO-DATE
+> Task :umay:createDebugCompatibleScreenManifests
+> Task :umay:extractDeepLinksDebug UP-TO-DATE
+> Task :umay:processDebugMainManifest
+> Task :umay:processDebugManifest
+> Task :umay:javaPreCompileDebug UP-TO-DATE
+> Task :umay:preDebugUnitTestBuild UP-TO-DATE
+> Task :umay:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :umay:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :umay:mergeDebugShaders UP-TO-DATE
+> Task :umay:compileDebugShaders NO-SOURCE
+> Task :umay:generateDebugAssets UP-TO-DATE
+> Task :umay:mergeDebugAssets UP-TO-DATE
+> Task :umay:compressDebugAssets UP-TO-DATE
+> Task :umay:checkDebugDuplicateClasses UP-TO-DATE
+> Task :umay:desugarDebugFileDependencies UP-TO-DATE
+> Task :umay:mergeExtDexDebug UP-TO-DATE
+> Task :umay:mergeLibDexDebug UP-TO-DATE
+> Task :umay:mergeDebugJniLibFolders UP-TO-DATE
+> Task :umay:mergeDebugNativeLibs UP-TO-DATE
+> Task :umay:stripDebugDebugSymbols UP-TO-DATE
+> Task :umay:validateSigningDebug UP-TO-DATE
+> Task :umay:writeDebugAppMetadata UP-TO-DATE
+> Task :umay:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :umay:buildKotlinToolingMetadata UP-TO-DATE
+> Task :umay:preReleaseBuild UP-TO-DATE
+> Task :umay:dataBindingMergeDependencyArtifactsRelease UP-TO-DATE
+> Task :umay:generateReleaseResValues UP-TO-DATE
+> Task :umay:generateReleaseResources UP-TO-DATE
+> Task :umay:packageReleaseResources
+> Task :umay:checkReleaseAarMetadata UP-TO-DATE
+> Task :umay:mapReleaseSourceSetPaths
+> Task :umay:createReleaseCompatibleScreenManifests
+> Task :umay:extractDeepLinksRelease UP-TO-DATE
+> Task :umay:mergeReleaseResources
+> Task :umay:parseReleaseLocalResources
+> Task :umay:processReleaseMainManifest
+> Task :umay:dataBindingGenBaseClassesRelease
+> Task :umay:processReleaseManifest
+> Task :umay:javaPreCompileRelease UP-TO-DATE
+> Task :umay:extractProguardFiles UP-TO-DATE
+> Task :umay:mergeReleaseJniLibFolders UP-TO-DATE
+> Task :umay:mergeReleaseNativeLibs UP-TO-DATE
+> Task :umay:stripReleaseDebugSymbols UP-TO-DATE
+> Task :umay:extractReleaseNativeSymbolTables UP-TO-DATE
+> Task :umay:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :umay:checkReleaseDuplicateClasses UP-TO-DATE
+> Task :umay:desugarReleaseFileDependencies UP-TO-DATE
+> Task :umay:mergeExtDexRelease UP-TO-DATE
+> Task :umay:processDebugManifestForPackage
+> Task :umay:mergeReleaseArtProfile UP-TO-DATE
+> Task :umay:mergeReleaseShaders UP-TO-DATE
+> Task :umay:compileReleaseShaders NO-SOURCE
+> Task :umay:generateReleaseAssets UP-TO-DATE
+> Task :umay:mergeReleaseAssets UP-TO-DATE
+> Task :umay:compressReleaseAssets UP-TO-DATE
+> Task :umay:collectReleaseDependencies UP-TO-DATE
+> Task :umay:sdkReleaseDependencyData UP-TO-DATE
+> Task :umay:validateSigningRelease UP-TO-DATE
+> Task :umay:writeReleaseAppMetadata UP-TO-DATE
+> Task :umay:writeReleaseSigningConfigVersions UP-TO-DATE
+> Task :umay:processReleaseManifestForPackage
+> Task :umay:processDebugResources
+> Task :umay:compileDebugKotlin UP-TO-DATE
+> Task :umay:compileDebugJavaWithJavac UP-TO-DATE
+> Task :umay:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :umay:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :umay:processReleaseResources
+> Task :umay:compileDebugUnitTestKotlin UP-TO-DATE
+> Task :umay:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :umay:processDebugJavaRes UP-TO-DATE
+> Task :umay:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :umay:testDebugUnitTest UP-TO-DATE
+> Task :umay:mergeDebugJavaResource UP-TO-DATE
+> Task :umay:dexBuilderDebug
+> Task :umay:mergeProjectDexDebug
+> Task :umay:packageDebug
+> Task :umay:createDebugApkListingFileRedirect
+> Task :umay:assembleDebug
+> Task :umay:optimizeReleaseResources
+> Task :umay:compileReleaseKotlin
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:437:22 Parameter 'ctx' is never used
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:491:48 Variable 'boxes' initializer is redundant
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:580:47 Elvis operator (?:) always returns the left operand of non-nullable type String
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:588:42 Elvis operator (?:) always returns the left operand of non-nullable type String
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/ReadService.kt:511:35 Parameter 'label' is never used
+w: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/ReaderActivity.kt:662:19 'onBackPressed(): Unit' is deprecated. Deprecated in Java
+
+> Task :umay:compileReleaseJavaWithJavac
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+> Task :umay:dexBuilderRelease
+> Task :umay:mergeReleaseGlobalSynthetics UP-TO-DATE
+> Task :umay:processReleaseJavaRes UP-TO-DATE
+> Task :umay:mergeReleaseJavaResource UP-TO-DATE
+> Task :umay:mergeDexRelease
+> Task :umay:compileReleaseArtProfile
+> Task :umay:packageRelease
+> Task :umay:createReleaseApkListingFileRedirect
+> Task :umay:lintVitalAnalyzeRelease
+> Task :umay:lintVitalReportRelease
+> Task :umay:lintVitalRelease
+> Task :umay:assembleRelease
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 2m 32s
+89 actionable tasks: 30 executed, 59 up-to-date
+EXIT=0

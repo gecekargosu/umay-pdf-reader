@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.UmayPdf" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Material 3 (koyu): dialoglar/şirinler de koyu tutarlı olsun -->
+    <style name="Theme.UmayPdf" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/umay_accent</item>
-        <item name="colorPrimaryVariant">@color/umay_accent_dark</item>
         <item name="colorOnPrimary">#04121A</item>
+        <item name="colorPrimaryContainer">@color/umay_accent_dark</item>
+        <item name="colorOnPrimaryContainer">#04121A</item>
         <item name="colorSecondary">@color/umay_accent</item>
+        <item name="colorOnSecondary">#04121A</item>
+        <item name="colorTertiary">#A78BFA</item>
+        <item name="colorSurface">@color/umay_panel</item>
+        <item name="colorOnSurface">@color/umay_text</item>
+        <item name="colorSurfaceVariant">@color/umay_panel2</item>
+        <item name="colorOnSurfaceVariant">@color/umay_text_dim</item>
+        <item name="colorOutline">#2C4060</item>
+        <item name="android:colorBackground">@color/umay_bg</item>
         <item name="android:windowBackground">@color/umay_bg</item>
         <item name="android:statusBarColor">@color/umay_bg</item>
         <item name="android:navigationBarColor">@color/umay_bg</item>
         <item name="android:textColorPrimary">@color/umay_text</item>
         <item name="android:textColorSecondary">@color/umay_text_dim</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.UmayDialog</item>
+    </style>
+
+    <!-- Uygulama diyalogları: yuvarlak, koyu, M3 butonlar -->
+    <style name="ThemeOverlay.UmayDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/umay_panel</item>
+        <item name="colorOnSurface">@color/umay_text</item>
+        <item name="colorPrimary">@color/umay_accent</item>
+        <item name="colorOnPrimary">#04121A</item>
+        <item name="buttonBarPositiveButtonStyle">@style/UmayDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/UmayDialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/UmayDialogButton</item>
+    </style>
+
+    <style name="UmayDialogButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/umay_accent</item>
+    </style>
+
+    <!-- Kitaplık kapakları: yuvarlak köşeli, ince çerçeveli -->
+    <style name="shape_cover" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6dp</item>
     </style>
 </resources>

@@ -4,6 +4,15 @@ Bu depo **iki bağımsız Android uygulaması** içerir:
 - **`umay/`** → **Umay PDF Okuyucu** (`com.umay.pdfreader`) — asıl ürün, aktif geliştirme.
 - **`app/`** → Jarvis Mobile (`com.jarvis.mobile`) — HUD/lockscreen uygulaması, bağımsız.
 
+> **📖 İKİNCİ BAĞIMSIZ PROJE — UMAY CAMPUS (5 Ekim 2026)**
+> Yeni ürün **UMAY Campus** (öğrenci sosyal ağı + akademik arşiv + AI ders asistanı)
+> **bu deposun DIŞINDA**, `/storage/emulated/0/FreebuffProject/UMAY_CAMPUS/`
+> klasöründe ve **tamamen bağımsızdır**.
+> - Master spec: `UMAY_CAMPUS/docs/PRODUCT_SPEC.md` (37 bölüm) · Kurallar: `UMAY_CAMPUS/CLAUDE.md`
+> - Durum: `UMAY_CAMPUS/STATUS.md` (Aşama 0 — dokümantasyon tam, kod yok)
+> - **Zorunlu:** UMAY Campus işleri için `umay/` ve `app/` kaynakları **DEĞİŞTİRİLMEZ**;
+>   yeni kod bu depoya karıştırılmaz. Sadece inceleme amaçlı okuma yapılır.
+
 ## Komutlar
 
 ```bash

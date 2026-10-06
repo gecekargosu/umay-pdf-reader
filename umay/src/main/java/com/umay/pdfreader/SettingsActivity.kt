@@ -15,7 +15,8 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
-    private val speeds = floatArrayOf(0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
+    // 0.5x'ten başlayan aralık: yavaşlatma da mümkün (ders anlatımı için)
+    private val speeds = floatArrayOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
 
     private data class VoiceEntry(val label: String, val value: String)
 
@@ -26,6 +27,22 @@ class SettingsActivity : AppCompatActivity() {
     )
 
     private var tts: TextToSpeech? = null
+
+    // Ekolayzırı açık okuma oturumuna anında uygulamak için servis bağı
+    private var service: ReadService? = null
+    private var bound = false
+    private val connection = object : android.content.ServiceConnection {
+        override fun onServiceConnected(name: android.content.ComponentName?, binder: android.os.IBinder?) {
+            service = (binder as ReadService.LocalBinder).service
+            bound = true
+            applyEqNow()
+        }
+
+        override fun onServiceDisconnected(name: android.content.ComponentName?) {
+            service = null
+            bound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         val curRate = AppPrefs.getFloat(this, AppPrefs.KEY_RATE, 1.0f)
         binding.speedSpinner.setSelection(
-            speeds.indexOfFirst { it == curRate }.let { if (it < 0) 1 else it }
+            speeds.indexOfFirst { it == curRate }.let { if (it < 0) 2 else it }
         )
 
         // ── Ses listesi (geçici TTS ile doldurulur) ──
@@ -61,11 +78,77 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.switchTranslate.isChecked =
             AppPrefs.getBool(this, AppPrefs.KEY_TRANSLATE, false)
+        // Doğal ses varsayılan açık (yoksa kullanıcı şikâyeti: "robot gibi okuyor")
+        binding.switchEdgeVoice.isChecked =
+            AppPrefs.getString(this, AppPrefs.KEY_TTS_MODE, "edge") == "edge"
         binding.apiKeyInput.setText(AppPrefs.getString(this, AppPrefs.KEY_API_KEY))
         binding.apiModelInput.setText(AppPrefs.getString(this, AppPrefs.KEY_API_MODEL))
 
         binding.btnTestVoice.setOnClickListener { testVoice() }
+        binding.btnTestApi.setOnClickListener { testApi() }
         binding.btnSave.setOnClickListener { save() }
+
+        initEqualizer()
+        try {
+            bindService(
+                android.content.Intent(this, ReadService::class.java),
+                connection, android.content.Context.BIND_AUTO_CREATE
+            )
+        } catch (_: Exception) {}
+    }
+
+    // ── Ekolayzır (Ayarlar paneli) ────────────────────────────
+
+    private fun gainToProgress(g: Float): Int = (20 + g / 5f).toInt().coerceIn(0, 40)
+    private fun progressToGain(p: Int): Float = ((p.coerceIn(0, 40) - 20) * 5f)
+
+    private fun initEqualizer() {
+        binding.settingsEqSwitch.isChecked =
+            AppPrefs.getBool(this, AppPrefs.KEY_EQ_ON, false)
+        binding.settingsEqLow.progress =
+            gainToProgress(AppPrefs.getFloat(this, AppPrefs.KEY_EQ_LOW, 0f))
+        binding.settingsEqMid.progress =
+            gainToProgress(AppPrefs.getFloat(this, AppPrefs.KEY_EQ_MID, 0f))
+        binding.settingsEqHigh.progress =
+            gainToProgress(AppPrefs.getFloat(this, AppPrefs.KEY_EQ_HIGH, 0f))
+        refreshEqLabels()
+
+        binding.settingsEqSwitch.setOnCheckedChangeListener { _, _ -> applyEqNow() }
+        val listener = object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    refreshEqLabels()
+                    applyEqNow()
+                }
+            }
+            override fun onStartTrackingTouch(sb: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(sb: android.widget.SeekBar?) {}
+        }
+        binding.settingsEqLow.setOnSeekBarChangeListener(listener)
+        binding.settingsEqMid.setOnSeekBarChangeListener(listener)
+        binding.settingsEqHigh.setOnSeekBarChangeListener(listener)
+    }
+
+    private fun refreshEqLabels() {
+        binding.settingsEqLowLabel.text =
+            "${getString(R.string.ay_eq_bas)} ${progressToGain(binding.settingsEqLow.progress).toInt()}"
+        binding.settingsEqMidLabel.text =
+            "${getString(R.string.ay_eq_orta)} ${progressToGain(binding.settingsEqMid.progress).toInt()}"
+        binding.settingsEqHighLabel.text =
+            "${getString(R.string.ay_eq_tiz)} ${progressToGain(binding.settingsEqHigh.progress).toInt()}"
+    }
+
+    /** Değerleri kaydeder ve açık bir okuma varsa hemen uygular. */
+    private fun applyEqNow() {
+        val on = binding.settingsEqSwitch.isChecked
+        val low = progressToGain(binding.settingsEqLow.progress)
+        val mid = progressToGain(binding.settingsEqMid.progress)
+        val high = progressToGain(binding.settingsEqHigh.progress)
+        AppPrefs.putBool(this, AppPrefs.KEY_EQ_ON, on)
+        AppPrefs.putFloat(this, AppPrefs.KEY_EQ_LOW, low)
+        AppPrefs.putFloat(this, AppPrefs.KEY_EQ_MID, mid)
+        AppPrefs.putFloat(this, AppPrefs.KEY_EQ_HIGH, high)
+        service?.setEqualizer(on, low, mid, high)
     }
 
     private fun fillVoices() {
@@ -153,10 +236,45 @@ class SettingsActivity : AppCompatActivity() {
         try { t.voice = pick } catch (e: IllegalArgumentException) {}
     }
 
+    /**
+     * Girilen API anahtarıyla gerçek bir Gemini/OpenAI isteği atar.
+     * Kaydetmeden önce "bu anahtar çalışıyor mu?" sorusunu yanıtlar.
+     * Ağ işlemi ana thread'de yapılmaz (NetworkOnMainThread crash'i).
+     */
+    private fun testApi() {
+        val key = binding.apiKeyInput.text.toString().trim()
+        if (key.isEmpty()) {
+            Toast.makeText(this, R.string.ay_api_test_bos, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val model = binding.apiModelInput.text.toString().trim()
+
+        binding.btnTestApi.isEnabled = false
+        binding.btnTestApi.setText(R.string.ay_api_test_bekle)
+
+        Thread {
+            val msg = try {
+                val answer = ApiClient.ask("Merhaba", emptyList(), key, model)
+                getString(R.string.ay_api_test_ok, answer.replace('\n', ' ').take(70))
+            } catch (e: Exception) {
+                "❌ " + (e.message ?: "Bilinmeyen hata")
+            }
+            runOnUiThread {
+                binding.btnTestApi.isEnabled = true
+                binding.btnTestApi.setText(R.string.ay_api_test)
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+            }
+        }.start()
+    }
+
     private fun save() {
         AppPrefs.putString(this, AppPrefs.KEY_VOICE, currentVoiceValue())
         AppPrefs.putFloat(this, AppPrefs.KEY_RATE, currentRate())
         AppPrefs.putBool(this, AppPrefs.KEY_TRANSLATE, binding.switchTranslate.isChecked)
+        AppPrefs.putString(
+            this, AppPrefs.KEY_TTS_MODE,
+            if (binding.switchEdgeVoice.isChecked) "edge" else "builtin"
+        )
         AppPrefs.putString(
             this, AppPrefs.KEY_API_KEY,
             binding.apiKeyInput.text.toString().trim()
@@ -173,6 +291,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        try {
+            if (bound) unbindService(connection)
+        } catch (_: Exception) {}
+        bound = false
+        service = null
         try {
             tts?.stop()
             tts?.shutdown()

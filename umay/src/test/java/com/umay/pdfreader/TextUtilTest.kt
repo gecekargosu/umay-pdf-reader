@@ -143,4 +143,205 @@ class TextUtilTest {
         assertEquals("cogdus", TextUtil.normalize("çöğdüş"))
         assertEquals("istanbul", TextUtil.normalize("İstanbul"))
     }
+
+    // ── Sembol → konuşma metni ────────────────────────────
+
+    @Test
+    fun forSpeech_matematikSembolleriniOkunurYapar() {
+        val out = TextUtil.forSpeech("x² + y² ≤ 100")
+        assertTrue(out.contains("kare"))
+        assertTrue(out.contains("artı"))
+        assertTrue(out.contains("küçük veya eşittir"))
+        assertFalse(out.contains("²"))
+        assertFalse(out.contains("≤"))
+    }
+
+    @Test
+    fun forSpeech_yuzdeyiTurkceOkur() {
+        assertEquals("yüzde 50 artış", TextUtil.forSpeech("%50 artış").trim())
+        assertEquals("yüzde 5", TextUtil.forSpeech("5%").trim())
+    }
+
+    @Test
+    fun forSpeech_yazilimIsaretleriniOkur() {
+        val out = TextUtil.forSpeech("a == b && c != d")
+        assertTrue(out.contains("eşittir"))
+        assertTrue(out.contains("ve"))
+        assertTrue(out.contains("eşit değil"))
+        assertFalse(out.contains("&&"))
+    }
+
+    @Test
+    fun forSpeech_duzTireyiBozmaz() {
+        // "e-posta" → "e eksi posta" OLMAAMALI (yaygın metin bozulurdu)
+        val out = TextUtil.forSpeech("e-posta adresi 2026-10-03 tarihinde")
+        assertTrue(out.contains("e-posta"))
+        assertTrue(out.contains("2026-10-03"))
+        assertFalse(out.contains("eksi"))
+    }
+
+    @Test
+    fun forSpeech_htmlEtiketleriniCikarir() {
+        val out = TextUtil.forSpeech("Merhaba <b>dünya</b> ve <i>italik</i>")
+        assertFalse(out.contains("<"))
+        assertFalse(out.contains(">"))
+        assertTrue(out.contains("dünya"))
+    }
+
+    @Test
+    fun forSpeech_duzMetniDegistirmez() {
+        val plain = "Kitap masanın üstünde duruyor."
+        assertEquals(plain, TextUtil.forSpeech(plain))
+        assertEquals("", TextUtil.forSpeech(""))
+    }
+
+    @Test
+    fun forSpeech_fazlaBoslukBirakmaz() {
+        val out = TextUtil.forSpeech("a<=b; c>=d")
+        assertFalse(out.contains("  "))
+        assertFalse(out.endsWith(" "))
+        assertFalse(out.startsWith(" "))
+    }
+
+    // ── Karaoke: satır eşleştirme ──────────────────────
+
+    private val karaokeLines = listOf(
+        "Newton birinci yasayı açıklar.",
+        "İkinci yasa net kuvvet ve ivme ilişkisidir.",
+        "Üçüncü yasa etki-tepki eşitliğidir."
+    )
+
+    @Test
+    fun matchingLines_eslesenSatirlariDoner() {
+        val hits = TextUtil.matchingLines(
+            "İkinci yasa net kuvvet ve ivme ilişkisidir.", karaokeLines
+        )
+        assertEquals(listOf(1), hits)
+    }
+
+    @Test
+    fun matchingLines_satirSiniriniKeser() {
+        // Cümle iki satıra yayılır → ikisi de vurgulanır
+        val lines = listOf("Birinci satır sonu.", "İkinci satır başı.")
+        val chunk = "Birinci satır sonu. İkinci satır başı."
+        assertEquals(listOf(0, 1), TextUtil.matchingLines(chunk, lines))
+    }
+
+    @Test
+    fun matchingLines_eslesmezseBosDoner() {
+        assertTrue(TextUtil.matchingLines("Bu hiç geçmiyor.", karaokeLines).isEmpty())
+        assertTrue(TextUtil.matchingLines("   ", karaokeLines).isEmpty())
+        assertTrue(TextUtil.matchingLines("x", emptyList()).isEmpty())
+    }
+
+    @Test
+    fun matchingLines_boslukFarkliligiOnemliDegil() {
+        // Sayfa metnindeki çoklu boşluk / satır sonu farkları eşleştirmeyi bozmaz
+        val lines = listOf("A  çok   boşluklu\nsatır")
+        assertEquals(listOf(0), TextUtil.matchingLines("A çok boşluklu satır", lines))
+    }
+
+    @Test
+    fun forSpeech_usSimgeleriniKelimelerleYazar() {
+        val out = TextUtil.forSpeech("a^2 + b^3 + c^4")
+        assertTrue(out.contains("kare"))
+        assertTrue(out.contains("küp"))
+        assertTrue(out.contains("üzeri 4"))
+        assertFalse(out.contains("^"))
+    }
+
+    // ── Doğal sıralama (tarama: sayfa_9 < sayfa_10) ──────
+
+    @Test
+    fun naturalKey_sayiyaDuyarliSiralar() {
+        val names = listOf("sayfa_10.jpg", "sayfa_2.jpg", "sayfa_1.jpg")
+        val sorted = names.sortedBy { TextUtil.naturalKey(it) }
+        assertEquals(
+            listOf("sayfa_1.jpg", "sayfa_2.jpg", "sayfa_10.jpg"),
+            sorted
+        )
+    }
+
+    @Test
+    fun naturalKey_rakamOlmayanAdlardaSiraBozulmaz() {
+        val names = listOf("c.jpg", "a.jpg", "b.jpg")
+        assertEquals(
+            listOf("a.jpg", "b.jpg", "c.jpg"),
+            names.sortedBy { TextUtil.naturalKey(it) }
+        )
+    }
+
+    // ── Sohbet bağlamı seçimi ────────────────────────────
+
+    private val chatPages = listOf(
+        "Bu fizik kitabıdır. Newton'un hareket yasaları burada anlatılır.",
+        "Tarih dersi: Osmanlı Devleti kuruluş dönemini kapsar.",
+        "Matematik: türev, integral ve limit konuları işlenir.",
+        "Kimya: periyodik tablo ve elementlerin özellikleri burada verilir.",
+        "Yasin suresi 83 ayettir. Kuran mealinde sure numaraları böyledir.",
+        "Bu sayfada konuyla ilgisi olmayan başka bir metin bulunur."
+    )
+
+    @Test
+    fun contextPages_ilgiliSayfayiSecer() {
+        val ctx = TextUtil.contextPages(
+            chatPages, "yasin süresi kaç ayet", maxPages = 3, maxChars = 6000
+        )
+        assertTrue(ctx.isNotEmpty())
+        // İlgili sayfa (5. sayfa, indeks 4) en başta olmalı
+        assertTrue(ctx.first().startsWith("Sayfa 5:"))
+        assertTrue(ctx.first().contains("83"))
+    }
+
+    @Test
+    fun contextPages_eslesmeYoksaIlkSayfalariDoner() {
+        val ctx = TextUtil.contextPages(
+            chatPages, "antidisestablishmentarianism", maxPages = 3, maxChars = 6000
+        )
+        // Eşleşme yoksa bile model boş bağlamla "kitapta yok" demesin
+        assertEquals(3, ctx.size)
+        assertTrue(ctx.first().startsWith("Sayfa 1:"))
+    }
+
+    @Test
+    fun contextPages_bosSayfalariAtlarVeButceyiSaglar() {
+        val pages = listOf("", "   ", "İkinci sayfanın dolu metni burada.")
+        val ctx = TextUtil.contextPages(pages, "sayfa", maxPages = 8, maxChars = 6000)
+        assertEquals(1, ctx.size)
+        assertTrue(ctx.first().startsWith("Sayfa 3:"))
+
+        val small = TextUtil.contextPages(chatPages, "fizik", maxPages = 8, maxChars = 10)
+        assertTrue(small.isNotEmpty())
+        assertTrue(small.sumOf { it.length } <= 10 + "Sayfa 1: ".length + 20)
+    }
+
+    @Test
+    fun contextPages_hepsiBosBosDoner() {
+        assertTrue(TextUtil.contextPages(listOf("", "  "), "herhangi", 5, 1000).isEmpty())
+    }
+
+    // ── ADIM 2: okuma yüzdesi (Hero raf + kapak rozeti) ──────
+
+    @Test
+    fun readPercent_ilkSayfaYuzde1() {
+        assertEquals(1, TextUtil.readPercent(page = 0, pageCount = 100))
+    }
+
+    @Test
+    fun readPercent_sonSayfaYuzde100() {
+        assertEquals(100, TextUtil.readPercent(page = 9, pageCount = 10))
+        assertEquals(100, TextUtil.readPercent(page = 50, pageCount = 10)) // sınırın ötesi
+    }
+
+    @Test
+    fun readPercent_tekSayfalikKitapHep100() {
+        assertEquals(100, TextUtil.readPercent(page = 0, pageCount = 1))
+    }
+
+    @Test
+    fun readPercent_gecersizGirdiSifir() {
+        assertEquals(0, TextUtil.readPercent(page = 0, pageCount = 0))   // sayfa yok
+        assertEquals(0, TextUtil.readPercent(page = -1, pageCount = 10)) // hiç okunmamış
+        assertEquals(50, TextUtil.readPercent(page = 4, pageCount = 10)) // normal
+    }
 }

@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Kitap listesi satırı -->
+<!-- Yatay raf kitap hücresi (ADIM 2): kapak + dairesel yüzde rozeti -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp">
+    android:paddingStart="5dp"
+    android:paddingTop="5dp"
+    android:paddingEnd="5dp"
+    android:paddingBottom="5dp">
 
     <LinearLayout
         android:id="@+id/bookRow"
-        android:layout_width="match_parent"
+        android:layout_width="118dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_panel"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:orientation="vertical"
+        android:padding="7dp">
 
-        <ImageView
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:contentDescription="PDF"
-            android:src="@drawable/ic_pdf"
-            app:tint="@color/umay_accent"
-            xmlns:app="http://schemas.android.com/apk/res-auto" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="152dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/bookName"
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/bookCover"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="middle"
-                android:singleLine="true"
-                android:textColor="@color/umay_text"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:layout_height="match_parent"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_pdf"
+                app:shapeAppearanceOverlay="@style/shape_cover"
+                app:strokeColor="@color/umay_panel2"
+                app:strokeWidth="1dp"
+                app:tint="@color/umay_accent" />
 
-            <TextView
-                android:id="@+id/bookMeta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
-        </LinearLayout>
+            <!-- Dairesel okuma yüzdesi rozeti -->
+            <com.umay.pdfreader.ProgressRingView
+                android:id="@+id/bookRing"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="4dp" />
+        </FrameLayout>
 
         <TextView
-            android:id="@+id/bookAction"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:background="@drawable/bg_button_secondary"
-            android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:text="@string/oynat"
-            android:textColor="@color/umay_accent"
-            android:textSize="13sp"
+            android:id="@+id/bookName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/umay_text"
+            android:textSize="12.5sp"
             android:textStyle="bold" />
-    </LinearLayout>
 
+        <TextView
+            android:id="@+id/bookMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="11sp" />
+    </LinearLayout>
 </LinearLayout>

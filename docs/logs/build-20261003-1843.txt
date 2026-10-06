@@ -1,0 +1,73 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.aapt2FromMavenOverride=/opt/android-sdk/build-tools/34.0.0/aapt2' is experimental.
+
+> Task :umay:preBuild UP-TO-DATE
+> Task :umay:preDebugBuild UP-TO-DATE
+> Task :umay:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :umay:generateDebugResValues UP-TO-DATE
+> Task :umay:generateDebugResources UP-TO-DATE
+> Task :umay:mergeDebugResources UP-TO-DATE
+> Task :umay:packageDebugResources UP-TO-DATE
+> Task :umay:parseDebugLocalResources UP-TO-DATE
+> Task :umay:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :umay:checkDebugAarMetadata UP-TO-DATE
+> Task :umay:mapDebugSourceSetPaths UP-TO-DATE
+> Task :umay:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :umay:extractDeepLinksDebug UP-TO-DATE
+> Task :umay:processDebugMainManifest UP-TO-DATE
+> Task :umay:processDebugManifest UP-TO-DATE
+> Task :umay:processDebugManifestForPackage UP-TO-DATE
+> Task :umay:processDebugResources UP-TO-DATE
+> Task :umay:javaPreCompileDebug UP-TO-DATE
+> Task :umay:preDebugUnitTestBuild UP-TO-DATE
+> Task :umay:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :umay:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :umay:mergeDebugShaders UP-TO-DATE
+> Task :umay:compileDebugShaders NO-SOURCE
+> Task :umay:generateDebugAssets UP-TO-DATE
+> Task :umay:mergeDebugAssets UP-TO-DATE
+> Task :umay:compressDebugAssets UP-TO-DATE
+> Task :umay:checkDebugDuplicateClasses UP-TO-DATE
+> Task :umay:desugarDebugFileDependencies UP-TO-DATE
+> Task :umay:mergeExtDexDebug UP-TO-DATE
+> Task :umay:mergeLibDexDebug UP-TO-DATE
+> Task :umay:mergeDebugJniLibFolders UP-TO-DATE
+> Task :umay:mergeDebugNativeLibs UP-TO-DATE
+> Task :umay:stripDebugDebugSymbols UP-TO-DATE
+> Task :umay:validateSigningDebug UP-TO-DATE
+> Task :umay:writeDebugAppMetadata UP-TO-DATE
+> Task :umay:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :umay:compileDebugKotlin
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:167:39 None of the following functions can be called with the arguments supplied: 
+public inline fun CharSequence.replace(regex: Regex, noinline transform: (MatchResult) -> CharSequence): String defined in kotlin.text
+public inline fun CharSequence.replace(regex: Regex, replacement: String): String defined in kotlin.text
+public fun String.replace(oldChar: Char, newChar: Char, ignoreCase: Boolean = ...): String defined in kotlin.text
+public fun String.replace(oldValue: String, newValue: String, ignoreCase: Boolean = ...): String defined in kotlin.text
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:195:28 'if' must have both main and 'else' branches if used as an expression
+
+> Task :umay:compileDebugKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':umay:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 21s
+30 actionable tasks: 1 executed, 29 up-to-date

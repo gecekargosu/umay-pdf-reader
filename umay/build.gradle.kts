@@ -11,8 +11,8 @@ android {
         applicationId = "com.umay.pdfreader"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 6
+        versionName = "1.4"
 
         // APK boyutu: sadece telefonlarda kullanılan mimariler
         ndk {
@@ -52,6 +52,8 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    // Fotoğraftaki EXIF yön bilgisi için (resim → PDF)
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
 
     // PDF metin çıkarma (Apache PDFBox Android portu)
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")

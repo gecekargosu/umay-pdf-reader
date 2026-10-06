@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kamerayla çekilen sayfaların paylaşımı (FileProvider) -->
+<paths>
+    <files-path name="capture" path="capture/" />
+    <cache-path name="capture_cache" path="capture/" />
+</paths>

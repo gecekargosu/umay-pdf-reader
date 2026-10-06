@@ -29,10 +29,14 @@ class ChatActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_BOOK_ID = "book_id"
+        /** ADIM 3: okuma ekranında açık olan sayfa (0 tabanlı) — bağlam önceliği. */
+        const val EXTRA_PAGE = "page"
     }
 
     private lateinit var binding: ActivityChatBinding
     private lateinit var bookId: String
+    /** Okuma ekranından gelindiyse açık sayfa; -1 = belirsiz. */
+    private var focusPage: Int = -1
 
     private val messages = mutableListOf<Msg>()
     private lateinit var adapter: MsgAdapter
@@ -49,6 +53,7 @@ class ChatActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         bookId = intent.getStringExtra(EXTRA_BOOK_ID) ?: run { finish(); return }
+        focusPage = intent.getIntExtra(EXTRA_PAGE, -1)   // ADIM 3
 
         adapter = MsgAdapter(messages)
         binding.messageList.layoutManager = LinearLayoutManager(this).apply {
@@ -81,9 +86,15 @@ class ChatActivity : AppCompatActivity() {
         AppPrefs.warmApiCache(this)
         val online = !AppPrefs.lastApiKey.isNullOrBlank()
         binding.modeChip.text = getString(if (online) R.string.sohbet_online else R.string.sohbet_offline)
-        binding.chatHint.text = getString(
+        val hint = getString(
             if (online) R.string.sohbet_online else R.string.sohbet_offline_ipucu
         )
+        // ADIM 3: okuma ekranından geldiysek açık sayfayı bağlam olarak bildir
+        binding.chatHint.text = if (focusPage >= 0) {
+            hint + "\n" + getString(R.string.sohbet_sayfa_baglami, focusPage + 1)
+        } else {
+            hint
+        }
     }
 
     private fun send() {
@@ -107,6 +118,11 @@ class ChatActivity : AppCompatActivity() {
         // IO thread'inden çağrılır: tüm sayfa metinleri burada okunur
         pages = BookStore.allPages(this, bookId)
 
+        // Taranmış kitapta metin henüz çıkmadıysa (OCR sürüyor) bunu açıkça söyle
+        if (pages.none { it.isNotBlank() }) {
+            return getString(R.string.sohbet_metin_hazir_degil)
+        }
+
         val apiKey = AppPrefs.lastApiKey
         val online = !apiKey.isNullOrBlank()
 
@@ -118,6 +134,12 @@ class ChatActivity : AppCompatActivity() {
             }
             val hits = TextUtil.search(pages, question, 4)
             if (hits.isEmpty()) {
+                // Cümle bazlı eşleşme yoksa sayfa bazlı (kısmi) eşleşmeyi dene
+                val loose = TextUtil.contextPages(pages, question, 3, 1200)
+                if (loose.isNotEmpty()) {
+                    return "🔍 PDF'te şunları buldum:\n\n" +
+                        loose.joinToString("\n\n") { it.take(400) }
+                }
                 return "Buna dair PDF'te bir şey bulamadım.\n\n" +
                     "İpucu: farklı kelimeler deneyebilir ya da \"özet yaz\" yazabilirsin.\n" +
                     "Gerçek sohbet için Ayarlar'dan ücretsiz bir API anahtarı girebilirsin."
@@ -131,18 +153,28 @@ class ChatActivity : AppCompatActivity() {
             return sb.toString().trim()
         }
 
-        // Online sohbet — PDF bağlamıyla
+        // Online sohbet — sayfa bazlı, kısmi eşleşmeli zengin bağlamla.
+        // Eski kod: yalnız cümle bazlı eşleşen 6 parça + ilk 3 sayfa →
+        // model "bu kitapta geçmiyor" diyordu.
+        // ADIM 3: okuma ekranındaki açık sayfa bağlamın EN BAŞINA alınır
+        // (aynı sayfa iki kez eklenmez).
         return try {
-            val contextHits = TextUtil.search(pages, question, 6)
-                .map { "Sayfa ${it.page + 1}: ${it.sentence.take(400)}" }
-            if (contextHits.isEmpty()) {
-                // Bağlam boşsa ilk sayfalardan birkaç parça ekle
-                val fallback = pages.take(3)
-                    .mapIndexed { i, t -> "Sayfa ${i + 1}: ${t.take(400)}" }
-                ApiClient.ask(question, fallback)
-            } else {
-                ApiClient.ask(question, contextHits)
+            val ctx = ArrayList<String>()
+            val seenPages = HashSet<Int>()
+            if (focusPage in pages.indices && pages[focusPage].isNotBlank()) {
+                seenPages.add(focusPage)
+                ctx.add(
+                    "Sayfa ${focusPage + 1} (kullanıcının o an açık olduğu sayfa): " +
+                        pages[focusPage].take(2500)
+                )
             }
+            TextUtil.contextPages(pages, question, 8, 6000).forEach { entry ->
+                val n = entry.substringAfter("Sayfa ", "")
+                    .substringBefore(':', "")
+                    .toIntOrNull()
+                if (n == null || seenPages.add(n - 1)) ctx.add(entry)
+            }
+            ApiClient.ask(question, ctx)
         } catch (e: Exception) {
             "Bağlantı hatası: ${e.message}\n\nOffline aramaya düşüyorum:\n\n" +
                 runCatching {

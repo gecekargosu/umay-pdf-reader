@@ -1,112 +1,321 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Ana ekran — Dijital Kitaplık (ADIM 2):
+     Hero raf (Son Okunan) + yatay kaydırmalı Arşiv rafı (kapak + % rozeti).
+     Dikey liste kaldırıldı; içerik taşarsa dikey kaydırma NestedScrollView ile. -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/umay_bg"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <!-- Başlık satırı -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp">
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp">
 
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
+        <!-- Başlık satırı -->
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="@string/app_name"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/app_name"
+                android:textColor="@color/umay_accent"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnChat"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/sohbet"
+                android:src="@drawable/ic_chat" />
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_toStartOf="@id/btnChat"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/ayarlar"
+                android:src="@drawable/ic_settings" />
+        </RelativeLayout>
+
+        <!-- Hızlı işlemler: PDF seç + galeriden PDF -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnPickPdf"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_primary"
+                android:gravity="center"
+                android:text="@string/pdf_sec"
+                android:textColor="#04121A"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnPickImages"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:text="@string/resimden_pdf"
+                android:textColor="@color/umay_accent"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Kamerayla kitap tarama -->
+        <TextView
+            android:id="@+id/btnScan"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/kitap_tara"
             android:textColor="@color/umay_accent"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/btnChat"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_alignParentEnd="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/sohbet"
-            android:src="@drawable/ic_chat" />
+        <!-- İlerleme bilgisi (içe aktarma / OCR) -->
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_toStartOf="@id/btnChat"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/ayarlar"
-            android:src="@drawable/ic_settings" />
-    </RelativeLayout>
+        <!-- ═══ HERO RAF: Son Okunan ═══ -->
+        <LinearLayout
+            android:id="@+id/heroWrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-    <!-- PDF seç butonu -->
-    <TextView
-        android:id="@+id/btnPickPdf"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@drawable/bg_button_primary"
-        android:gravity="center"
-        android:text="@string/pdf_sec"
-        android:textColor="#04121A"
-        android:textSize="17sp"
-        android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="@string/son_okunan"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-    <!-- İlerleme bilgisi -->
-    <TextView
-        android:id="@+id/progressText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/umay_text_dim"
-        android:textSize="13sp"
-        android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/continueCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_panel"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-    <!-- Kitaplarda arama -->
-    <EditText
-        android:id="@+id/searchInput"
-        android:layout_width="match_parent"
-        android:layout_height="42dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_input"
-        android:hint="@string/ara"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:maxLines="1"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:textColor="@color/umay_text"
-        android:textColorHint="@color/umay_text_dim"
-        android:textSize="14sp"
-        android:visibility="gone" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="6dp"
-        android:text="@string/kitaplarim"
-        android:textColor="@color/umay_text_dim"
-        android:textSize="14sp" />
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/continueCover"
+                        android:layout_width="84dp"
+                        android:layout_height="118dp"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_pdf"
+                        app:shapeAppearanceOverlay="@style/shape_cover"
+                        app:strokeColor="@color/umay_panel2"
+                        app:strokeWidth="1dp"
+                        app:tint="@color/umay_accent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bookList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/emptyText"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/bos_kutuphane"
-        android:textColor="@color/umay_text_dim"
-        android:textSize="15sp" />
+                        <TextView
+                            android:id="@+id/continueTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="@color/umay_text"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
 
-</LinearLayout>
+                        <TextView
+                            android:id="@+id/continueMeta"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/umay_text_dim"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/heroPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/umay_orange"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnContinue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/bg_button_primary"
+                            android:gravity="center"
+                            android:paddingStart="20dp"
+                            android:paddingEnd="20dp"
+                            android:text="@string/devam_et"
+                            android:textColor="#04121A"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- İlerleme çubuğu -->
+                <ProgressBar
+                    android:id="@+id/heroProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="12dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/bg_progress_hero"
+                    android:progressTint="@color/umay_accent" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Arama -->
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_input"
+            android:hint="@string/ara"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/umay_text"
+            android:textColorHint="@color/umay_text_dim"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <!-- Sıralama çipleri -->
+        <LinearLayout
+            android:id="@+id/sortRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/sortRecent"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/sort_recent"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/sortAlpha"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/sort_alpha"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/sortAdded"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/sort_added"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Arşiv rafı başlığı -->
+        <TextView
+            android:id="@+id/libraryLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/kutuphanem"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- ═══ ARŞİF RAFI: yatay kaydırmalı kapaklar ═══ -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/bookList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/bos_kutuphane"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="15sp"
+            android:visibility="gone" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

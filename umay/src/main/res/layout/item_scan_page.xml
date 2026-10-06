@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tarama ekranındaki tek bir sayfa önizlemesi -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/pageThumb"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@drawable/bg_panel"
+        android:contentDescription="@string/tara_sayfa"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/pageNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_button_primary"
+        android:minWidth="26dp"
+        android:gravity="center"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:textColor="#04121A"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/btnDelete"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_button_secondary"
+        android:contentDescription="@string/tara_sil"
+        android:gravity="center"
+        android:text="×"
+        android:textColor="@color/umay_accent"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+</FrameLayout>

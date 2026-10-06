@@ -1,0 +1,114 @@
+# Geri Bildirim Kaydı — 5 Ekim 2026 (tur 3) · Sürüm 1.3.1
+
+Kaynak: kullanıcının 7 görselden derlediği hata metni + crash logu
+(Paket `com.umay.pdfreader`, `ReaderActivity.kt:117`,
+`activity_reader.xml:48`, drawable `#0x7f0700b8`).
+
+## Alınan geri bildirim
+
+| # | Belirti | Durum |
+|---|---------|-------|
+| 1 | `RuntimeException: Unable to start activity ...ReaderActivity` → `InflateException: Error inflating class ImageButton` → `Resources$NotFoundException: File res/drawable/ic_search.xml` → `IllegalArgumentException: C needs to be followed by a multiple of 6 floats. However, 22 float(s) are found.` | ✅ Çözüldü |
+| 2 | "Ayarlar/Sohbet'e girdiğim ücretsiz Gemini API anahtarı çalışsın" | ✅ Güçlendirildi + test butonu |
+| 3 | "Program şu an hiç çalışmıyor" (derleme başarılı, cihazda açılmıyor) | ✅ Kök neden #1 |
+
+## 1) ic_search.xml çökmesi — kök neden analizi
+
+- `res/drawable/ic_search.xml` satır 11'deki `android:pathData` bozuktu.
+- `C` kübik komutundan sonra gelen koordinat sayısı **22** idi; SVG/Android
+  kuralı gereği 6'nın katı olmalı (12/18/24…).
+- Geometrik olarak dördüncü çeyrek daire eksikti. Olması gereken:
+  `C3,13.09 5.91,16 9.5,16` (merkez (9.5,9.5), yarıçap 6.5) — dosyada ise
+  `5.91,13 9.5,16` (4 sayı) vardı.
+- Zincirleme etki: `ReaderActivity.onCreate` → `ActivityReaderBinding.inflate`
+  → satır 48'deki `btnSearch` `ImageButton` → `android:src="@drawable/ic_search"`
+  → `PathParser` patlar → `InflateException` → tüm uygulama açılmaz.
+
+## 2) Yapılan düzeltmeler
+
+- `ic_search.xml`: eksik iki koordinat tamamlandı, her kübik segment açık `C`
+  etiketiyle ayrıldı (eski parser'larda da güvenli).
+- Tarama: `umay/src/main/res/**/*.xml` içindeki **12 pathData'nın tamamı**
+  doğrulandı → tek hatalı dosya `ic_search.xml` idi, hepsi "OK".
+- Geometri doğrulaması: 9 kübik segment; halka merkez (9.5,9.5) r=6.5,
+  iç delik r=4.5, zıt sarmal (halka deliği doğru), segmentler bitişik.
+- Resource bütünlüğü: `R.id` / `R.string` / `@drawable` referanslarının
+  tamamı mevcut (eksik yok).
+- APK doğrulaması: `aapt2 dump resources` → `drawable/ic_search` = `res/W8.xml`,
+  `aapt2 dump xmltree` içindeki `pathData` düzeltmeyle birebir aynı.
+
+## 3) Gemini / sohbet (ApiClient.kt)
+
+- Model otomatik keşfi: `GET /v1beta/models` → `generateContent` destekleyen
+  modeller, `flash` önce; kullanıcı tercihi → keşif → yerleşik yedek zinciri.
+- 404/NOT_FOUND (model emekliyse) sıradaki adaya geçer; anahtar hataları
+  (API_KEY_INVALID, PERMISSION_DENIED) ilk anda Türkçe mesajla durur.
+- `thinkingConfig.thinkingBudget = 0` (2.5+ modellerde yanıtı yiyen thinking'e
+  karşı), `maxOutputTokens` 700 → 2048.
+- OpenAI-uyumlu yol da 401/403/429 için anlaşılır mesaj üretir.
+- `SettingsActivity` → **"Bağlantıyı test et"** butonu: girilen anahtarla gerçek
+  istek atılır, sonuç toast'ta görünür (ağ `Thread` üzerinde, ana thread değil).
+
+## 4) Kontrol sonuçları
+
+- `bash gradlew :umay:testDebugUnitTest :umay:assembleDebug :umay:assembleRelease`
+  → BUILD SUCCESSFUL, **26/26 birim testi geçti**.
+- Log: `docs/logs/build-20261005-*.txt`
+- Sürüm: 1.3 / versionCode 4 → **1.3.1 / versionCode 5**
+- APK: `/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.3.1.apk`
+
+---
+
+# Geri Bildirim Kaydı — 5 Ekim 2026 (tur 4) · Sürüm 1.4
+
+Geri bildirim maddeleri ve çözüm:
+
+| # | Kullanıcı şikâyeti | Kök neden | Durum |
+|---|---|---|---|
+| 1 | Galeriden resim seçtim, "resim okunamadı" | `loadBitmapForPdf`: `inJustDecodeBounds=true` ile `decodeStream` **null** döner, `?: return null` yüzünden fonksiyon HER ZAMAN null dönerdi → tüm resimler "çözülemedi" sayılıp atlanırdı | ✅ Onarıldı |
+| 2 | "Gerçek kitaptan resim çekip sıraya göre PDF'e çevirip okumak" | Doğal sıralama yoktu; kamera akışı hiç yoktu | ✅ `naturalKey` + `ScannerActivity` |
+| 3 | "Ekolayzır ana sayfada görünmüyor" | Panel yalnızca okuma ekranındaki Ses butonunun içindeydi | ✅ Ayarlar → Ekolayzır paneli eklendi |
+| 4 | Sohbete "yasin süresi kaç ayet" → "kitapta yok" | Bağlam çok zayıf: yalnız cümle bazlı eşleşen parçalar + ilk 3 sayfa | ✅ `TextUtil.contextPages` (sayfa bazlı, kısmi eşleşmeli, 6000 karakter bütçesi) + OCR uyarısı |
+
+## Yapılanlar
+
+### 1) Resim → PDF onarımı (`BookStore.kt`)
+- Boyut okuması ayrı ifadeye alındı; `outWidth/outHeight` kontrolü eklendi.
+- Decode: OOM'da `inSampleSize` iki kez artırılıp yeniden denenir.
+- `takePersistableUriPermission(FLAG_GRANT_READ_URI_PERMISSION)` — kalıcı izin.
+- Hata mesajı artık sebebi gösteriyor: `Resimler çevrilemedi (n/m hata). İlk hata: …`
+
+### 2) Tarama akışı
+- `TextUtil.naturalKey(name)`: rakamlar 12 hanele doldurulur → `sayfa_9 < sayfa_10`.
+- `BookStore.importImages` seçilen/cançekilen URI'ları bu anahtarla sıralar.
+- **Yeni:** `ScannerActivity` + `activity_scanner.xml` + `item_scan_page.xml` +
+  `file_paths.xml` + manifest `FileProvider` + ana sayfa "Kitap Tara (Kamera)" butonu.
+  Akış: kamera → ızgara (sayfa no + sil) → PDF Yap → kütüphane → OCR → okuma ekranı.
+  Harici kamera uygulaması kullanıldığı için CAMERA izni gerekmiyor.
+
+### 3) Ayarlar → Ekolayzır
+- `settingsEqSwitch` + Bas/Orta/Tiz SeekBar'ları (−100…+100, ekranda sayısal değer).
+- `SettingsActivity` `ReadService`'e bağlanır → çalan okumaya **anında** uygulanır;
+  servis yoksa yalnızca `AppPrefs`'e yazılır (sonraki oturumda uygulanır).
+
+### 4) Sohbet bağlamı
+- `TextUtil.contextPages(pages, question, maxPages, maxChars)`:
+  sorudaki her kelime sayfada kaç kez geçiyor → en yüksek puanlı 8 sayfa,
+  okuma sırasındaıyla, 6000 karakter bütçesi. Eşleşme yoksa ilk metinli sayfalar.
+- `ChatActivity`: online yol bu bağlamı kullanır; metin henüz yoksa (OCR sürüyor)
+  `sohbet_metin_hazir_degil` uyarısını gösterir; offline modda cümle eşleşmezse
+  sayfa bazlı sonuç döner.
+
+### 5) Test
+- 26 → **32 test** (`naturalKey_sayiyaDuyarliSiralar`,
+  `naturalKey_rakamOlmayanAdlardaSiraBozulmaz`, `contextPages_*`), 32/32 geçti.
+- İlk çalıştırmada `contextPages_eslesmeYoksaIlkSayfalariDoner` düştü →
+  `maxPages` sınırı eşleşmeyen sayfalarda uygulanmıyordu, düzeltildi.
+
+## Kontrol
+- `bash gradlew :umay:testDebugUnitTest :umay:assembleDebug :umay:assembleRelease`
+  → BUILD SUCCESSFUL (log: `docs/logs/build-20261005-1113.txt`)
+- APK içi doğrulama: `ScannerActivity` + `FileProvider` manifestte,
+  `layout/activity_scanner`, `xml/file_paths`, `id/btnScan` mevcut,
+  `versionName=1.4 / versionCode=6`
+- APK: `/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.4.apk`
