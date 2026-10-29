@@ -67,6 +67,29 @@ object DocsExport {
     // ── Android 10+ ──────────────────────────────────────────
 
     private fun saveViaMediaStore(ctx: Context, src: File, name: String): Boolean {
+        // v31 — DÜZELTME: aynı adlı dosya diskde kayıtlı değilse Android
+        // "Failed to build unique file" (IllegalStateException) fırlatıyordu ve
+        // dışa aktarma tümden başarısız oluyordu. Artık ad çakışması kendi
+        // adımızla çözülür (") ve son çare olarak benzersiz adla tekrar denenir.
+        val stem = name.removeSuffix(".pdf")
+        var attempt = 0
+        while (attempt < 3) {
+            val tryName = if (attempt == 0) name else "$stem-${System.currentTimeMillis() % 100000}.pdf"
+            try {
+                return insertViaMediaStore(ctx, src, tryName)
+            } catch (t: IllegalStateException) {
+                // ad çakışması → benzersiz adla yeniden dene
+                attempt++
+            }
+        }
+        BookStore.logError(
+            ctx, "DocsExport",
+            IllegalStateException("MediaStore benzersiz dosya adı üretemedi: $name")
+        )
+        return false
+    }
+
+    private fun insertViaMediaStore(ctx: Context, src: File, name: String): Boolean {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")

@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Umay PDF Okuyucu</string>
+    <!-- v11 (GÖREV 1) — Dışarıdan gelen belge karşılama bottom sheet -->
+    <string name="open_with_title">Bu PDF dosyasını Umay\'a aktarmak ister misin?</string>
+    <string name="open_with_view">Umay\'da Görüntüle</string>
+    <string name="open_with_listen">Umay\'da Sesli Dinle</string>
+    <!-- v11 (GÖREV 3) — Tanılama / özellik künyesi -->
+    <string name="diag_title">Özellik Künyesi</string>
+    <!-- v17 (GÖREV 2) — Hata günlüğü paylaşımı -->
+    <string name="errlog_share">Hata Günlüğünü Paylaş (umay_error.log)</string>
+    <string name="errlog_empty">Henüz hata günlüğü yok — ortaya çıkan ilk hatada dosya otomatik oluşur.</string>
+    <string name="errlog_copied">Log panoya kopyalandı (paylaşım denenemedi)</string>
+    <string name="diag_run">Özellikleri ve Sistemi Test Et</string>
+    <string name="diag_running">Testler çalıştırılıyor…</string>
+    <string name="diag_copy">Raporu Kopyala</string>
+    <string name="diag_done">Test tamamlandı</string>
 
     <!-- Ana ekran -->
+    <string name="notification_channel_id">umay_alarms</string>
     <string name="pdf_sec">PDF Seç</string>
     <string name="resimden_pdf">Resimlerden PDF Yap</string>
 
@@ -15,6 +30,8 @@
     <string name="tara_sayfa">Çekilen sayfa</string>
     <string name="tara_sil">Bu sayfayı sil</string>
     <string name="tara_kamera_yok">Kamera başlatılamadı</string>
+    <!-- v5.4 (ONARIM): kamera fotoğrafı diske yazılamadığında sessiz kalmayalım -->
+    <string name="tara_kaydedilemedi">Fotoğraf kaydedilemedi — tekrar dener misin? (depolama alanı/dosya izni)</string>
     <string name="tara_pdf_bos">Önce en az bir sayfa çek</string>
     <string name="kitap_tara">Kitap Tara (Kamera)</string>
     <string name="resim_cevriliyor">Resimler PDF\'e çevriliyor…</string>
@@ -28,12 +45,15 @@
     <string name="kaldigin_yer">KALDIĞIN YERDEN DEVAM</string>
     <string name="sayfa_ilerleme">Sayfa %1$d / %2$d</string>
     <string name="henuz_okunmadi">%1$d sayfa • henüz okunmadı</string>
+    <!-- v5 — Yedek kapak şablonu -->
+    <string name="kapak_yedek_etiket">UMAY KİTAPLIK</string>
 
     <!-- Dijital kitaplık (ADIM 2) -->
     <string name="son_okunan">Son Okunan</string>
     <string name="kutuphanem">Kütüphanem</string>
-    <string name="okundu_yuzde">%1$d%% okundu</string>
+    <string name="okundu_yuzde">%1$d%% Okundu</string>
     <string name="rozet_okundu">Okunma oranı: %1$d%%</string>
+    <string name="yuzde_ve_sayfa">%1$d%% Okundu • Sayfa %2$d / %3$d</string>
     <string name="sort_recent">Son okunan</string>
 
     <!-- Ses Renkleri paneli -->
@@ -60,7 +80,7 @@
     <string name="sonuc_yok">Sonuç bulunamadı.</string>
     <string name="sonuc_sayi">%1$d sonuç — tıklayınca o sayfaya gider</string>
     <string name="sort_alpha">Alfabetik</string>
-    <string name="sort_added">Eklenme</string>
+    <string name="sort_added">En son eklenen</string>
     <string name="dosya_aliniyor">Dosya içeri alınıyor…</string>
     <string name="kitaplarim">Kitaplarım</string>
     <string name="ara">Kitaplarda ara…</string>
@@ -115,6 +135,7 @@
     <string name="ay_okuma_hizi">Okuma Hızı</string>
     <string name="ay_ceviri">İngilizce PDF\'i Türkçe oku (offline çeviri)</string>
     <string name="ay_ceviri_aciklama">İlk kullanımda ~35MB çeviri modeli indirilir, sonra internet gerekmez.</string>
+    <string name="ceviri_model_hazirlanamadi">Çeviri modeli şu an indirilemedi — internet bağlantısını kontrol et; okuma kesintiye uğramaz, çevrimdışı özet her zaman çalışır.</string>
     <string name="ay_api_baslik">Yapay Zekâ Sohbet (opsiyonel)</string>
     <string name="ay_api_key">API Anahtarı</string>
     <string name="ay_api_key_aciklama">Ücretsiz Gemini anahtarını aistudio.google.com al\'dan alabilirsin (AIza ile başlar). Boş bırakırsan sohbet çevrimdışı çalışır (PDF içi arama).</string>
@@ -143,6 +164,27 @@
     <string name="sohbet_online">AI bağlı</string>
     <string name="sohbet_offline_ipucu">İpucu: \"özet yaz\", \"ikinci yasalar ne zaman\", gibi sorular sorabilirsin.</string>
     <string name="sohbet_hazir">Sorunu yaz ve gönder. PDF\'in metninde arayıp cevap vereceğim.</string>
+    <!-- v5.10 (F2) — konu bazlı kalıcı sohbet geçmişi -->
+    <string name="sohbet_gecmis">Sohbet geçmişi</string>
+    <string name="sohbet_konu">🧠 Konu: %1$s · %2$d soru</string>
+    <string name="sohbet_yeni">＋ Yeni sohbet</string>
+    <string name="sohbet_yeni_aciklama">Konuyu ilk sorudan yeniden belirlerim</string>
+    <string name="sohbet_bos_gecmis">Henüz kayıtlı sohbet yok. İlk soruyu yazınca konu otomatik açılır.</string>
+    <string name="sohbet_devam">Konuşma kaldığı yerden sürüyor: %1$s</string>
+    <string name="sohbet_sil">Sohbeti sil</string>
+    <string name="sohbet_sil_onay">“%1$s” konuşması kalıcı olarak silinsin mi?</string>
+    <string name="sohbet_silindi">Sohbet silindi</string>
+    <string name="sohbet_konu_degisti">🔀 Bu soru başka bir derse ait: %1$s — o dersin konuşmasına geçtim.</string>
+    <!-- v5.12 — Arapça sayfa okuma (OCR) -->
+    <string name="arapca_ocr_kisa">Arapça OCR</string>
+    <string name="arapca_ocr_baslik">Arapça sayfaları oku</string>
+    <string name="arapca_ocr_aciklama">Bu kitapta Arapça satırlar metin olarak okunamıyor (font eşlemesi bozuk).\n\nAçarsan her sayfa görüntüsü bir kez yapay zekâ ile okunur (ücretsiz kota) ve sonucu cihaza kaydedilir; sonraki okumalarda internet gerekmez.\n\nOkuma biraz yavaşlayabilir: sıradaki sayfa arka planda hazırlanır.</string>
+    <string name="arapca_ocr_acik">Arapça OCR açık — sayfalar görüntüden okunuyor</string>
+    <string name="arapca_ocr_kapali">Arapça OCR kapalı — metin katmanı kullanılıyor</string>
+    <string name="arapca_ocr_cevrimdisi">Arapça sayfa şu an okunamadı (internet/kota). Bozuk satırlar atlanıyor; bağlantı gelince o sayfalar kalıcı olarak okunur.</string>
+    <string name="okuma_yeniden_deneniyor">Sayfa hazırlanıyor — okuma yeniden başlatılıyor…</string>
+    <string name="ses_motoru_hazirlaniyor">Ses motoru hazırlanıyor…</string>
+    <string name="okuma_baslatilamadi">Bu sayfada okunacak metin bulunamadı. Sonraki sayfaya geçebilirsin.</string>
     <string name="sohbet_sayfa_baglami">Açık olduğun %1$d. sayfa sohbet bağlamına eklendi — o sayfa hakkında sorabilirsin.</string>
     <string name="sohbet_metin_hazir_degil">Kitabın metni henüz çıkarılmadı (taranmış sayfalarda OCR sürüyor). Bitmesini bekle, sonra tekrar sor — ilerlemeyi okuma ekranında görebilirsin.</string>
 
@@ -155,4 +197,557 @@
     <!-- İlerleme -->
     <string name="metin_cikariliyor">Metin çıkarılıyor: %1$d / %2$d sayfa</string>
     <string name="ocr_yapiliyor">Taranmış sayfalar okunuyor (OCR): %1$d / %2$d sayfa</string>
+
+    <!-- ═══ Akademik asistan: ders rafları ═══ -->
+    <string name="derslerim">Derslerim</string>
+    <string name="ders_ekle">＋ Ders</string>
+    <string name="derslerim_bos">Henüz ders yok. "＋ Ders" ile derslerini ekle; kaynak, ödev ve sınavlarını takip et.</string>
+    <string name="ders_programi">Program</string>
+    <string name="yeni_ders_ekle">Yeni Ders Ekle</string>
+    <string name="ders_adi">Ders adı</string>
+    <string name="ders_kaydedildi">Ders kaydedildi</string>
+    <string name="ders_bos_olamaz">Ders adı boş olamaz</string>
+    <string name="ders_duzenle">Dersi Düzenle</string>
+    <string name="ders_sil">Dersi Sil</string>
+    <string name="ders_sil_soru">Bu ders ve tüm kayıtları (kaynaklar, ödevler, sınavlar, program satırları) silinsin mi? Kitaplar silinmez.</string>
+    <string name="ders_istatistik">%1$d kaynak • %2$d ödev • %3$d sınav</string>
+    <string name="sonraki_ders">Sıradaki: %1$s %2$s</string>
+    <string name="kaynaklar">Ders Kaynakları</string>
+    <string name="kaynak_ekle">＋ Kaynak Ekle</string>
+    <string name="kaynak_bos">Bu derse henüz kaynak eklenmedi. Kütüphanedeki kitapları seç.</string>
+    <string name="kaynak_sec_baslik">Kütüphaneden kaynak seç</string>
+    <string name="kaynak_eklendi">Kaynaklar eklendi</string>
+    <string name="kaynak_cikarildi">Kaynak çıkarıldı</string>
+    <string name="ovdevler">Ödevler ve Projeler</string>
+    <string name="ovdev_ekle">＋ Ödev Ekle</string>
+    <string name="ovdev_bos">Bu derse henüz ödev/proje eklenmedi.</string>
+    <string name="sinavlar">Sınavlar</string>
+    <string name="sinav_ekle">＋ Sınav Ekle</string>
+    <string name="sinav_bos">Bu derse henüz sınav eklenmedi.</string>
+    <string name="baslik_etiket">Başlık</string>
+    <string name="aciklama_etiket">Açıklama (opsiyonel)</string>
+    <string name="teslim_tarihi">Son teslim tarihi</string>
+    <string name="sinav_tarihi">Sınav tarihi</string>
+    <string name="tarih_sec">Tarih seç: %1$s</string>
+    <string name="saat_sec">Saat: %1$s</string>
+    <string name="kaydet">Kaydet</string>
+    <string name="iptal">Vazgeç</string>
+    <string name="teslim_edildi">✓ Teslim edildi</string>
+    <string name="teslim_bekliyor">Bekliyor</string>
+    <string name="kutuphane_bos_ekle">Kütüphane boş — önce "PDF Seç" ile dosya ekle.</string>
+
+    <!-- ═══ Ders programı + alarmlar ═══ -->
+    <string name="program_baslik">Haftalık Ders Programı</string>
+    <!-- v16 (GÖREV 6) — İnteraktif takvim + not/yüzde/AGNO ekranı -->
+    <string name="sinavlar_baslik">Sınavlar ve Notlar</string>
+    <string name="kamu_mali_kitaplik">Kamu Malı Kitaplık (Ücretsiz)</string>
+    <string name="sinav_ekle_gun">＋ Seçili Güne Sınav/Ekinlik Ekle</string>
+    <string name="sinav_yok_gun">Bu günde sınav/etkinlik yok.</string>
+    <string name="sinavlar_bos">Henüz sınav yok — takvimden bir gün seç ve sınav ekle.</string>
+    <string name="en_yakin_sinav">En yakın sınav: %1$s</string>
+    <string name="notlar_baslik">Ders Notları ve Ağırlıklar</string>
+    <string name="notlar_bos">Not girmek için önce Derslerim rafından ders ekle.</string>
+    <string name="not_duzenle">Puan / Yüzde</string>
+    <string name="agno_baslik">AGNO</string>
+    <string name="agno_toplam_akts">Toplam AKTS: %1$d</string>
+    <string name="agno_hesaplanamadi">AGNO hesaplanamadı — not ve AKTS gir.</string>
+    <string name="akts_kisa">AKTS</string>
+    <string name="ekle">Ekle</string>
+    <string name="sinav_basligi">Sınav adı</string>
+    <string name="tarih">Tarih</string>
+    <string name="saat">Saat</string>
+    <string name="not_puan">Puan (0-100)</string>
+    <string name="not_yuzde">Yüzde (%)</string>
+    <string name="not_akts_girdi">AKTS kredisi</string>
+    <string name="not_kaydedildi">Notlar kaydedildi ✓</string>
+    <string name="sinav_eklendi">Sınav eklendi ✓</string>
+    <string name="sinav_sil">Sınavı sil</string>
+    <string name="ders_yok_uyari">Önce Derslerim bölümünden bir ders ekle.</string>
+    <string name="not_turu_vize">Vize</string>
+    <string name="not_turu_quiz">Quiz</string>
+    <string name="not_turu_final">Final</string>
+    <string name="not_turu_proje">Proje</string>
+    <!-- v16 (GÖREV 5) — Excel tarzı matris tablo (günler × saatler) -->
+    <string name="program_tablo">⬜ Tablo Görünümü (Excel Tarzı)</string>
+    <!-- v16 (GÖREV 5) — Ders/sınav DÜZENLEME (CRUD) -->
+    <string name="slot_duzenle">Düzenle</string>
+    <string name="slot_guncellendi">Program satırı güncellendi ✓</string>
+    <string name="sinav_guncellendi">Sınav güncellendi ✓</string>
+    <string name="sinav_notu">Sınav notu (varsa)</string>
+    <string name="kulaklik_cikti">Kulaklık çıkarıldı — okuma duraklatıldı.</string>
+    <string name="ogretim_uyesi">Öğretim üyesi</string>
+    <string name="program_liste">☰ Liste Görünümü</string>
+    <string name="program_grid_ipucu">Yatay kaydır → günler. Boş hücreye dokun → o gün ve saat için ders ekler. Ders hücresine dokun → siler.</string>
+    <string name="saat_kolonu">Saat</string>
+    <string name="dk_once">%1$d dk önce</string>
+    <string name="program_bos">Henüz program yok. "＋ Ders Programına Ekle" ile ilk dersini gir.</string>
+    <string name="programa_ekle">＋ Ders Programına Ekle</string>
+    <string name="gunluk_saat">Günlük hatırlatma: %1$s</string>
+    <string name="gunluk_saat_degistir">Günlük saat</string>
+    <string name="test_bildirim">Test bildirimi</string>
+    <string name="hatirlatma_ipucu">Dersler başlamadan hatırlatma, günlük sınav geri sayımı ve ödev bildirimleri için bildirim izni gerekir.</string>
+    <string name="ders_sec">Ders seç</string>
+    <string name="yeni_ders_secenege">＋ Yeni ders…</string>
+    <string name="gun_etiket">Gün</string>
+    <string name="saat_etiket">Saat</string>
+    <string name="ders_suresi_etiket">Ders süresi</string>
+    <string name="sure_dk">%1$d dk</string>
+    <string name="derslik_etiket">Derslik / Sınıf No</string>
+    <string name="hatirlatma_etiket">Ders öncesi hatırlatma</string>
+    <string name="slot_kaydedildi">Programa eklendi — alarm kuruldu</string>
+    <string name="slot_silindi">Program satırı silindi</string>
+    <string name="saat_secimi">Saat seç</string>
+    <string name="remind_20">20 dakika önce (melodili)</string>
+    <string name="remind_15">15 dakika önce</string>
+    <string name="remind_30">30 dakika önce</string>
+    <string name="remind_60">1 saat önce</string>
+    <string name="remind_off">Kapalı (bildirim yok)</string>
+    <string name="ders_hatirlatma_baslik">Ders hatırlatıcısı</string>
+    <string name="sinav_hatirlatma_baslik">Sınav geri sayım</string>
+    <string name="ovdev_hatirlatma_baslik">Ödev/Proje hatırlatıcısı</string>
+    <string name="test_bildirim_metin">Bildirimler çalışıyor ✓ Ders öncesi hatırlatmalar bu şekilde gelecek.</string>
+
+    <!-- v5 — Ders programı PDF/Görsel içe aktarma (ADIM A) -->
+    <string name="program_ice_aktar">PDF / Görselden İçe Aktar</string>
+    <string name="program_ice_aktar_baslik">Ders Programını İçe Aktar</string>
+    <string name="program_ice_aktar_sec">Ders programının PDF veya görselini (JPG/PNG) seç. Gün, saat, ders ve derslik otomatik çıkarılır.</string>
+    <string name="program_okunuyor">Dosya okunuyor ve dersler çözümleniyor…</string>
+    <string name="program_bulunamadi">Ders programı metni çıkarılamadı. Dosyanın program tablosu içerdiğinden emin ol.</string>
+    <string name="program_ice_aktar_onay">%1$d ders satırı bulundu:\n\n%2$s\n\nPrograma eklensin mi?</string>
+    <string name="program_ice_aktarildi">%1$d ders programa eklendi, alarmlar kuruldu</string>
+
+    <!-- v5 — Tam alarm izni (SDK 36) -->
+    <string name="tam_alarm_izin_yok">⚠ Tam alarm izni kapalı — ders hatırlatmaları gecikebilir. İzin vermek için dokun.</string>
+
+    <!-- v5 — Sayfa özeti kontrolleri (ADIM D) -->
+    <string name="ozet_duraklat">⏸ Duraklat</string>
+    <string name="ozet_devam">▶ Devam Et</string>
+    <string name="ozet_durdur">⏹ Durdur</string>
+
+    <!-- ═══ v14 (V5.0 §7) — Öğrenci Kimliği ═══ -->
+    <string name="hos_geldin">Cengiz Kılıç</string>
+    <string name="hos_geldin_alt">İstanbul Rumeli Üniversitesi • YZ ve Makine Öğrenimi</string>
+    <!-- v12 (MARKA REFORMU) — Yeni slogan + puzzle logo (eski "AI BEYİN" rozeti silindi) -->
+    <string name="app_slogan">Akıllı PDF &amp; Akademik Belge Asistanı</string>
+
+    <!-- v12 (YENİ ÖZELLİKLER) — Flashcard / Yer İmi / İstatistik / Widget / Paylaşım -->
+    <string name="kapat">Kapat</string>
+    <string name="flashcard_title">AI Çalışma Kartları</string>
+    <string name="flashcard_next">Sonraki Kart →</string>
+    <string name="flashcard_done">Test Bitti! 🎯</string>
+    <string name="flashcard_result">Doğru: %1$d / %2$d</string>
+    <string name="flashcard_no_text">Bu sayfada okunacak metin yok.</string>
+    <string name="flashcard_none">Bu sayfadan kart üretilemedi — tekrar deneyin.</string>
+    <string name="flashcard_error">Kartlar üretilemedi. İnternet ve API anahtarını kontrol edin.</string>
+    <string name="flashcard_open">🃏 Kartlar</string>
+    <string name="bookmark_open">📌 Yer İmleri</string>
+    <string name="bookmark_add">Bu sayfaya yer imi ekle</string>
+    <string name="bookmark_remove">Yer imini kaldır</string>
+    <string name="bookmark_note_hint">Ders notu (örn. sınav konusu)…</string>
+    <string name="bookmark_empty">Henüz yer imi yok. Okurken 📌 ile sayfa işaretleyin.</string>
+    <string name="bookmark_added">Yer imi eklendi</string>
+    <string name="bookmark_removed">Yer imi kaldırıldı</string>
+    <string name="stats_title">Okuma İstatistikleri</string>
+    <string name="stats_today">Bugün: %1$d dk</string>
+    <string name="stats_week">Son 7 gün: %1$d dk</string>
+    <string name="stats_total">Toplam: %1$d dk</string>
+    <string name="stats_finished">Bitirilen kitap: %1$d</string>
+    <string name="export_summary">📄 Özeti Kaydet / Paylaş</string>
+    <string name="export_done">Özet kaydedildi: %1$s</string>
+    <string name="quote_share">💬 Alıntıyı Kart Yap</string>
+    <string name="quote_done">Alıntı kartı hazır — paylaş</string>
+    <string name="reading_books">Okuma Kitapları</string>
+    <string name="widget_label">UMAY Sıradaki Ders</string>
+    <string name="widget_no_class">Bugün ders yok 🎉</string>
+    <string name="widget_next">Sıradaki: %1$s\n%2$s • %3$d dk sonra</string>
+    <string name="pd_downloading">İndiriliyor…</string>
+
+    <!-- v13 (T8) — Derin dosya tarayıcı -->
+    <string name="deep_title">Tüm Cihazı Tara (SD Kart Dahil)</string>
+    <string name="deep_ready">Hazır — taramaya başlayın.</string>
+    <string name="deep_scanning">Taranıyor… (dahili + SD kart)</string>
+    <string name="deep_empty">Desteklenen belge bulunamadı.</string>
+    <string name="deep_found">%1$d belge bulundu — aktarmak için seçin.</string>
+    <string name="deep_scan">🔍 Yeniden Tara</string>
+    <string name="deep_import">📥 Kütüphaneye Aktar</string>
+    <string name="deep_none_selected">Önce dosya seçin.</string>
+    <string name="deep_importing">Aktarılıyor… %1$d / %2$d</string>
+    <string name="deep_import_done">Aktarıldı: %1$d başarılı, %2$d başarısız</string>
+    <!-- v21 (DENETİM) — sonuç raporu: yeni / zaten ekli / başarısız ayrımı -->
+    <string name="deep_import_done3">Aktarıldı: %1$d yeni eklendi, %2$d zaten ekli, %3$d başarısız</string>
+    <string name="deep_selected_count">%1$d dosya seçildi — aktarmak için "Kütüphaneye Aktar"a basın.</string>
+    <string name="deep_no_permission">Depolama izni verilmeden tarama yapılamaz.</string>
+    <string name="deep_open">Tüm Cihazı Tara</string>
+
+    <!-- v22 (AŞAMA 5.5) — tarama ekranı: metadata + filtre/sıralama -->
+    <string name="deep_filter_type_title">Dosya türü</string>
+    <string name="deep_filter_status_title">Durum</string>
+    <string name="deep_sort_title">Sıralama</string>
+    <string name="deep_filter_type">Tür: %1$s</string>
+    <string name="deep_filter_all">Tümü</string>
+    <string name="deep_filter_status">Durum: %1$s</string>
+    <string name="deep_status_filter_new">Eklenmemiş</string>
+    <string name="deep_status_filter_added">Zaten ekli</string>
+    <string name="deep_sort_label">Sırala: %1$s</string>
+    <string name="deep_sort_az">Ad (A-Z)</string>
+    <string name="deep_sort_za">Ad (Z-A)</string>
+    <string name="deep_sort_size_asc">Boyut (küçük→büyük)</string>
+    <string name="deep_sort_size_desc">Boyut (büyük→küçük)</string>
+    <string name="deep_sort_date_new">Tarih (en yeni)</string>
+    <string name="deep_sort_date_old">Tarih (en eski)</string>
+    <string name="deep_select_all">Tümünü Seç</string>
+    <string name="deep_clear_selection">Seçimi Temizle</string>
+    <string name="deep_status_added">Zaten kütüphanede</string>
+    <string name="deep_status_not_added">Henüz eklenmedi</string>
+    <string name="deep_status_gone">⚠ Erişilemiyor</string>
+    <string name="deep_page_count">%1$d sayfa</string>
+
+    <!-- v13 (T8) — Raf yönetimi -->
+    <string name="shelves_title">Raflar</string>
+    <string name="shelves_add">＋ Yeni Raf</string>
+    <string name="shelves_name_hint">Raf adı (örn. Sınav Hazırlık)</string>
+    <string name="shelves_added">Raf eklendi</string>
+    <string name="shelves_deleted">Raf silindi</string>
+    <string name="shelves_empty">Henüz özel raf yok.</string>
+    <string name="shelves_move">📚 Başka Rafa Taşı</string>
+    <string name="shelves_manage">Rafları Düzenle</string>
+    <string name="shelf_empty_hint">Bu raf boş — yeni dosya ekleyin</string>
+    <string name="ekolayzir_ac">Ekolayzır</string>
+    <string name="panel_hiz">Hız (0.5x – 2.0x)</string>
+
+    <!-- v6 — Kitap silme -->
+    <string name="kitap_sil">Sil</string>
+    <string name="kitap_sil_soru">Bu PDF; dosyaları, kapağı ve okuma geçmişiyle birlikte kütüphaneden silinsin mi?</string>
+    <string name="kitap_silindi">"%1$s" kütüphaneden silindi</string>
+
+    <!-- v6 — AI kota limiti (Aşama 2.4) -->
+    <string name="ai_limit">Günlük AI kullanım limitinize ulaşıldı. Ödüllü reklam izleyerek veya Puan harcayarak hak kazanabilirsiniz!</string>
+
+    <!-- v5 — Edge Neural ses (ADIM C) -->
+    <string name="ses_yerlesik_yedek">Çevrimdışı: yerleşik ses</string>
+    <string name="ses_yerlesik_yedek_ipucu">Açık: Edge Neural ulaşılamadığında (internet yokken) okuma yerleşik sesle sürer. Kapalı: mekanik ses hiç kullanılmaz.</string>
+
+    <!-- ═══ v7 — Ders programı Gemini Vision + önizleme/düzenleme ═══ -->
+    <string name="program_onizleme_baslik">Dersleri Kontrol Et</string>
+    <string name="program_onizleme_ipucu">Çıkarılan dersler aşağıda. Eksik veya yanlış satırları düzelt, \"＋ Ders Ekle\" ile yenisini ekle, sonra kaydet.</string>
+    <string name="ders_satir_ekle">＋ Ders Ekle</string>
+    <string name="ders_adi_zorunlu">En az bir ders adı gerekli.</string>
+    <string name="program_ai_okunuyor">Görsel yapay zekâ ile okunuyor…</string>
+    <string name="program_ai_analiz">Yapay zekâ %1$d ders buldu — kontrol edip kaydet.</string>
+    <string name="program_bos_elle">Program otomatik okunamadı — dersleri elle ekleyip kaydedebilirsin.</string>
+
+    <!-- v13 (AGENT 22) — Yeni ekranlar: onboarding / profil / kasa / görünüm -->
+    <string name="onboarding_gec">Geç</string>
+    <string name="onboarding_basla">Hadi Başlayalım</string>
+    <string name="profile_title">Profilim</string>
+    <string name="vault_title">Gizli Kasa</string>
+    <string name="settings_look_title">PROFİL &amp; GÖRÜNÜM</string>
+    <string name="btn_profile">👤 Profilim</string>
+    <string name="btn_vault">🔒 Gizli Kasa (PIN + Parmak İzi)</string>
+    <string name="theme_mode">Tema: Gece / Gündüz / Sistem</string>
+    <string name="night_pdf">Gece modunda PDF sayfalarını koyulaştır</string>
+    <string name="haftalik_program">Haftalık Ders Programı</string>
+
+    <!-- v13 (AGENT 22 — A3) — Dil seçimi (TR/EN) -->
+    <string name="lang_title">Uygulama dili / App language</string>
+    <string name="lang_button">🌐 Dil / Language: Türkçe — English</string>
+
+    <!-- v13 (AGENT 22 — A3) — Sosyal giriş (simüle/demo) + çıkış -->
+    <string name="social_login_hint">Hızlı giriş (demo)</string>
+    <string name="soc_google">Google</string>
+    <string name="soc_apple">Apple</string>
+    <string name="soc_facebook">Facebook</string>
+    <string name="soc_instagram">Instagram</string>
+    <string name="social_login_title">%1$s ile giriş</string>
+    <string name="social_login_msg">%1$s ile hızlı giriş yapılsın mı?\n\n(Demo akış: gerçek hesap doğrulaması için Play Console + uygulama kimliği gerekir; seçimin Profil\'de görünür ve cihazda saklanır.)</string>
+    <string name="social_login_ok">Giriş yap</string>
+    <string name="social_login_done">%1$s ile giriş yapıldı ✓</string>
+    <string name="social_logged_in">Oturum: %1$s ile giriş yapıldı</string>
+    <string name="social_not_logged_in">Misafir moddasın — sosyal giriş yapmadın</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="logout_confirm">Oturum kapatılsın mı? Uygulama ilk kayıt (giriş) ekranına döner. Kitapların ve ayarların SİLİNMEZ.</string>
+    <string name="logout_yes">Evet, çıkış yap</string>
+
+    <!-- v13 (AGENT 22 — A4) — Çoklu AI sağlayıcı + ücretsiz rehber -->
+    <string name="ay_ai_provider">AI Sağlayıcı</string>
+    <string name="ay_api_base">Sunucu adresi (OpenAI uyumlu uç nokta)</string>
+    <string name="ay_api_guide">Ücretsiz anahtar rehberi (adım adım)</string>
+    <string name="ay_api_key_builtin_hint">Gerek yok — gömülü ücretsiz Gemini anahtarı devrede</string>
+    <string name="guide_gemini">ÜCRETSİZ Gemini anahtarı (önerilen — kod gerekmez, uygulamada gömülü anahtar zaten var):\n\n1) aistudio.google.com adresine Git\n2) Google hesabınla giriş yap (ücretsiz)\n3) Sol menüden \"Get API key\" / \"API anahtarı al\" tıkla\n4) \"Create API key\" de → anahtar (AIza… ile başlar) kopyalanır\n5) Buraya yapıştır → Test et → Kaydet\n\nÜcretsiz kota günlük yeterli; kredi kartı GEREKMEZ.</string>
+    <string name="guide_openrouter">ÜCRETSİZ OpenRouter anahtarı (birçok ücretsiz model):\n\n1) openrouter.ai adresine Git\n2) Sign in ile giriş yap (Google/GitHub)\n3) Sol menüden Keys → \"Create Key\" tıkla\n4) Anahtarı kopyala (sk-or-… ile başlar)\n5) Buraya yapıştır → Test et → Kaydet\n6) Model alanına ücretsiz model yaz (örn. \"deepseek/deepseek-chat-v3-0324:free\" — openrouter.ai/models listesinden seçebilirsin)</string>
+    <string name="guide_openai">OpenAI anahtarı (ücretli servis — dikkatli kullan):\n\n1) platform.openai.com adresine Git\n2) Kayıt ol / giriş yap\n3) API keys bölümünden \"Create new secret key\"\n4) Anahtarı kopyala (sk-… ile başlar)\n5) Buraya yapıştır → Test et → Kaydet\n\n⚠ OpenAI kotaları ÜCRETLİDİR; ücretsiz istiyorsan Gemini veya OpenRouter seç.</string>
+    <string name="guide_custom">Özel sunucu (OpenAI uyumlu — Ollama, LM Studio, vLLM, LocalAI):\n\n1) Bilgisayarında Ollama/LM Studio gibi bir yerel sunucu çalıştır\n2) Adresi yaz (örn. http://192.168.1.4:11434/v1/chat/completions)\n3) Yerel sunucunun API anahtarını gir (yoksa \"ollama\" yaz)\n4) Model adını gir (örn. llama3.1)\n5) Test et → Kaydet\n\nTelefon ile bilgisayar aynı Wi-Fi ağında olmalı.</string>
+    <string name="guide_open_link">Tarayıcıda aç: %1$s</string>
+
+    <!-- v14 (V5.0 §3) — Son okunanlar rafı -->
+    <string name="recent_shelf_title">📚 Son Okunan Kitaplar</string>
+    <string name="recent_shelf_percent">%1$d%% okundu</string>
+    <string name="book_share">Kitabı Paylaş (PDF)</string>
+    <string name="book_shared">Kitap paylaşım menüsünde ✓</string>
+
+    <!-- v14 (V5.0 §3) — Derin tarama: tüm dosya erişimi -->
+    <string name="deep_all_files_title">Tüm dosyalara erişim izni</string>
+    <string name="deep_all_files_msg">Telefonundaki TÜM PDF\'leri eksiksiz bulmak için Android 11+ izni gerekiyor. Açılan ayar sayfasından Umay\'a izin VER ve geri dön — tarama otomatik başlar.</string>
+    <string name="deep_all_files_go">İzin sayfasını aç</string>
+    <!-- v16 (T8.1) — izin kilidi çözümü: SAF yedeği + yönlendirme metinleri -->
+    <string name="deep_saf">📂 Belge Seç (SAF)</string>
+    <string name="folder_import">📚 Klasörden Derslere Aktar</string>
+    <string name="folder_import_info">İndirilenler/UmayKaynak klasörü alt klasörleriyle taranacak; her dosya klasör adına göre dersin Kitap / Slayt / Doküman rafına eklenir. Kaynak dosyalar silinmez.</string>
+    <string name="folder_import_running">Aktarılıyor</string>
+    <string name="folder_import_none">Klasörde desteklenen dosya bulunamadı (PDF, PPTX, DOCX).</string>
+    <string name="folder_import_done">Aktarma tamamlandı</string>
+    <string name="pool_organize">🧩 Havuzu Düzenle (isim → içerik)</string>
+    <string name="pool_organize_info">Hiçbir derse/gruba bağlı olmayan kitaplar taranır; adından, olmazsa ilk sayfalarındaki metinden hangi gruba ait olduğu bulunup rafına eklenir. Dosya taşınmaz/silinmez.</string>
+    <string name="deep_saf_error">Belge seçici açılamadı.</string>
+    <string name="deep_all_files_ok">İzin verildi — derin tarama başlıyor.</string>
+    <string name="deep_all_files_denied">Tüm dosyalara erişim açılmadı — tarama sınırlı çalışır.</string>
+    <string name="deep_all_files_manual">Anahtar açılamıyorsa: Ayarlar › Uygulamalar › Umay › İzinler › Tüm dosyalara erişim yolundan açabilir ya da \"Belge Seç (SAF)\" ile dosya ekleyebilirsin.</string>
+    <string name="deep_empty_no_access">Belge bulunamadı — \"Tüm dosyalara erişim\" kapalı olabilir. İzni aç ya da SAF ile seç.</string>
+
+    <!-- v14 (V5.0) — Ortak -->
+    <string name="geri">← Geri</string>
+    <string name="sil">Sil</string>
+    <string name="disa_aktarildi">Dışa aktarıldı ✓</string>
+    <string name="disa_aktarilamadi">Dışa aktarılamadı</string>
+
+    <!-- v14 (V5.0) — Tema tasarlayıcı -->
+    <string name="tema_studio_title">Özel Tema Tasarımcısı</string>
+    <string name="tema_studio_sub">Arka plan, panel, vurgu ve raf çerçeve rengini seç — değişim anında önizlemede görünür ve kalıcıdır.</string>
+    <string name="tema_preview_label">CANLI ÖNİZLEME</string>
+    <string name="tema_preview_shelf">Örnek raf kartı (çerçeve rengi)</string>
+    <string name="tema_preview_button">Örnek buton</string>
+    <string name="tema_presets">Hazır mat paletler</string>
+    <string name="tema_reset">Varsayılana dön (Siber Akademik)</string>
+    <string name="tema_reset_done">Varsayılan tema geri yüklendi ✓</string>
+    <!-- v16 (GÖREV 2 + GÖREV 3) — tema modu/tasarımcı metinleri (TR) -->
+    <string name="uygula">Uygula</string>
+    <string name="tema_mod_sistem">Sistem (otomatik)</string>
+    <string name="tema_mod_gece">Gece (koyu)</string>
+    <string name="tema_mod_gunduz">Gündüz (açık)</string>
+    <string name="tema_mod_ozel_uyari">Tema modu — özel tema KAPATILACAK</string>
+    <string name="tema_ozel_kapatildi">Özel tema kapatıldı, seçilen mod uygulandı ✓</string>
+    <string name="tema_auto_btn">Otomatik moda dön (Gece / Gündüz / Sistem)</string>
+    <string name="tema_auto_done">Otomatik mod etkin — özel tema kapatıldı ✓</string>
+    <string name="tema_row_bg">Arka plan rengi</string>
+    <string name="tema_row_panel">Panel / kart rengi</string>
+    <string name="tema_row_accent">Vurgu (aksan) rengi</string>
+    <string name="tema_row_shelf">Raf çerçeve rengi</string>
+    <string name="tema_row_bg_kisa">Arka plan</string>
+    <string name="tema_row_panel_kisa">Panel / kart</string>
+    <string name="tema_row_accent_kisa">Vurgu</string>
+    <string name="tema_row_shelf_kisa">Raf çerçevesi</string>
+
+    <!-- v14 (V5.0 §5) — Alarm sesi -->
+    <string name="alarm_sound_pick">Alarm Sesini Seç</string>
+    <string name="alarm_sound_current">Şu anki alarm sesi: %1$s</string>
+    <string name="alarm_sound_default">Sistem varsayılanı</string>
+
+    <!-- v14 (V5.0 §7) — Bulut yedekleme -->
+    <string name="backup_title">Yedekleme (Yedek Al / Geri Yükle)</string>
+    <string name="backup_take">Yedek oluştur (zip → Belgeler/UmayPDF)</string>
+    <string name="backup_restore">Yedekten geri yükle (zip seç)</string>
+    <string name="backup_done">Yedek oluşturuldu: %1$s</string>
+    <string name="backup_restored">Yedek geri yüklendi ✓ — kitaplar yeniden yükleniyor</string>
+    <string name="backup_failed">Yedeklenemedi: %1$s</string>
+
+    <!-- v14 (V5.0 §6) — Transkript & AGNO -->
+    <string name="transcript_title">Transkript &amp; AGNO Hesaplayıcı</string>
+    <string name="transcript_add">Ders Ekle</string>
+    <string name="transcript_semester">Dönem</string>
+    <string name="transcript_agno">AGNO: %1$s</string>
+    <string name="transcript_sem_agno">Dönem ort.: %1$s</string>
+    <string name="transcript_empty">Bu dönemde henüz ders yok. "Ders Ekle" ile başla.</string>
+    <string name="transcript_export">Dışa Aktar (.md)</string>
+
+    <!-- v14 (V5.0 §2) — Dışarıdan PDF aktarım uyarısı -->
+    <string name="ow_ask_title">Umay\'a aktar</string>
+    <string name="ow_ask_import">Bu PDF dosyasını Umay\'a aktar ve yapay zeka ile incele?</string>
+    <string name="ow_import_now">Umay\'a Aktar</string>
+    <string name="guide_link_error">Tarayıcı açılamadı — adresi elle ziyaret edebilirsin.</string>
+
+    <!-- v13 (AGENT 22 — A2) — Özet düzenleme -->
+    <string name="summary_edit">✏️ Düzenle</string>
+    <string name="summary_edit_title">Özeti düzenle</string>
+    <string name="summary_saved">Özet güncellendi ✓</string>
+    <string name="summary_revert">Orijinaline dön</string>
+
+    <!-- v13 (AGENT 22 — A2) — Flashcard düzenleme -->
+    <string name="flashcard_edit">✏️ Kartı Düzenle</string>
+    <string name="flashcard_edit_title">Kartı düzenle</string>
+    <string name="flashcard_edit_question">Soru</string>
+    <string name="flashcard_edit_options">Şıklar (A/B/C/D)</string>
+    <string name="flashcard_edit_answer">Doğru cevap</string>
+    <string name="flashcard_edit_explanation">Açıklama</string>
+    <string name="flashcard_edited">Kart güncellendi ✓</string>
+
+    <!-- v13 (AGENT 22 — A5) — Harici PDF yakalama -->
+    <string name="open_with_import">📚 Rafa Ekle (kitaplığa aktar)</string>
+    <string name="pdf_added_to_shelf">\'%1$s\' kitaplığa eklendi ✓ (Kitaplıklar rafından açabilirsin)</string>
+
+    <!-- v14 (V5.0 §7) — Öğrenci profil kartı (contentDescription) -->
+    <string name="profil">Profil</string>
+
+    <!-- v15 (V5.1 ADIM B.1 / #19) — Pomodoro Odak Modu -->
+    <string name="pomodoro_channel">Pomodoro Odak</string>
+    <string name="pomodoro_start">🍅 Odaklan (25 dk)</string>
+    <string name="pomodoro_done_title">Pomodoro tamamlandı 🍅</string>
+    <string name="pomodoro_done_text">%1$d dakikalık odak bitti. Harikasın — kısa bir mola ver!</string>
+    <string name="pomodoro_cancel_title">Pomodoro iptal edilsin mi?</string>
+    <string name="pomodoro_cancel_text">Devam eden odak süresi sayılmayacak.</string>
+    <string name="pomodoro_yes">İptal et</string>
+    <string name="pomodoro_no">Devam et</string>
+
+    <!-- v15 (V5.1 ADIM B.4 / #5) — Taranan sayfada OCR metin katmanı -->
+    <string name="scan_ocr_running">Metinler okunuyor (OCR)…</string>
+    <string name="scan_upright_progress">Sayfa %1$d/%2$d: yön düzeltiliyor ve metin okunuyor…</string>
+
+    <!-- v15 (V5.1 ADIM B.5 / #1) — Raf arka planı teması -->
+    <string name="ay_raf_temasi">Raf Teması</string>
+    <string name="ay_raf_temasi_aciklama">Kitaplığın raf tahtasının görünümü. Seçim anında uygulanır ve kalıcıdır.</string>
+    <string name="shelf_wood">Ahşap</string>
+    <string name="shelf_metal">Metal</string>
+    <string name="shelf_dark">Koyu (Gece)</string>
+    <!-- v16 (YENİ GÖREV 1) — Ders detayı 3 ana raf -->
+    <string name="shelf_books">Ders Kitapları</string>
+    <string name="shelf_slides">Slayt Dosyaları</string>
+    <string name="shelf_docs">Dokümanlar / Yardımcı Dosyalar</string>
+    <string name="shelf_move_title">Rafı Değiştir (taşı)</string>
+    <!-- v16 (YENİ GÖREV 2) — Sınav türü / etki oranı / alarm -->
+    <string name="exam_weight_hint">Not etki oranı % (örn. 40)</string>
+    <string name="exam_alarm_on">🔔 Hatırlatma: Açık</string>
+    <string name="exam_alarm_off">🔕 Hatırlatma: Kapalı</string>
+    <string name="exam_alarm_set">Hatırlatıcı kuruldu ✓</string>
+    <string name="hw_alarm_on">🔔 Teslim hatırlatıcısı: Açık</string>
+    <string name="hw_alarm_off">🔕 Teslim hatırlatıcısı: Kapalı</string>
+    <!-- v16 (YENİ GÖREV 6) — Galeri çoklu sayfa seçimi -->
+    <string name="tara_gallery">🖼 Galeriden Sayfa Seç (çoklu)</string>
+    <string name="tara_add_page">📷 Sayfa Ekle (+)</string>
+    <!-- v16 (GÖREV 3) — Sayfa aralığı modu: aralık bitince otomatik dur -->
+    <string name="sayfa_araligi_bitti">Seçilen sayfa aralığı tamamlandı (%1$d. sayfa) — okuma durdu.</string>
+    <string name="tts_range_label">Sayfa Aralığı</string>
+    <string name="tts_range_all">Tüm sayfalar (aralık yok)</string>
+    <string name="tts_range_value">%1$d – %2$d. sayfalar</string>
+    <string name="tts_range_from">Başlangıç sayfası (örn. 15)</string>
+    <string name="tts_range_to">Bitiş sayfası (örn. 40 · 0 = sınırsız)</string>
+    <!-- v16 — Ana ekran APK kurulum kısayolu -->
+    <string name="apk_install_shortcut">📦 Güncel APK\'yi Kur (Download)</string>
+    <string name="apk_not_found">UmayPDF_Guncel.apk bulunamadı — dosya Download klasöründe olmalı (ve tüm dosyalara erişim izni verilmeli).</string>
+    <string name="apk_install_failed">Kurulum başlatılamadı: %1$s</string>
+    <!-- v16 (YENİ GÖREV 7) — OCR metin bulunamadı uyarısı -->
+    <string name="ocr_no_text">Metin bulunamadı — sayfalar görüntü olarak eklendi. Sesli okuma için sayfaları daha net çekin.</string>
+    <string name="ocr_pages_added">%1$d sayfa eklendi • OCR metni: %2$s</string>
+    <!-- v16 (YENİ GÖREV 8) — Profil kimlik doğrulama (yerel) -->
+    <string name="auth_email">E-posta</string>
+    <string name="auth_password">Şifre</string>
+    <string name="auth_login">Giriş Yap</string>
+    <string name="auth_register">Kayıt Ol</string>
+    <string name="auth_google">Google ile Giriş</string>
+    <string name="auth_login_ok">Giriş yapıldı ✓</string>
+    <string name="auth_register_ok">Kayıt olundu ✓</string>
+    <string name="auth_bad_credentials">E-posta veya şifre hatalı</string>
+    <string name="auth_weak">Şifre en az 4 karakter olmalı</string>
+    <string name="auth_invalid_email">Geçerli bir e-posta adresi girin</string>
+    <string name="auth_logged_in_as">Oturum: %1$s</string>
+    <string name="auth_google_local">Google oturumu açıldı (yerel) ✓</string>
+    <string name="auth_hint">Yerel hesap — bilgiler yalnız bu cihazda saklanır.</string>
+    <!-- v16 (YENİ GÖREV 8) — SAF JSON yedek al / geri yükle -->
+    <string name="json_take">JSON yedek al (.json)</string>
+    <string name="json_restore">JSON yedekten geri yükle (.json)</string>
+    <string name="json_done">JSON yedek yazıldı: %1$s</string>
+    <string name="json_restored">JSON yedek geri yüklendi ✓ — kitaplar yeniden yükleniyor</string>
+    <string name="json_failed">JSON işlem başarısız: %1$s</string>
+    <!-- v20 (ADIM 3) — Raf taşıma / raftan çıkarma menüsü -->
+    <string name="raf_tasi">📚 Raflara taşı…</string>
+    <string name="raftan_cikar">⬅ Raftan çıkar</string>
+    <string name="raf_tasi_baslik">Hangi rafa taşınsın?</string>
+    <string name="tasindi_raf">"%1$s" rafına taşındı</string>
+    <string name="raftan_cikildi">Kitap raflardan çıkarıldı</string>
+    <string name="raf_yok_once_ekle">Önce "Raflar" butonuyla bir raf ekle</string>
+
+    <!-- v5.5 (AŞAMA 1) — Bildirim & alarm izin merkezi -->
+    <string name="perm_center_title">🔔 Bildirim &amp; Alarm İzinleri</string>
+
+    <!-- v5.5 (AŞAMA 1) — ⭐ Favoriler -->
+    <string name="favorilerim">⭐ FAVORİLERİM</string>
+    <string name="favori_ekle">⭐ Favorilere ekle</string>
+    <string name="favori_cikar">☆ Favorilerden çıkar</string>
+    <string name="favori_eklendi">Favorilere eklendi</string>
+    <string name="favori_cikarildi">Favorilerden çıkarıldı</string>
+    <string name="favori_bos">Favori yok — bir kitaba uzun basıp "⭐ Favorilere ekle" de</string>
+    <string name="devam_kaldigin">Kaldığın yerden devam</string>
+    <string name="en_son_okunan">EN SON OKUNAN</string>
+    <string name="sayfa_ayrac">/</string>
+    <string name="hero_ses_hint">Sesli okuma hazır</string>
+    <string name="araclar">ARAÇLAR</string>
+    <string name="ders_etiketi">DERS</string>
+    <string name="son_okuma_bugun">Bugün %1$s okundu</string>
+    <string name="son_okuma_tarih">%1$s okundu</string>
+    <string name="ders_raflar">Raflar</string>
+    <string name="ders_raflar_ipucu">Kaynağa uzun bas → rafa taşı / çıkar</string>
+    <string name="raf_ekle">＋ Yeni Raf</string>
+    <string name="raf_adi">Raf adı</string>
+    <string name="raf_adlandir">Rafı yeniden adlandır</string>
+    <string name="raf_sil">Rafı sil</string>
+    <string name="raf_sil_soru">Bu raf silinsin mi? İçindeki kaynaklar silinmez, yerleşik raflarına döner.</string>
+    <string name="raf_yukari">↑ Bir yukarı taşı</string>
+    <string name="raf_tasindi">Raflar arasında taşındı</string>
+    <string name="bu_raftan_cikar">Bu raftan çıkar</string>
+    <string name="dersten_cikar">Dersten çıkar</string>
+    <string name="kitabi_ac">Kitabı aç</string>
+    <string name="shelf_homework">ÖDEV &amp; PROJELER</string>
+    <!-- v24 — ders video rafı -->
+    <string name="shelf_videos">VİDEOLAR</string>
+    <string name="shelf_videos_empty">Henüz video yok — “＋” ile cihazdan video veya YouTube bağlantısı ekle</string>
+    <string name="ses_kaydi_baslat">⏺  AR · Ders ses kaydı başlat</string>
+    <string name="ses_kaydi_durdur">⏹  Kaydı bitir</string>
+    <string name="shelf_audio">SES KAYITLARI</string>
+    <string name="shelf_audio_empty">Henüz ses kaydı yok — “＋” ile derste aldığın kaydı ekle</string>
+    <string name="audio_remove_note">Raftan kaldırınca yalnız uygulamadaki kopya silinir; telefonundaki orijinal kayıt yerinde kalır.</string>
+    <string name="video_local">Yerel video</string>
+    <string name="video_link_hint">Bağlantı · internet ister</string>
+    <string name="video_pick_local">Cihazdan video seç</string>
+    <string name="video_add_link">YouTube / bağlantı ekle</string>
+    <string name="hw_overdue_badge">GEÇTİ</string>
+    <string name="hw_open_badge">AÇIK</string>
+    <string name="hw_mark_open">Yapılmadı olarak işaretle</string>
+    <string name="hw_mark_done">Yapıldı olarak işaretle</string>
+    <string name="kasa_baslik">Gizli Kasa</string>
+    <string name="kasa_ipucu">Parmak izi / PIN ile korunan özel alan</string>
+    <string name="kasa_ac">Kasayı Aç</string>
+    <string name="ay_guncelleme">Uygulama Güncellemesi</string>
+    <string name="ay_apk_kur">Güncel APK kur</string>
+    <string name="ay_apk_ipucu">İndirilen en yeni UMAY APK dosyasını bulur ve kurulum ekranını açar</string>
+    <string name="apk_pick">APK dosyası seç ve kur</string>
+    <string name="apk_pick_failed">Dosya seçici açılamadı</string>
+    <string name="apk_open_downloads">İndirilenler klasörünü aç</string>
+    <string name="ay_guncelleme_yok">İndirilenler klasöründe yeni bir UMAY APK dosyası bulunamadı.</string>
+    <string name="sec_bildirim">BİLDİRİM &amp; İZİN</string>
+    <string name="sec_bildirim_ipucu">Hatırlatıcıların zamanında çalması için bildirim, alarm ve pil izinlerini buradan yönetin.</string>
+    <string name="sec_guncelleme">HAKKINDA &amp; GÜNCELLEME</string>
+    <string name="ayarlar_alt_baslik">Okuma, görünüm ve akademik ayarların tek yerde</string>
+    <string name="sec_okuma">OKUMA &amp; SES</string>
+    <string name="sec_ceviri">ÇEVİRİ</string>
+    <string name="sec_gorunum">GÖRÜNÜM &amp; KİŞİSEL</string>
+    <string name="sec_yapayzeka">YAPAY ZEKÂ</string>
+    <string name="sec_kisisel">KİŞİSEL &amp; UYGULAMA</string>
+    <string name="sec_veri">VERİ, YEDEK &amp; GÜVENLİK</string>
+    <string name="ekran_acik_kalsin">Ekran açık kalsın (okurken kapanmasın)</string>
+    <string name="ay_apk_kuruluyor">%1$s kurulum ekranına hazırlanıyor…</string>
+    <string name="ay_surum">Sürüm %1$s</string>
+    <string name="kasa_kilitli">Kilitli</string>
+    <string name="kasa_kitaplar">%1$d öğe kasada</string>
+    <!-- v35 / A5: sohbet yanıtındaki sayfa bağlantısı -->
+    <string name="sohbet_sayfa_yok">Sayfa %1$d yok — kitap %2$d sayfa</string>
+    <string name="sohbet_sayfa_acilmadi">Sayfa açılamadı</string>
+    <!-- v36.1: bozuk metin katmanı + AR modu kapalı -->
+    <string name="arapca_modu_onerisi">Bu sayfada metin katmanı bozuk. Okuma ekranındaki AR (Arapça OCR) modunu açarsan sayfa görüntüsünden okunur.</string>
+    <string name="ayar_prep">Ön hazırlık</string>
+    <string name="ayar_prep_acik">Ön hazırlık: AÇIK — boşta kitapları hazırlar</string>
+    <string name="ayar_prep_kapali">Ön hazırlık: KAPALI</string>
+    <string name="ayar_prep_son"> · son: %1$s</string>
+    <string name="ayar_prep_acildi">Ön hazırlık açıldı (şarjda + cihaz boşta)</string>
+    <string name="ayar_prep_kapandi">Ön hazırlık kapatıldı</string>
+    <string name="ayar_lamp_ses">Lamba uyarı sesi</string>
+    <string name="ayar_lamp_ses_acik">Lamba sesi: AÇIK — sarı/kırmızıda bip</string>
+    <string name="ayar_lamp_ses_kapali">Lamba sesi: KAPALI</string>
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v13 (RESPONSIVE) — Küçük/orta telefon (sw360dp) ölçüsü -->
+<resources>
+    <dimen name="page_margin">12dp</dimen>
+    <dimen name="card_margin">10dp</dimen>
+    <dimen name="card_padding">12dp</dimen>
+    <dimen name="cover_width">84dp</dimen>
+    <dimen name="cover_height">116dp</dimen>
+</resources>

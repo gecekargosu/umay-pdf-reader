@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v13 (T9b) — Ara tanıtım ekranı: 3 kart otomatik akar, "Geç" ile atlanır -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_root"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <ViewFlipper
+        android:id="@+id/onbFlipper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_app" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/app_name"
+                android:textColor="@color/umay_accent"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Akıllı PDF &amp; Akademik Belge Asistanı"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔊"
+                android:textSize="64sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Doğal seslerle sesli okuma, karaoke vurgu, ekolayzır ve uyku zamanlayıcı"
+                android:textColor="@color/umay_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✨"
+                android:textSize="64sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Yapay zekâ sayfa özeti, çalışma kartları, ders programı ve sınav geri sayımı"
+                android:textColor="@color/umay_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </ViewFlipper>
+
+    <TextView
+        android:id="@+id/onbNext"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_button_primary"
+        android:gravity="center"
+        android:text="@string/onboarding_basla"
+        android:textColor="@color/umay_on_accent"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- v13 (AGENT 22 — A3) — Hızlı sosyal giriş (simüle/demo akış) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/social_login_hint"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/socGoogle"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/soc_google"
+            android:textColor="@color/umay_text"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/socApple"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/soc_apple"
+            android:textColor="@color/umay_text"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/socFacebook"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/soc_facebook"
+            android:textColor="@color/umay_text"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/socInstagram"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/soc_instagram"
+            android:textColor="@color/umay_text"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/onbSkip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:text="@string/onboarding_gec"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="UmaySoft"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="12sp" />
+</LinearLayout>

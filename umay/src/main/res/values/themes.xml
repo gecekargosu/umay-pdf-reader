@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 (koyu): dialoglar/şirinler de koyu tutarlı olsun -->
-    <style name="Theme.UmayPdf" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/umay_accent</item>
-        <item name="colorOnPrimary">#04121A</item>
-        <item name="colorPrimaryContainer">@color/umay_accent_dark</item>
-        <item name="colorOnPrimaryContainer">#04121A</item>
-        <item name="colorSecondary">@color/umay_accent</item>
-        <item name="colorOnSecondary">#04121A</item>
+    <!-- v13 (T9a): DayNight — gündüz values/colors.xml, gece values-night/colors.xml.
+         Uygulama varsayılanı GECE'dir (AppCompatDelegate); Ayarlar'dan geçiş yapılır. -->
+    <style name="Theme.UmayPdf" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- v5: ANA vurgu sıcak turuncu (butonlar/aktif durumlar), ikincil turkuaz -->
+        <item name="colorPrimary">@color/umay_orange</item>
+        <item name="colorOnPrimary">@color/umay_bg</item>
+        <item name="colorPrimaryContainer">@color/umay_orange_dark</item>
+        <item name="colorOnPrimaryContainer">@color/umay_text</item>
+        <item name="colorSecondary">@color/umay_orange</item>
+        <item name="colorOnSecondary">@color/umay_bg</item>
         <item name="colorTertiary">#A78BFA</item>
         <item name="colorSurface">@color/umay_panel</item>
         <item name="colorOnSurface">@color/umay_text</item>
         <item name="colorSurfaceVariant">@color/umay_panel2</item>
         <item name="colorOnSurfaceVariant">@color/umay_text_dim</item>
-        <item name="colorOutline">#2C4060</item>
+        <item name="colorOutline">@color/umay_border</item>
         <item name="android:colorBackground">@color/umay_bg</item>
         <item name="android:windowBackground">@color/umay_bg</item>
         <item name="android:statusBarColor">@color/umay_bg</item>
@@ -27,15 +29,15 @@
     <style name="ThemeOverlay.UmayDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="colorSurface">@color/umay_panel</item>
         <item name="colorOnSurface">@color/umay_text</item>
-        <item name="colorPrimary">@color/umay_accent</item>
-        <item name="colorOnPrimary">#04121A</item>
+        <item name="colorPrimary">@color/umay_orange</item>
+        <item name="colorOnPrimary">@color/umay_bg</item>
         <item name="buttonBarPositiveButtonStyle">@style/UmayDialogButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/UmayDialogButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/UmayDialogButton</item>
     </style>
 
     <style name="UmayDialogButton" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/umay_accent</item>
+        <item name="android:textColor">@color/umay_orange</item>
     </style>
 
     <!-- Kitaplık kapakları: yuvarlak köşeli, ince çerçeveli -->

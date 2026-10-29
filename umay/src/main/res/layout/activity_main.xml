@@ -1,321 +1,978 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ana ekran — Dijital Kitaplık (ADIM 2):
-     Hero raf (Son Okunan) + yatay kaydırmalı Arşiv rafı (kapak + % rozeti).
-     Dikey liste kaldırıldı; içerik taşarsa dikey kaydırma NestedScrollView ile. -->
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- ══ UMAY — ANA EKRAN (v5.6) ══
+     Kullanıcının el çizimine göre: Profil → Dersler (yatay) → EN SON OKUNAN
+     (kapak + "kaldığın yerden devam" + "baştan başla" + sayfa çipleri) →
+     raflar (başlık şeridi + yatay kitaplar) → araçlar.
+     KURAL: sabit yükseklikli yer tutucular kullanılır (progressText) ki içerik
+     değişimi sayfayı aşağı-yukarı zıplatmasın (BUG-005). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/umay_bg"
-    android:fillViewport="true">
+    android:background="@drawable/bg_gradient_root"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/homeScroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="20dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_gradient_root"
+        android:fillViewport="true"
+        android:fadeScrollbars="true"
+        android:scrollbarSize="0dp"
+        android:scrollbars="none">
 
-        <!-- Başlık satırı -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:id="@+id/titleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="@string/app_name"
-                android:textColor="@color/umay_accent"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-
-            <ImageButton
-                android:id="@+id/btnChat"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_alignParentEnd="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/sohbet"
-                android:src="@drawable/ic_chat" />
-
-            <ImageButton
-                android:id="@+id/btnSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_toStartOf="@id/btnChat"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/ayarlar"
-                android:src="@drawable/ic_settings" />
-        </RelativeLayout>
-
-        <!-- Hızlı işlemler: PDF seç + galeriden PDF -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/btnPickPdf"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_button_primary"
-                android:gravity="center"
-                android:text="@string/pdf_sec"
-                android:textColor="#04121A"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/btnPickImages"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_button_secondary"
-                android:gravity="center"
-                android:text="@string/resimden_pdf"
-                android:textColor="@color/umay_accent"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Kamerayla kitap tarama -->
-        <TextView
-            android:id="@+id/btnScan"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_button_secondary"
-            android:gravity="center"
-            android:text="@string/kitap_tara"
-            android:textColor="@color/umay_accent"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <!-- İlerleme bilgisi (içe aktarma / OCR) -->
-        <TextView
-            android:id="@+id/progressText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/umay_text_dim"
-            android:textSize="13sp"
-            android:visibility="gone" />
-
-        <!-- ═══ HERO RAF: Son Okunan ═══ -->
-        <LinearLayout
-            android:id="@+id/heroWrap"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:paddingStart="16dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="22dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
-                android:text="@string/son_okunan"
-                android:textColor="@color/umay_accent"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
+            <!-- 1. BAŞLIK: logo + ad + slogan + ayarlar/sohbet -->
             <LinearLayout
-                android:id="@+id/continueCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_app" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/titleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.04"
+                        android:text="@string/app_name"
+                        android:textColor="@color/umay_text"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="@string/app_slogan"
+                        android:textColor="@color/umay_text_dim"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- v33 — 3 NEON DURUM LAMBASI artık profil kartının sağında:
+                     başlıkta 14dp'de kalınca gözden kaçıyordu. -->
+
+                <ImageButton
+                    android:id="@+id/btnSettings"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/ayarlar"
+                    android:src="@drawable/ic_settings"
+                    app:tint="@color/umay_orange" />
+
+                <ImageButton
+                    android:id="@+id/btnChat"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/sohbet"
+                    android:src="@drawable/ic_chat"
+                    app:tint="@color/umay_orange" />
+            </LinearLayout>
+
+            <!-- 2. PROFİL KARTI — v25: neon çerçeveli (kullanıcı isteği) -->
+            <com.umay.pdfreader.NeonCardLayout
+                android:id="@+id/greetingCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_profile_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/profileAvatar"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:background="@drawable/bg_avatar_circle"
+                    android:clipToOutline="true"
+                    android:contentDescription="@string/profil"
+                    android:padding="3dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_profile" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/greetingTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Cengiz Kılıç"
+                        android:textColor="@color/umay_text"
+                        android:textSize="15.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/greetingSub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:lineSpacingExtra="1dp"
+                        android:maxLines="3"
+                        android:text="İstanbul Rumeli Üniversitesi&#10;Mühendislik Fakültesi&#10;Yapay Zekâ ve Makine Öğrenimi"
+                        android:textColor="@color/umay_accent"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- v33 — DURUM LAMBALARI (kırmızı=hata, sarı=uyarı,
+                     yeşil=sorun yok). Profile adının yanındaki boşlukta,
+                     18dp neon; sorunlu olan yanıp söner, yeşil sabit yanar.
+                     Dokununca Özellik Künyesi açılır. -->
+                <LinearLayout
+                    android:id="@+id/btnDiagBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/diag_title"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
+
+                    <!-- v34 — lambaların İÇİNDE sayı: kırmızı=çalışmayan,
+                         sarı=uyarı, yeşil=çalışan özellik sayısı. Lamba
+                         sönükken de sayı görünür (0 yazar). -->
+                    <TextView
+                        android:id="@+id/lampRed"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:background="@drawable/bg_lamp_red"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="0"
+                        android:textColor="#0B1220"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/lampAmber"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="4dp"
+                        android:background="@drawable/bg_lamp_amber"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="0"
+                        android:textColor="#0B1220"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/lampGreen"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="4dp"
+                        android:background="@drawable/bg_lamp_green"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="0"
+                        android:textColor="#0B1220"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@string/profil"
+                    android:src="@drawable/ic_chevron_right" />
+            </com.umay.pdfreader.NeonCardLayout>
+
+            <!-- Durum/ilerleme yuvası: SABİT yükseklik (zıplama yok) -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="18dp"
+                android:layout_marginTop="2dp">
+
+                <TextView
+                    android:id="@+id/progressText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:textColor="@color/umay_text_dim"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- 3. DERSLER — v25: bölümün TAMAMI tek neon çerçeve içinde -->
+            <com.umay.pdfreader.NeonCardLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_panel"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/coursesLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/derslerim"
+                    android:textColor="@color/umay_text"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnAddCourse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/ders_ekle"
+                    android:textColor="@color/umay_orange"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnSchedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_input"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/ders_programi"
+                    android:textColor="@color/umay_text_dim"
+                    android:textSize="12sp" />
+
+                <ImageButton
+                    android:id="@+id/coursePrev"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/derslerim"
+                    android:src="@drawable/ic_carousel_left" />
+
+                <ImageButton
+                    android:id="@+id/courseNext"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/derslerim"
+                    android:src="@drawable/ic_carousel_right" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/courseList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/coursesEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/derslerim_bos"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            </com.umay.pdfreader.NeonCardLayout>
+
+            <!-- 4. EN SON OKUNAN (kahraman kart) -->
+            <LinearLayout
+                android:id="@+id/heroWrap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp">
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/continueCover"
-                        android:layout_width="84dp"
-                        android:layout_height="118dp"
-                        android:contentDescription="@string/app_name"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_pdf"
-                        app:shapeAppearanceOverlay="@style/shape_cover"
-                        app:strokeColor="@color/umay_panel2"
-                        app:strokeWidth="1dp"
-                        app:tint="@color/umay_accent" />
-
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:letterSpacing="0.12"
+                        android:text="@string/en_son_okunan"
+                        android:textColor="@color/umay_orange"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/continueTitle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:maxLines="2"
-                            android:textColor="@color/umay_text"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
+                    <ImageButton
+                        android:id="@+id/heroPrev"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/en_son_okunan"
+                        android:src="@drawable/ic_carousel_left" />
 
-                        <TextView
-                            android:id="@+id/continueMeta"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textColor="@color/umay_text_dim"
-                            android:textSize="13sp" />
+                    <ImageButton
+                        android:id="@+id/heroNext"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/en_son_okunan"
+                        android:src="@drawable/ic_carousel_right" />
+                </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/heroPercent"
-                            android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/continueCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_hero_card"
+                    android:clickable="true"
+                    android:elevation="6dp"
+                    android:focusable="true"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Kapak -->
+                        <FrameLayout
+                            android:layout_width="86dp"
+                            android:layout_height="120dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/continueCover"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/app_name"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_pdf"
+                                app:shapeAppearanceOverlay="@style/shape_cover"
+                                app:strokeColor="@color/umay_hero_stroke"
+                                app:strokeWidth="1dp" />
+
+                            <LinearLayout
+                                android:id="@+id/coverFallbackHero"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_cover_fallback"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="6dp">
+
+                                <ImageView
+                                    android:layout_width="26dp"
+                                    android:layout_height="26dp"
+                                    android:importantForAccessibility="no"
+                                    android:src="@drawable/ic_book_neu" />
+
+                                <TextView
+                                    android:id="@+id/coverFallbackHeroTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:ellipsize="end"
+                                    android:gravity="center"
+                                    android:maxLines="4"
+                                    android:textColor="@color/umay_text"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </FrameLayout>
+
+                        <!-- Kitap bilgisi + eylemler -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:textColor="@color/umay_orange"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/continueTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:textColor="@color/umay_text"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/continueMeta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="@color/umay_text_dim"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/heroPercent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:textColor="@color/umay_text_dim"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <ProgressBar
+                                android:id="@+id/heroProgress"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="5dp"
+                                android:layout_marginTop="7dp"
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/bg_progress_hero" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Eylemler: kaldığın yerden devam + baştan başla -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/btnContinue"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="42dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_weight="1.35"
                             android:background="@drawable/bg_button_primary"
                             android:gravity="center"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="20dp"
-                            android:text="@string/devam_et"
-                            android:textColor="#04121A"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="@string/devam_kaldigin"
+                            android:textColor="@color/umay_on_accent"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnRestart"
+                            android:layout_width="0dp"
+                            android:layout_height="42dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_button_secondary"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="@string/bastan_basla"
+                            android:textColor="@color/umay_text"
+                            android:textSize="12.5sp"
                             android:textStyle="bold" />
                     </LinearLayout>
+
+                    <!-- Alt şerit: sayfa çipleri + ses/okuma göstergesi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/heroPageCurrent"
+                            android:layout_width="34dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/bg_chip_page_active"
+                            android:gravity="center"
+                            android:textColor="@color/umay_on_accent"
+                            android:textSize="11.5sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:text="@string/sayfa_ayrac"
+                            android:textColor="@color/umay_text_dim"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/heroPageTotal"
+                            android:layout_width="34dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/bg_chip_page"
+                            android:gravity="center"
+                            android:textColor="@color/umay_text"
+                            android:textSize="11.5sp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_eq_panel"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp">
+
+                            <View
+                                android:layout_width="118dp"
+                                android:layout_height="30dp"
+                                android:background="@drawable/eq_bars" />
+
+                            <TextView
+                                android:id="@+id/heroReadHint"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="@string/hero_ses_hint"
+                                android:textColor="@color/umay_text_dim"
+                                android:textSize="9.5sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 5. KİTAPLIĞIM: arama + sıralama (v25 — neon çerçeveli bölüm) -->
+            <com.umay.pdfreader.NeonCardLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_panel"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+            <TextView
+                android:id="@+id/libraryLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/kutuphanem"
+                android:textColor="@color/umay_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:hint="@string/ara"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/umay_text"
+                android:textColorHint="@color/umay_text_dim"
+                android:textSize="14sp" />
+
+            <HorizontalScrollView
+                android:id="@+id/sortRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/sortAlpha"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="@string/sort_alpha"
+                        android:textColor="@color/umay_text_dim"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/sortAdded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="@string/sort_added"
+                        android:textColor="@color/umay_text_dim"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            </com.umay.pdfreader.NeonCardLayout>
+
+            <!-- 6. RAFLAR — her raf: başlık şeridi + yatay kitaplar -->
+
+            <!-- ⭐ Favorilerim (kullanıcının seçtiği kitaplar; dosya taşınmaz) -->
+            <LinearLayout
+                android:id="@+id/shelfFavorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include layout="@layout/item_shelf_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/shelfFavoritesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:scrollbars="none" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/umay_shelf_edge" />
+            </LinearLayout>
+
+            <!-- Raf: Ders Kitapları -->
+            <LinearLayout
+                android:id="@+id/shelf_ders_kitaplari"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include layout="@layout/item_shelf_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/shelf_ders_kitaplari_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:scrollbars="none" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/umay_shelf_edge" />
+            </LinearLayout>
+
+            <!-- Raf: Ders Slaytları ve Notlar -->
+            <LinearLayout
+                android:id="@+id/shelf_ders_slayt_notlar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include layout="@layout/item_shelf_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/shelf_ders_slayt_notlar_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:scrollbars="none" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/umay_shelf_edge" />
+            </LinearLayout>
+
+            <!-- Kullanıcının eklediği özel raflar -->
+            <LinearLayout
+                android:id="@+id/shelfDynamicWrap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+            <!-- Raf: Cihaz Taramaları ve Dokümanlar (en altta) -->
+            <LinearLayout
+                android:id="@+id/shelf_cihang_taramalari"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include layout="@layout/item_shelf_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/shelf_cihang_taramalari_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:scrollbars="none" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/umay_shelf_edge" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/emptyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="@string/bos_kutuphane"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <!-- 7. ARAÇLAR — içe aktarma ve yönetim (sade, iki sütun)
+                 v24: tüm blok neon çerçeveli tek panelde toplandı
+                 (çerçeve MainActivity'de toolsPanel'e uygulanır). -->
+            <LinearLayout
+                android:id="@+id/toolsPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/araclar"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnPickPdf"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_primary"
+                    android:gravity="center"
+                    android:text="@string/pdf_sec"
+                    android:textColor="@color/umay_on_accent"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnPickImages"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/resimden_pdf"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnScan"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/kitap_tara"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnDeepScan"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/deep_open"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnShelves"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/shelves_manage"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnExams"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/sinavlar_baslik"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+
+            <!-- v5.7 — GİZLİ KASA: ana sayfanın en altında, kilitli alan -->
+            <LinearLayout
+                android:id="@+id/vaultCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_hero_card"
+                android:clickable="true"
+                android:elevation="4dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="14dp">
+
+                <!-- v21 — gerçek kasa ikonu (emoji yerine vektör çizim) -->
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_avatar_circle"
+                    android:contentDescription="@string/kasa_baslik"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_safe"
+                    app:tint="@color/umay_orange" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/kasa_baslik"
+                        android:textColor="@color/umay_text"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/kasa_ipucu"
+                        android:textColor="@color/umay_text_dim"
+                        android:textSize="11.5sp" />
                 </LinearLayout>
 
-                <!-- İlerleme çubuğu -->
-                <ProgressBar
-                    android:id="@+id/heroProgress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="6dp"
-                    android:layout_marginTop="12dp"
-                    android:max="100"
-                    android:progress="0"
-                    android:progressDrawable="@drawable/bg_progress_hero"
-                    android:progressTint="@color/umay_accent" />
+                <TextView
+                    android:id="@+id/vaultOpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/kasa_ac"
+                    android:textColor="@color/umay_orange"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+            </LinearLayout>
+            <!-- /toolsPanel -->
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Arama -->
-        <EditText
-            android:id="@+id/searchInput"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_input"
-            android:hint="@string/ara"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:textColor="@color/umay_text"
-            android:textColorHint="@color/umay_text_dim"
-            android:textSize="14sp"
-            android:visibility="gone" />
-
-        <!-- Sıralama çipleri -->
-        <LinearLayout
-            android:id="@+id/sortRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/sortRecent"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:background="@drawable/bg_input"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/sort_recent"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/sortAlpha"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/bg_input"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/sort_alpha"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/sortAdded"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/bg_input"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:text="@string/sort_added"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Arşiv rafı başlığı -->
-        <TextView
-            android:id="@+id/libraryLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="4dp"
-            android:text="@string/kutuphanem"
-            android:textColor="@color/umay_text_dim"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-        <!-- ═══ ARŞİF RAFI: yatay kaydırmalı kapaklar ═══ -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/bookList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/emptyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:text="@string/bos_kutuphane"
-            android:textColor="@color/umay_text_dim"
-            android:textSize="15sp"
-            android:visibility="gone" />
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    <!-- Sabit alt banner (G sınıfı güvenli reklam) -->
+    <FrameLayout
+        android:id="@+id/adContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/umay_frame" />
+</LinearLayout>

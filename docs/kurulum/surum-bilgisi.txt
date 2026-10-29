@@ -1,0 +1,17 @@
+UMAY PDF READER — SÜRÜM BİLGİSİ
+===============================
+Sürüm adı ......... 5.13
+Sürüm kodu ........ 30
+Paket adı ......... com.umay.pdfreader
+Dosya ............. UmayPdfReader.apk (~70 MB)
+Hedef Android ..... 8.0 (API 26) ve üzeri
+Derleme tarihi .... 29 Ekim 2026
+
+SHA-256 (dosya doğrulama):
+  4bd11cc53fde427a335a5b2629704f3eb81fe2a85a0d90aa706c60305fe330c7
+
+Bu sürüm test amaçlıdır:
+  • Reklam alanında "Test Reklamı" yazar (normal).
+  • Yapay zekâ sohbeti için uygulama içinde gömülü ücretsiz anahtar var;
+    istenirse Ayarlar'dan kişisel anahtar girilebilir.
+  • Kitaplar ve notlar cihazda kalır.

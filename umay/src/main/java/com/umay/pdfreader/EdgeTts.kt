@@ -35,7 +35,9 @@ import kotlin.coroutines.resumeWithException
 object EdgeTts {
 
     private const val TRUSTED_CLIENT_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4"
-    private const val SEC_MS_GEC_VERSION = "1-143.0.3650.75"
+    // v5.8 — Microsoft Ekim 2026'da v1 token'ı reddetti (403 Forbidden).
+    // "2-" öneki v2 token biçimini seçer; token EdgeToken.generateV2() üretir.
+    private const val SEC_MS_GEC_VERSION = "2-143.0.3650.75"
     private const val BASE =
         "speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1"
     private const val CHROME_UA =
@@ -46,22 +48,26 @@ object EdgeTts {
     const val VOICE_TR_FEMALE = "tr-TR-EmelNeural"
     const val VOICE_TR_MALE = "tr-TR-AhmetNeural"
     const val VOICE_MULTI = "en-US-EmmaMultilingualNeural"
+    // v5.12 — ARAPÇA: meal/tefsir okuması. Türkçe ses Arapça harfleri
+    // okuyamadığı için (veya telaffuzu bozuk olduğu için) ayrı ses gerekir.
+    const val VOICE_AR_MALE = "ar-SA-HamedNeural"
+    const val VOICE_AR_FEMALE = "ar-SA-ZariyahNeural"
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(12, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS)
+        // v10 (M3 — MOTOR KİLİTLENME FIX): Yavaş ağlarda / uzun parçalarda
+        // 12sn bağlantı + 60sn okuma sınırı "yanıt vermedi" hatalarına yol
+        // açıyordu → cömert timeout'lar (Edge neural synth uzun chunk'ta 60sn'yi aşabiliyor)
+        .connectTimeout(20, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(20, TimeUnit.SECONDS)
         .build()
 
-    /** edge-tts drm.py ile birebir aynı token üretimi. */
-    private fun secMsGec(): String {
-        var ticks = System.currentTimeMillis() / 1000.0 + 11644473600.0   // Windows epoch
-        ticks -= ticks % 300                                             // 5 dk yuvarla
-        val scaled = (ticks * 1e7).toLong()                              // 100ns tick
-        val digest = MessageDigest.getInstance("SHA-256")
-            .digest("$scaled$TRUSTED_CLIENT_TOKEN".toByteArray(Charsets.US_ASCII))
-        return digest.joinToString("") { "%02X".format(it) }
-    }
+    /**
+     * v5.8 — edge-tts drm.py (v7) ile birebir aynı **v2** token üretimi.
+     * Eski 64 haneli SHA-256 token'ı 403 alıyordu; artık CS64+SHA-256 biçimi
+     * `<16 hex>-<64 hex>` üretilir (algoritma `EdgeToken` içinde, testli).
+     */
+    private fun secMsGec(): String = EdgeToken.generateV2()
 
     /** edge-tts date_to_string(): "Sat Oct 03 2026 17:00:00 GMT+0000 (Coordinated...)" */
     private fun dateToString(): String {
@@ -112,8 +118,13 @@ object EdgeTts {
         // Perde: orana göre Hz ofseti (±50Hz güvenli sınır — servis reddetmesin)
         val pitchHz = ((pitchRatio - 1f) * 100f).toInt().coerceIn(-50, 50)
         val pitch = if (pitchHz >= 0) "+${pitchHz}Hz" else "${pitchHz}Hz"
+        // v5.12 — Konuşma dili SES ADINDAN türetilir (tr-TR / ar-SA / en-US).
+        // Eskiden sabit 'en-US' idi; Arapça seste SSML dili uyuşmadığı için
+        // servis yanıtı bozuk/düşük kaliteli olabiliyordu.
+        val lang = voice.split('-').take(2).joinToString("-")
+            .ifBlank { "en-US" }
         val ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' " +
-            "xml:lang='en-US'><voice name='$voice'>" +
+            "xml:lang='$lang'><voice name='$voice'>" +
             "<prosody pitch='$pitch' rate='$rate' volume='+0%'>${clean(text)}</prosody>" +
             "</voice></speak>"
 
@@ -180,7 +191,10 @@ object EdgeTts {
                     if (bytes.size < 2) return
                     val arr = bytes.toByteArray()
                     val headerLen = ((arr[0].toInt() and 0xff) shl 8) or (arr[1].toInt() and 0xff)
-                    if (headerLen > arr.size) return
+                    // v5.1: headerLen == arr.size durumunda substring(headerLen + 2, size)
+                    // IllegalArgumentException fırlatıyordu (WebSocket callback'inde
+                    // → çökme). Bayt gövdesi için header + 2 kadar yer KALMALI.
+                    if (headerLen + 2 > arr.size) return
                     val headers = String(arr, 0, headerLen, Charsets.ISO_8859_1)
                     if (!headers.contains("Path:audio")) return
                     if (!headers.contains("audio/mpeg")) return   // Content-Type'suz bitiş mesajı
@@ -217,6 +231,12 @@ object EdgeTts {
 
     /** Kullanıcının seçimine göre ses adı. */
     fun voiceFor(genderMode: String, text: String): String {
+        // v5.12 — Arapça metin: Arapça neural ses (Kur'an meali / tefsir).
+        // Öncelik sırası önemli: Arapça blok varsa "Türkçe değil" kuralından
+        // ÖNCE buraya düşmeli, yoksa multilingual ses anlaşılmaz okur.
+        if (TextUtil.arabicRatio(text) >= 0.15) {
+            return if (genderMode == "male") VOICE_AR_MALE else VOICE_AR_FEMALE
+        }
         // Türkçe olmayan metinde multilingual ses daha doğru okur
         if (!TextUtil.looksTurkish(text)) return VOICE_MULTI
         return when (genderMode) {

@@ -3,5 +3,5 @@
     android:width="24dp" android:height="24dp"
     android:viewportWidth="24" android:viewportHeight="24"
     android:tint="@color/umay_text">
-    <path android:fillColor="#FFFFFF" android:pathData="M6,5h4v14H6zM14,5h4v14h-4z" />
+    <path android:fillColor="@color/umay_icon" android:pathData="M6,5h4v14H6zM14,5h4v14h-4z" />
 </vector>

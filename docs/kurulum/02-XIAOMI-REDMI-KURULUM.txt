@@ -1,0 +1,43 @@
+﻿XIAOMI / REDMI / POCO (MIUI & HyperOS) — KURULUM
+=================================================
+
+Xiaomi'de en sık takılan yer: "bilinmeyen kaynak" izni ve Güvenlik
+uygulamasının uyarısı. Sırayla:
+
+1) APK'yı telefona al (WhatsApp/Telegram → "İndir").
+
+2) Bilinmeyen kaynaktan yüklemeye izin ver
+   Ayarlar → Gizlilik koruması (Privacy protection) → Özel izinler →
+   "Bilinmeyen kaynaklardan yükleme" → APK'yı açacağın uygulamayı seç
+   (Dosyalar / Chrome / WhatsApp / Telegram) → AÇ.
+   (HyperOS'ta: Ayarlar → Uygulamalar → İzinleri yönet → Özel izinler →
+    "Bilinmeyen uygulamaları yükle".)
+
+3) Play Protect uyarısı
+   "Google Play Protect bu uygulamayı tanımıyor" → "Yine de yükle".
+   Sürekli çıkıyorsa: Play Store → profil → Play Protect → dişli →
+   taramayı geçici kapat, kurulumdan sonra aç.
+
+4) Xiaomi "Güvenlik" uygulaması uyarısı
+   Kurulumdan sonra Güvenlik uygulaması "riskli uygulama" diyebilir:
+   "Yoksay" / "Güven" seç. Program virüs değil; Play dışı olduğu için
+   imzası bilinmiyor.
+
+5) Kur
+   Dosyalar / Mi Dosya Yöneticisi → İndirilenler → UmayPdfReader.apk →
+   "Yükle" → onay ekranında "Yine de yükle" → "Aç".
+
+6) İlk açılış ve arka plan izinleri (Xiaomi'de önemli)
+   • Bildirim izni: "İzin ver".
+   • Tüm dosyalara erişim: "İzin ver".
+   • Ayarlar → Uygulamalar → Umay → Otomatik başlatma (Autostart): AÇ.
+   • Ayarlar → Uygulamalar → Umay → Pil tasarrufu → "Kısıtlama yok".
+   • Son uygulamalar ekranında Umay'ı aşağı çekip KİLİTLE (kilit simgesi);
+     yoksa Xiaomi arka planda okumayı kapatır.
+
+Sorun giderme
+  • "Yükleme engellendi" → 2. adımdaki izni verdiğin uygulamanın doğru
+    olduğundan emin ol (APK'yı hangi uygulamadan açtıysan o).
+  • "Paket geçersiz" → dosya yarım inmiş; tekrar indir.
+  • Kurulumdan sonra uygulama simgesi yok → uygulama çekmecesinde ara,
+    ana ekrana sürükle.

@@ -1,89 +1,90 @@
-# Umay PDF Okuyucu 📖🔊
+# UMAY PDF Reader
 
-**Android için çevrimdışı PDF okuyucu + seslendirme + ders asistanı.**
-Ders PDF'ini içeri al, arka planda seslendir, ekrana bakma; taranmış sayfalar OCR ile
-okunsun, İngilizce kitap Türkçe seslendirilsin, PDF'e soru sor.
+Telefonundaki PDF, slayt, doküman ve resimleri **açan**, **sesli okuyan**,
+içindekileri **yapay zekâ ile açıklayan** ve kitaplığını raflara ayıran
+Android uygulaması. Türkçe arayüz, çevrimdışı çalışma, ekran kapalıyken
+okumaya devam.
 
-| | |
+## ⬇️ İndir (APK)
+
+**Doğrudan indirme:**
+[UmayPdfReader.apk](https://github.com/gecekargosu/umay-pdf-reader/releases/latest/download/UmayPdfReader.apk)
+
+Telefonda bu bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
+Uyarı çıkarsa **"Yine de yükle"**.
+
+Sürüm: **5.13** (kod 30) · Android 8.0 ve üzeri · ~70 MB
+
+## Kurulum (kısa)
+
+Program Google Play'de olmadığı için Android "bilinmeyen kaynak" uyarısı verir.
+Bu normaldir; izin verip devam edilir.
+
+| Telefon | Yapılacak |
 |---|---|
-| Paket | `com.umay.pdfreader` |
-| Sürüm | **1.4** (versionCode 6) |
-| Min SDK | 26 (Android 8.0) — Target 34 |
-| Dil | Kotlin 1.9.10 · AGP 8.1.4 · Gradle 8.7 |
-| Kurulum | `umay-pdf-reader-1.4.apk` (release, debug anahtarıyla imzalı) |
+| **Samsung** | Ayarlar → Güvenlik ve gizlilik → Diğer güvenlik ayarları → *Bilinmeyen uygulamaları yükle* → izin ver. One UI 6.1+ ise **Otomatik engelleme**'yi kapat. |
+| **Xiaomi / Redmi / POCO** | Ayarlar → Gizlilik koruması → Özel izinler → *Bilinmeyen kaynaklardan yükleme* → izin ver. Kurulumdan sonra **Otomatik başlatma** aç, pil → *Kısıtlama yok*. |
+| **Diğer Android** | Ayarlar → Uygulamalar → Özel erişim → *Bilinmeyen uygulamaları yükle* → Dosyalar/Chrome → izin ver. |
+| **Tüm cihazlar** | Play Protect "tanımıyor" derse **Yine de yükle**. |
 
-> Bu depoda ikinci bir uygulama daha var: `app/` → **Jarvis Mobile** (HUD/lockscreen).
-> PDF okuyucu **`umay/`** modülüdür.
+Ayrıntılı rehberler: [`docs/kurulum/`](docs/kurulum)
+- [Önce bunu oku](docs/kurulum/00-ONCE-BUNU-OKU.txt)
+- [Samsung](docs/kurulum/01-SAMSUNG-KURULUM.txt)
+- [Xiaomi / Redmi / POCO](docs/kurulum/02-XIAOMI-REDMI-KURULUM.txt)
+- [Diğer Android markaları](docs/kurulum/03-DIGER-ANDROID-KURULUM.txt)
+- [WhatsApp / Telegram ile gönderme](docs/kurulum/04-WHATSAPP-TELEGRAM.txt)
+
+### İlk açılışta önerilen izinler
+- **Bildirim** — sesli okuma kontrolü, ders/sınav hatırlatmaları
+- **Tüm dosyalara erişim** — cihazdaki belgeleri kütüphaneye ekleme
+- **Pil → Kısıtlama yok** — ekran kapalıyken okumanın sürmesi
+- **Tam alarm** — ders/sınav alarmlarının zamanında çalması
 
 ## Özellikler
 
-- 📷 **Kitap tarama** — kamerayla sayfa sayfa çek, **sayfa numarasına göre
-  sıralanıp tek PDF olsun**, kütüphaneye kitap olarak girsin ve okunsun
-- 🖼 **Fotoğraftan PDF** — galeriden seçtiğin fotoğraflar otomatik sıralanıp
-  A4 sayfalara dönüşür, OCR'e girer
-- 📚 **Kütüphane** — SAF ile PDF seç, kitap listesi, arama, "kaldığın yerden devam et"
-- 🔊 **Seslendirme** — ekran kapalıyken bile devam eder (foreground servis + wakelock),
-  bildirimden oynat/duraklat/ileri/geri
-- 🎚 **Hız & ses** — 0.5x–2.0x, kadın/erkek/otomatik ses seçimi, ses testi,
-  **ekolayzır** (Ayarlar paneli + okuma ekranındaki Ses paneli)
-- 🖨 **OCR** — taranmış (görsel) sayfalar ML Kit ile offline okunur, ilerleme gösterilir
-- 🌐 **Çeviri** — İngilizce PDF'i Türkçe oku (ML Kit offline, ~35MB model bir kez iner)
-- 💬 **Sohbet** — API anahtarı yoksa PDF içinde offline arama + özet; varsa
-  ücretsiz Gemini / OpenAI-uyumlu gerçek sohbet
-- ⏱ **Uyku zamanlayıcı** — 10–90 dk veya "bu sayfada bitir"
-- 🔍 **Yakınlaştırma** — çift parmak zoom, sürükle, çift dokunuşla sıfırla
+- **Kitaplık ve raflar**: ders/dosya adına göre otomatik yerleştirme, her raf
+  farklı neon çerçeve, yatay kaydırma, alfabetik / en son eklenen sıralaması
+- **Okuma**: PDF, DOC/DOCX, PPTX, TXT, EPUB görüntüleme; sayfa bazlı metin
+  çıkarma; taranmış sayfalar için OCR; Arapça OCR modu; karaoke vurgusu
+- **Sesli okuma**: Edge Neural sesler, yerleşik TTS'e otomatik düşüş, gerçek
+  PCM ekolayzır, 700+ sayfalık kitaplarda takılmadan ilerleme, ekran kapalıyken
+  devam, İngilizce metni Türkçeye çevirerek okuma
+- **Yapay zekâ**: kitap içinden kaynaklı yanıt (sayfa numarasıyla), konu bazlı
+  sohbet geçmişi, sayfa özeti
+- **Dersler**: program, sınav türleri (vize/final/bütünleme/quiz), yüzdeler,
+  notlar, ANO/AGNO, ders ses kayıtları ve video rafları
+- **Gizli kasa**: PIN + parmak izi, AES-256 şifreli resim/video/belge rafları
+- **Arka plan ön hazırlık**: şarjdayken ve boştayken kitapları okumaya hazırlar,
+  sorunlu sayfaları raporlar
+- **Durum lambaları**: kırmızı/sarı/yeşil; sorun varsa yanıp söner ve sesli
+  uyarı verir; yeşil lamba 2 dakikada bir kendi kendini denetler
 
-## APK kurulumu (telefonda)
+## Kaynaktan derleme
 
-Release APK bu ortamda şuraya kopyalanır:
-
-```
-/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.4.apk
-```
-
-Dosya yöneticisinden APK'ya bas → "Yükle". (Termux'tan: `termux-open
-/storage/emulated/0/FreebuffProject/umay-pdf-reader-1.4.apk`)
-
-Bilinmeyen kaynak izni ilk kurulumda sorulur — izin ver.
-
-## Derleme
+Gereksinim: **JDK 17** (JDK 21/25 ile AGP 8.1.4 derlemez), Android SDK 36.
 
 ```bash
-export ANDROID_HOME=/opt/android-sdk
-bash gradlew :umay:testDebugUnitTest :umay:assembleDebug :umay:assembleRelease --no-daemon
+export JAVA_HOME=/yol/jdk-17
+./gradlew :umay:assembleDebug
+# çıktı: umay/build/outputs/apk/debug/umay-debug.apk
 ```
 
-> `chmod +x gradlew` bu dosya sisteminde etkili olmaz; **her zaman `bash gradlew`**.
+Gömülü yapay zekâ anahtarı **depoda yoktur** (güvenlik). Kendi ücretsiz
+Gemini anahtarını iki yoldan biriyle ver:
 
-CI (`.github/workflows/build.yml`) push'ta test + debug + release üretir;
-artifact adları: `umay-pdf-reader-release`, `umay-pdf-reader-debug`.
-
-## Test
-
-`umay/src/test/.../TextUtilTest.kt` — 32 test: cümle ayırma, dil algılama,
-çevrimdışı arama, özet, normalizasyon, sembol→konuşma, karaoke eşleşmesi,
-doğal dosya sıralaması, sohbet bağlamı seçimi.
-
-```bash
-bash gradlew :umay:testDebugUnitTest
+```properties
+# UmayWork/local.properties
+umay.geminiKey=AIza...
 ```
+veya ortam değişkeni: `export UMAY_GEMINI_KEY=AIza...`
 
-## Depo Haritası
+Anahtar yoksa uygulama yine çalışır; sohbet çevrimdışı PDF aramasına düşer,
+kullanıcı anahtarını uygulama içinden Ayarlar'dan girebilir.
 
-```
-├── CLAUDE.md                 ← AI ajanlar için hızlı bağlam
-├── README.md                 ← bu dosya
-├── docs/
-│   ├── ARCHITECTURE.md       ← mimari + veri akışları
-│   ├── ROADMAP.md            ← yol haritası ve durum
-│   ├── CHANGELOG.md          ← sürüm geçmişi
-│   ├── TEST_REPORT.md        ← build/test kanıtları, SHA256
-│   └── logs/                 ← build logları (commit edilmiş)
-├── umay/                     ← 📖 PDF okuyucu uygulaması
-│   └── src/main/java/com/umay/pdfreader/   (11 dosya, ~2.600 satır)
-└── app/                      ← Jarvis Mobile (bağımsız)
-```
+Yayın imzası için `umay/keystore.properties` + `umay/GUNCELLEME_ANAHTARLARI/umay-release.jks`
+gerekir; ikisi de depoda **yoktur** ve paylaşılmaz.
 
-## Lisans
+## Gizlilik
 
-Kişisel/özel proje.
+Kitaplar ve notlar cihazda kalır. Yalnız sesli okuma (Edge TTS) ve yapay zekâ
+özellikleri ağ kullanır; ilgili metin parçaları istek anında gönderilir.

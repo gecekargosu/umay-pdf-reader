@@ -26,7 +26,7 @@
         android:paddingEnd="6dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:textColor="#04121A"
+        android:textColor="@color/umay_on_accent"
         android:textSize="12sp"
         android:textStyle="bold" />
 

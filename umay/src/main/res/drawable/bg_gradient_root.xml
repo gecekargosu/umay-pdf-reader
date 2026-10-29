@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v6 — Konsept arka planı: derin uzay siyahı (#0B0E14) üzerine hafif
+     mavi/turkuaz sisli degrade (glassmorphism zemini). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:centerColor="@color/umay_bg_mid"
+        android:endColor="@color/umay_bg_haze"
+        android:startColor="@color/umay_bg"
+        android:type="linear" />
+</shape>

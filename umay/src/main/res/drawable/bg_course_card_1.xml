@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v16 (GÖREV 2) — Renkli ders kartı (1): zemin+çerçeve tema token'ı
+     (gündüz pastel + koyu çerçeve, gece derin + parlak çerçeve). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/umay_course_1" />
+    <corners android:radius="12dp" />
+    <stroke android:width="1.5dp" android:color="@color/umay_course_stroke_1" />
+</shape>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v11 (GÖREV 5) — Kamu Malı Kitap Arama Diyaloğu (Open Library) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kamu Malı Kitaplık"
+        android:textColor="@color/umay_accent"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Telif hakkı dolmuş ücretsiz kitaplar (Open Library)"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/pdQuery"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_input"
+        android:hint="Kitap adı, yazar veya konu…"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textColor="@color/umay_text"
+        android:textColorHint="@color/umay_text_dim"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/pdSearch"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_button_primary"
+        android:gravity="center"
+        android:text="Ara"
+        android:textColor="@color/umay_on_accent"
+        android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/pdProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/pdResults"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_marginTop="10dp"
+        android:divider="@color/umay_panel2"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone" />
+</LinearLayout>

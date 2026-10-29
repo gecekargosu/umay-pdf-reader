@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/umay_bg">
+    android:background="@drawable/bg_gradient_root">
 
     <!-- Üst bar -->
     <RelativeLayout
@@ -32,6 +33,19 @@
             android:textColor="@color/umay_text"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <!-- v5.10 (F2) — konu bazlı sohbet geçmişi -->
+        <ImageButton
+            android:id="@+id/btnHistory"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="4dp"
+            android:layout_toStartOf="@id/modeChip"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/sohbet_gecmis"
+            android:src="@drawable/ic_history"
+            app:tint="@color/umay_accent" />
 
         <TextView
             android:id="@+id/modeChip"
@@ -103,7 +117,7 @@
             android:paddingStart="18dp"
             android:paddingEnd="18dp"
             android:text="@string/gonder"
-            android:textColor="#04121A"
+            android:textColor="@color/umay_on_accent"
             android:textStyle="bold" />
     </LinearLayout>
 

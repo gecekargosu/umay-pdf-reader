@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v25 (H5) — ANDROID 12+ (API 31+) veri çıkarma kuralları.
+  Kasa sırları ve şifreli içerik ne bulut yedeğine ne de cihazdan cihaza
+  aktarıma dahil edilir. Gerekçe: PIN özeti/tuzu taşınırsa kasa başka cihazda
+  açılabilir hâle gelir; şifreli dosyalar ise zaten cihazda çözülürken anlamsızdır.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="umay_vault.xml" />
+        <exclude domain="file" path="vault" />
+        <exclude domain="file" path="vault_view" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="umay_vault.xml" />
+        <exclude domain="file" path="vault" />
+        <exclude domain="file" path="vault_view" />
+    </device-transfer>
+</data-extraction-rules>

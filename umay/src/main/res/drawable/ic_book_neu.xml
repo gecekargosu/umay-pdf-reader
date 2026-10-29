@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v7 — Neumorphic kitap ikonu (yedek kapak şablonunda ortalanır).
+     Üç katman: koyu gölge (sağ-alt) + açık ışık (sol-üst) + mat gövde →
+     kabartma/neumorphic his. Turuncu çizgi marka aksanıdır. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="34dp"
+    android:height="34dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+
+    <!-- Gölge (sağ-alt kaydırılmış) -->
+    <path
+        android:fillColor="#04060A"
+        android:fillAlpha="0.85"
+        android:pathData="M14,13 h18 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-18 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z" />
+
+    <!-- Işık (sol-üst kaydırılmış) -->
+    <path
+        android:fillColor="#33415A"
+        android:fillAlpha="0.9"
+        android:pathData="M12,9 h18 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-18 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z" />
+
+    <!-- Gövde -->
+    <path
+        android:fillColor="#1A2230"
+        android:pathData="M13,11 h18 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-18 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z" />
+
+    <!-- Cilt / sırt bandı -->
+    <path
+        android:fillColor="#141B27"
+        android:pathData="M13,11 h3 v24 h-3 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z" />
+
+    <!-- Sırt ayrım çizgisi (ışık) -->
+    <path
+        android:fillColor="#2C3950"
+        android:pathData="M16,11 h1.2 v24 h-1.2 z" />
+
+    <!-- Sayfa satırları -->
+    <path
+        android:fillColor="#3B4A61"
+        android:pathData="M20,17 h11 v2 h-11 z" />
+    <path
+        android:fillColor="#3B4A61"
+        android:pathData="M20,22 h11 v2 h-11 z" />
+    <path
+        android:fillColor="#FF6B00"
+        android:pathData="M20,27 h7 v2 h-7 z" />
+</vector>

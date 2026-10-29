@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v13 (AGENT 22 — A3) — English UI resources.
+  Turkish is the default locale (values/strings.xml); this file defines
+  English only. Language selection: AppPrefs.KEY_LANG ("en") + LangHelper.
+-->
+<resources>
+    <string name="app_name">Umay PDF Reader</string>
+
+    <!-- Document handoff -->
+    <string name="open_with_title">Do you want to import this PDF into Umay?</string>
+    <string name="open_with_view">View in Umay</string>
+    <string name="open_with_listen">Listen in Umay</string>
+    <string name="open_with_import">📚 Add to shelf (import to library)</string>
+    <string name="pdf_added_to_shelf">\'%1$s\' added to your library ✓ (open it from the Library shelf)</string>
+
+    <!-- Diagnostics -->
+    <string name="diag_title">Feature Info</string>
+    <!-- v17 (GÖREV 2) — error log sharing -->
+    <string name="errlog_share">Share Error Log (umay_error.log)</string>
+    <string name="errlog_empty">No error log yet — the file is created automatically on the first error.</string>
+    <string name="errlog_copied">Log copied to clipboard (share failed)</string>
+    <string name="diag_run">Test Features and System</string>
+    <string name="diag_running">Running tests…</string>
+    <string name="diag_copy">Copy Report</string>
+    <string name="diag_done">Test completed</string>
+
+    <!-- Main screen -->
+    <string name="pdf_sec">Choose PDF</string>
+    <string name="resimden_pdf">Make PDF from Images</string>
+
+    <!-- Book scanning (camera) -->
+    <string name="tara_baslik">Scan Book (Camera)</string>
+    <string name="tara_cek">Capture Page</string>
+    <string name="tara_yap">Make PDF → Add to Library</string>
+    <string name="tara_bos">No pages captured yet. Capture the pages in order; the PDF is sorted by page number automatically.</string>
+    <string name="tara_hazir">%1$d pages ready — tap × to remove one if the order is wrong.</string>
+    <string name="tara_sayfa">Captured page</string>
+    <string name="tara_sil">Delete this page</string>
+    <string name="tara_kamera_yok">Camera could not be started</string>
+    <string name="tara_pdf_bos">Capture at least one page first</string>
+    <string name="kitap_tara">Scan Book (Camera)</string>
+    <string name="resim_cevriliyor">Converting images to PDF…</string>
+    <string name="sayfa_olusturuluyor">Creating page %1$d / %2$d…</string>
+    <string name="buradan_oku">Start reading from this page ▶</string>
+    <string name="yavaslat">Slow Down</string>
+    <string name="hizlandir">Speed Up</string>
+    <string name="ceviri_kisa">Translate</string>
+
+    <!-- Library -->
+    <string name="kaldigin_yer">CONTINUE WHERE YOU LEFT OFF</string>
+    <string name="sayfa_ilerleme">Page %1$d / %2$d</string>
+    <string name="henuz_okunmadi">%1$d pages • not read yet</string>
+    <string name="kapak_yedek_etiket">UMAY LIBRARY</string>
+
+    <!-- Digital library -->
+    <string name="son_okunan">Last Read</string>
+    <string name="kutuphanem">My Library</string>
+    <string name="okundu_yuzde">%1$d%% Read</string>
+    <string name="rozet_okundu">Read progress: %1$d%%</string>
+    <string name="yuzde_ve_sayfa">%1$d%% Read • Page %2$d / %3$d</string>
+    <string name="sort_recent">Recently read</string>
+
+    <!-- Voice panel -->
+    <string name="panel_ses">Voice</string>
+    <string name="panel_perde">Pitch (deep ↔ high)</string>
+    <string name="panel_perde_ipucu">Lower deepens the voice, higher makes it sharper. Symbols are read by both engines.</string>
+    <string name="panel_hazir">Presets</string>
+    <string name="preset_dogal">Natural</string>
+    <string name="preset_derin">Deep</string>
+    <string name="preset_cocuk">Child</string>
+    <string name="preset_vurgulu">Emphatic</string>
+    <string name="panel_ekolayzir">Equalizer</string>
+    <string name="panel_ekolayzir_ipucu">Only works with the natural voice (Edge mp3); disabled on the built-in engine.</string>
+    <string name="panel_ekolayzir_acik">Equalizer on</string>
+    <string name="eq_bas">Bass</string>
+    <string name="eq_orta">Mid</string>
+    <string name="eq_tiz">Treble</string>
+    <string name="panel_tamam">Done</string>
+
+    <!-- In-book search -->
+    <string name="ic_ara_hint">Search inside the book</string>
+    <string name="ara_ipucu">Type a word and I will find the page it appears on.</string>
+    <string name="araniyor">Searching…</string>
+    <string name="sonuc_yok">No results found.</string>
+    <string name="sonuc_sayi">%1$d results — tap to jump to that page</string>
+    <string name="sort_alpha">Alphabetical</string>
+    <string name="sort_added">Newest first</string>
+    <string name="dosya_aliniyor">Importing file…</string>
+    <string name="kitaplarim">My Books</string>
+    <string name="ara">Search books…</string>
+    <string name="bos_kutuphane">No PDFs yet.\nUse \"Choose PDF\" to import your lecture PDF.</string>
+    <string name="ayarlar">Settings</string>
+    <string name="sohbet">Chat</string>
+    <string name="sayfa">Page</string>
+
+    <!-- Resume question -->
+    <string name="devam_sorusu">Continue from page %1$d where you left off?</string>
+    <string name="devam_et">Continue</string>
+    <string name="bastan_basla">Start Over</string>
+    <string name="yeni_dosya">Upload New File</string>
+
+    <!-- Reader -->
+    <string name="oynat">Play</string>
+    <string name="duraklat">Pause</string>
+    <string name="onceki">Previous</string>
+    <string name="sonraki">Next</string>
+    <string name="hız">Speed</string>
+    <string name="ses">Voice</string>
+    <string name="ses_kadin">Female</string>
+    <string name="ses_erkek">Male</string>
+    <string name="ses_otomatik">Automatic</string>
+    <string name="uyku_zamanlayici">Sleep Timer</string>
+    <string name="kapali">Off</string>
+    <string name="sayfada_bitir">Finish at end of page</string>
+    <string name="cevir_oku">Read English in Turkish</string>
+    <string name="sayfaya_git">Go</string>
+    <string name="metin_hazirlaniyor">Preparing page text, please wait…</string>
+    <string name="metin_yok">No readable text found on this page.</string>
+    <string name="tts_hazir_degil">Voice engine is warming up…</string>
+    <string name="kitap_bitti">Book finished 🎉</string>
+    <string name="sayfa_gosterilemiyor">Page cannot be displayed</string>
+
+    <!-- Page summary + waveform -->
+    <string name="ozet">Page Summary</string>
+    <string name="ozet_kisa">Summary</string>
+    <string name="ozet_aliniyor">Preparing page summary…</string>
+    <string name="ozet_hazir_degil">The summary is not ready yet.</string>
+    <string name="ozet_okunuyor">Reading the summary aloud ▶</string>
+    <string name="ozet_dinle">▶ Listen</string>
+    <string name="ozet_kapat">Close</string>
+    <string name="ozet_yok">This page has not been extracted yet (OCR still running on scanned pages). Try again when it finishes.</string>
+    <string name="ozet_hata">Could not fetch summary: %1$s</string>
+    <string name="ozet_cevrimdisi">Offline summary — add an API key in Settings to get detailed Gemini summaries.</string>
+    <string name="ses_dalgasi">Sound wave visualizer</string>
+
+    <!-- Settings -->
+    <string name="ayarlar_baslik">Settings</string>
+    <string name="ay_ses_secimi">Voice (Female / Male)</string>
+    <string name="ay_okuma_hizi">Reading Speed</string>
+    <string name="ay_ceviri">Read English PDFs in Turkish (offline translation)</string>
+    <string name="ay_ceviri_aciklama">A ~35MB translation model is downloaded on first use; no internet needed afterwards.</string>
+    <string name="ceviri_model_hazirlanamadi">The translation model cannot be downloaded right now — check your connection; reading continues and offline summaries always work.</string>
+    <string name="ay_api_baslik">AI Chat (optional)</string>
+    <string name="ay_api_key">API Key</string>
+    <string name="ay_api_key_aciklama">Get a free Gemini key at aistudio.google.com (starts with AIza). Leave empty to use offline chat (in-PDF search).</string>
+    <string name="ay_api_model">Model / Address</string>
+    <string name="ay_api_model_aciklama">Leave empty to auto-detect a suitable model. E.g. gemini-2.5-flash or an OpenAI-compatible address</string>
+    <string name="ay_api_test">Test connection</string>
+    <string name="ay_api_test_bekle">Testing…</string>
+    <string name="ay_api_test_bos">Enter an API key first</string>
+    <string name="ay_api_test_ok">✅ Connection works: %1$s</string>
+    <string name="ay_kaydet">Save</string>
+    <string name="ay_kaydedildi">Settings saved</string>
+    <string name="ay_tts_test">Test voice engine</string>
+    <string name="ay_eq_baslik">Equalizer (Bass / Mid / Treble)</string>
+    <string name="ay_eq_bas">Bass</string>
+    <string name="ay_eq_orta">Mid</string>
+    <string name="ay_eq_tiz">Treble</string>
+    <string name="ay_tts_motor">Voice Engine</string>
+    <string name="tts_dogal">Natural voice — Edge Neural (internet required)</string>
+    <string name="tts_dogal_aciklama">Free ChatGPT/Edge-quality reading. If the internet drops or the service fails, it falls back to the built-in voice automatically; reading never stops.</string>
+
+    <!-- Chat -->
+    <string name="sohbet_baslik">Chat</string>
+    <string name="sohbet_input">Ask something about the PDF…</string>
+    <string name="gonder">Send</string>
+    <string name="sohbet_offline">Offline mode — searching inside the PDF</string>
+    <string name="sohbet_online">AI connected</string>
+    <string name="sohbet_offline_ipucu">Tip: ask things like \"write a summary\", \"when is the second law mentioned\".</string>
+    <string name="sohbet_hazir">Type your question and send. I will search the PDF text and answer.</string>
+    <!-- v5.10 (F2) — topic based persistent chat history -->
+    <string name="sohbet_gecmis">Chat history</string>
+    <string name="sohbet_konu">🧠 Topic: %1$s · %2$d questions</string>
+    <string name="sohbet_yeni">＋ New chat</string>
+    <string name="sohbet_yeni_aciklama">I pick the topic again from your first question</string>
+    <string name="sohbet_bos_gecmis">No saved chats yet. A topic opens automatically with your first question.</string>
+    <string name="sohbet_devam">Continuing where you left off: %1$s</string>
+    <string name="sohbet_sil">Delete chat</string>
+    <string name="sohbet_sil_onay">Delete “%1$s” permanently?</string>
+    <string name="sohbet_silindi">Chat deleted</string>
+    <string name="sohbet_konu_degisti">🔀 This question belongs to another course: %1$s — switched to that chat.</string>
+    <!-- v5.12 — Arabic page OCR reading -->
+    <string name="arapca_ocr_kisa">Arabic OCR</string>
+    <string name="arapca_ocr_baslik">Read Arabic pages</string>
+    <string name="arapca_ocr_aciklama">Arabic lines in this book cannot be read from the text layer (broken font mapping).\n\nIf you enable this, each page image is read once by AI (free quota) and the result is saved on the device; later readings work offline.\n\nReading may slow slightly: the next page is prepared in the background.</string>
+    <string name="arapca_ocr_acik">Arabic OCR on — pages are read from the image</string>
+    <string name="arapca_ocr_kapali">Arabic OCR off — using the text layer</string>
+    <string name="arapca_ocr_cevrimdisi">The Arabic page could not be read right now (network/quota). Broken lines are skipped; once you are back online those pages are read for good.</string>
+    <string name="okuma_yeniden_deneniyor">Preparing the page — restarting reading…</string>
+    <string name="ses_motoru_hazirlaniyor">Preparing the speech engine…</string>
+    <string name="okuma_baslatilamadi">No readable text on this page. You can move to the next page.</string>
+    <string name="sohbet_sayfa_baglami">Page %1$d you are on was added to the chat context — ask about that page.</string>
+    <string name="sohbet_metin_hazir_degil">The book text has not been extracted yet (OCR still running on scanned pages). Wait for it to finish, then ask again — you can watch progress on the reader screen.</string>
+
+    <!-- Notification -->
+    <string name="bildirim_baslik">Reading</string>
+    <string name="bildirim_duraklat">Pause</string>
+    <string name="bildirim_devam">Resume</string>
+    <string name="bildirim_durdur">Stop</string>
+
+    <!-- Progress -->
+    <string name="metin_cikariliyor">Extracting text: %1$d / %2$d pages</string>
+    <string name="ocr_yapiliyor">Reading scanned pages (OCR): %1$d / %2$d pages</string>
+
+    <!-- Academic: course shelves -->
+    <string name="derslerim">My Courses</string>
+    <string name="ders_ekle">＋ Course</string>
+    <string name="derslerim_bos">No courses yet. Add courses with \"＋ Course\" and track resources, homework and exams.</string>
+    <string name="ders_programi">Schedule</string>
+    <string name="yeni_ders_ekle">Add New Course</string>
+    <string name="ders_adi">Course name</string>
+    <string name="ders_kaydedildi">Course saved</string>
+    <string name="ders_bos_olamaz">Course name cannot be empty</string>
+    <string name="ders_duzenle">Edit Course</string>
+    <string name="ders_sil">Delete Course</string>
+    <string name="ders_sil_soru">Delete this course and all its records (resources, homework, exams, schedule rows)? Books are not deleted.</string>
+    <string name="ders_istatistik">%1$d resources • %2$d homework • %3$d exams</string>
+    <string name="sonraki_ders">Next: %1$s %2$s</string>
+    <string name="kaynaklar">Course Resources</string>
+    <string name="kaynak_ekle">＋ Add Resource</string>
+    <string name="kaynak_bos">No resources added to this course yet. Pick books from your library.</string>
+    <string name="kaynak_sec_baslik">Pick resources from library</string>
+    <string name="kaynak_eklendi">Resources added</string>
+    <string name="kaynak_cikarildi">Resource removed</string>
+    <string name="ovdevler">Homework and Projects</string>
+    <string name="ovdev_ekle">＋ Add Homework</string>
+    <string name="ovdev_bos">No homework/projects added to this course yet.</string>
+    <string name="sinavlar">Exams</string>
+    <string name="sinav_ekle">＋ Add Exam</string>
+    <string name="sinav_bos">No exams added to this course yet.</string>
+    <string name="baslik_etiket">Title</string>
+    <string name="aciklama_etiket">Description (optional)</string>
+    <string name="teslim_tarihi">Deadline</string>
+    <string name="sinav_tarihi">Exam date</string>
+    <string name="tarih_sec">Pick a date: %1$s</string>
+    <string name="saat_sec">Time: %1$s</string>
+    <string name="kaydet">Save</string>
+    <string name="iptal">Cancel</string>
+    <string name="teslim_edildi">✓ Submitted</string>
+    <string name="teslim_bekliyor">Pending</string>
+    <string name="kutuphane_bos_ekle">Library is empty — add a file with \"Choose PDF\" first.</string>
+
+    <!-- Schedule + alarms -->
+    <string name="program_baslik">Weekly Class Schedule</string>
+    <!-- v16 (GÖREV 6) — Interactive calendar + grade/weight/GPA screen -->
+    <string name="sinavlar_baslik">Exams &amp; Grades</string>
+    <string name="kamu_mali_kitaplik">Public Domain Library (Free)</string>
+    <string name="sinav_ekle_gun">＋ Add exam/event to selected day</string>
+    <string name="sinav_yok_gun">No exam/event on this day.</string>
+    <string name="sinavlar_bos">No exams yet — tap a day on the calendar and add one.</string>
+    <string name="en_yakin_sinav">Next exam: %1$s</string>
+    <string name="notlar_baslik">Course Grades &amp; Weights</string>
+    <string name="notlar_bos">Add a course from the \"My Courses\" shelf first.</string>
+    <string name="not_duzenle">Score / Weight</string>
+    <string name="agno_baslik">GPA</string>
+    <string name="agno_toplam_akts">Total ECTS: %1$d</string>
+    <string name="agno_hesaplanamadi">GPA not available — enter scores and ECTS.</string>
+    <string name="akts_kisa">ECTS</string>
+    <string name="ekle">Add</string>
+    <string name="sinav_basligi">Exam title</string>
+    <string name="tarih">Date</string>
+    <string name="saat">Time</string>
+    <string name="not_puan">Score (0-100)</string>
+    <string name="not_yuzde">Weight (%)</string>
+    <string name="not_akts_girdi">ECTS credit</string>
+    <string name="not_kaydedildi">Grades saved ✓</string>
+    <string name="sinav_eklendi">Exam added ✓</string>
+    <string name="sinav_sil">Delete exam</string>
+    <string name="ders_yok_uyari">First add a course from the \"My Courses\" section.</string>
+    <string name="not_turu_vize">Midterm</string>
+    <string name="not_turu_quiz">Quiz</string>
+    <string name="not_turu_final">Final</string>
+    <string name="not_turu_proje">Project</string>
+    <!-- v16 (GÖREV 5) — Excel-style matrix grid (days × hours) -->
+    <string name="program_tablo">⬜ Grid View (Excel style)</string>
+    <!-- v16 (GÖREV 5) — schedule/exam EDIT (CRUD) -->
+    <string name="slot_duzenle">Edit</string>
+    <string name="slot_guncellendi">Schedule row updated ✓</string>
+    <string name="sinav_guncellendi">Exam updated ✓</string>
+    <string name="sinav_notu">Exam note (optional)</string>
+    <string name="kulaklik_cikti">Headphones unplugged — reading paused.</string>
+    <string name="ogretim_uyesi">Instructor</string>
+    <string name="program_liste">☰ List View</string>
+    <string name="program_grid_ipucu">Swipe sideways → days. Tap an empty cell → adds a class for that day and hour. Tap a class cell → deletes it.</string>
+    <string name="saat_kolonu">Time</string>
+    <string name="dk_once">%1$d min before</string>
+    <string name="program_bos">No schedule yet. Add your first class with \"＋ Add to Schedule\".</string>
+    <string name="programa_ekle">＋ Add to Schedule</string>
+    <string name="gunluk_saat">Daily reminder: %1$s</string>
+    <string name="gunluk_saat_degistir">Daily time</string>
+    <string name="test_bildirim">Test notification</string>
+    <string name="hatirlatma_ipucu">Notification permission is needed for class reminders, daily exam countdowns and homework alerts.</string>
+    <string name="ders_sec">Pick a course</string>
+    <string name="yeni_ders_secenege">＋ New course…</string>
+    <string name="gun_etiket">Day</string>
+    <string name="saat_etiket">Time</string>
+    <string name="ders_suresi_etiket">Class duration</string>
+    <string name="sure_dk">%1$d min</string>
+    <string name="derslik_etiket">Room / Class no</string>
+    <string name="hatirlatma_etiket">Reminder before class</string>
+    <string name="slot_kaydedildi">Added to schedule — alarm set</string>
+    <string name="slot_silindi">Schedule row deleted</string>
+    <string name="saat_secimi">Pick a time</string>
+    <string name="remind_20">20 minutes before (with melody)</string>
+    <string name="remind_15">15 minutes before</string>
+    <string name="remind_30">30 minutes before</string>
+    <string name="remind_60">1 hour before</string>
+    <string name="remind_off">Off (no notification)</string>
+    <string name="ders_hatirlatma_baslik">Class reminder</string>
+    <string name="sinav_hatirlatma_baslik">Exam countdown</string>
+    <string name="ovdev_hatirlatma_baslik">Homework/project reminder</string>
+    <string name="test_bildirim_metin">Notifications work ✓ Class reminders will look like this.</string>
+
+    <!-- Schedule import -->
+    <string name="program_ice_aktar">Import from PDF / Image</string>
+    <string name="program_ice_aktar_baslik">Import Class Schedule</string>
+    <string name="program_ice_aktar_sec">Pick the schedule PDF or image (JPG/PNG). Day, time, course and room are extracted automatically.</string>
+    <string name="program_okunuyor">Reading file and parsing classes…</string>
+    <string name="program_bulunamadi">Could not extract schedule text. Make sure the file contains a schedule table.</string>
+    <string name="program_ice_aktar_onay">%1$d class rows found:\n\n%2$s\n\nAdd to schedule?</string>
+    <string name="program_ice_aktarildi">%1$d classes added to schedule, alarms set</string>
+
+    <!-- Exact alarm permission -->
+    <string name="tam_alarm_izin_yok">⚠ Exact alarm permission is off — class reminders may be late. Tap to allow.</string>
+
+    <!-- Summary controls -->
+    <string name="ozet_duraklat">⏸ Pause</string>
+    <string name="ozet_devam">▶ Resume</string>
+    <string name="ozet_durdur">⏹ Stop</string>
+
+    <!-- UI/UX -->
+    <string name="hos_geldin">Cengiz Kılıç</string>
+    <string name="hos_geldin_alt">Istanbul Rumeli University • AI &amp; Machine Learning</string>
+    <string name="app_slogan">Smart PDF &amp; Academic Document Assistant</string>
+
+    <!-- Flashcards / bookmarks / stats / widget / export -->
+    <string name="kapat">Close</string>
+    <string name="flashcard_title">AI Study Cards</string>
+    <string name="flashcard_next">Next Card →</string>
+    <string name="flashcard_done">Quiz Finished! 🎯</string>
+    <string name="flashcard_result">Correct: %1$d / %2$d</string>
+    <string name="flashcard_no_text">There is no readable text on this page.</string>
+    <string name="flashcard_none">No cards could be generated from this page — try again.</string>
+    <string name="flashcard_error">Could not generate cards. Check internet and API key.</string>
+    <string name="flashcard_open">🃏 Cards</string>
+    <string name="bookmark_open">📌 Bookmarks</string>
+    <string name="bookmark_add">Bookmark this page</string>
+    <string name="bookmark_remove">Remove bookmark</string>
+    <string name="bookmark_note_hint">Study note (e.g. exam topic)…</string>
+    <string name="bookmark_empty">No bookmarks yet. Tap 📌 while reading to mark a page.</string>
+    <string name="bookmark_added">Bookmark added</string>
+    <string name="bookmark_removed">Bookmark removed</string>
+    <string name="stats_title">Reading Statistics</string>
+    <string name="stats_today">Today: %1$d min</string>
+    <string name="stats_week">Last 7 days: %1$d min</string>
+    <string name="stats_total">Total: %1$d min</string>
+    <string name="stats_finished">Books finished: %1$d</string>
+    <string name="export_summary">📄 Save / Share Summary</string>
+    <string name="export_done">Summary saved: %1$s</string>
+    <string name="quote_share">💬 Make Quote Card</string>
+    <string name="quote_done">Quote card ready — share it</string>
+    <string name="reading_books">Reading Books</string>
+    <string name="widget_label">UMAY Next Class</string>
+    <string name="widget_no_class">No class today 🎉</string>
+    <string name="widget_next">Next: %1$s\n%2$s • in %3$d min</string>
+    <string name="pd_downloading">Downloading…</string>
+
+    <!-- Deep file scanner -->
+    <string name="deep_title">Scan Entire Device (SD Card Included)</string>
+    <string name="deep_ready">Ready — start scanning.</string>
+    <string name="deep_scanning">Scanning… (internal + SD card)</string>
+    <string name="deep_empty">No supported documents found.</string>
+    <string name="deep_found">%1$d documents found — select to import.</string>
+    <string name="deep_scan">🔍 Scan Again</string>
+    <string name="deep_import">📥 Import to Library</string>
+    <string name="deep_none_selected">Select files first.</string>
+    <string name="deep_importing">Importing… %1$d / %2$d</string>
+    <string name="deep_import_done">Imported: %1$d succeeded, %2$d failed</string>
+    <string name="deep_import_done3">Imported: %1$d new, %2$d already in library, %3$d failed</string>
+    <string name="deep_selected_count">%1$d files selected — tap "Import to Library" to add them.</string>
+    <string name="deep_no_permission">Scanning requires storage permission.</string>
+    <string name="deep_open">🗂️ Scan Entire Device</string>
+
+    <!-- Scan screen: metadata + filters/sort -->
+    <string name="deep_filter_type_title">File type</string>
+    <string name="deep_filter_status_title">Status</string>
+    <string name="deep_sort_title">Sort</string>
+    <string name="deep_filter_type">Type: %1$s</string>
+    <string name="deep_filter_all">All</string>
+    <string name="deep_filter_status">Status: %1$s</string>
+    <string name="deep_status_filter_new">Not added</string>
+    <string name="deep_status_filter_added">Already added</string>
+    <string name="deep_sort_label">Sort: %1$s</string>
+    <string name="deep_sort_az">Name (A-Z)</string>
+    <string name="deep_sort_za">Name (Z-A)</string>
+    <string name="deep_sort_size_asc">Size (small→large)</string>
+    <string name="deep_sort_size_desc">Size (large→small)</string>
+    <string name="deep_sort_date_new">Date (newest)</string>
+    <string name="deep_sort_date_old">Date (oldest)</string>
+    <string name="deep_select_all">Select All</string>
+    <string name="deep_clear_selection">Clear Selection</string>
+    <string name="deep_status_added">Already in library</string>
+    <string name="deep_status_not_added">Not added yet</string>
+    <string name="deep_status_gone">⚠ Not accessible</string>
+    <string name="deep_page_count">%1$d pages</string>
+
+    <!-- Shelf management -->
+    <string name="shelves_title">Shelves</string>
+    <string name="shelves_add">＋ New Shelf</string>
+    <string name="shelves_name_hint">Shelf name (e.g. Exam Prep)</string>
+    <string name="shelves_added">Shelf added</string>
+    <string name="shelves_deleted">Shelf deleted</string>
+    <string name="shelves_empty">No custom shelves yet.</string>
+    <string name="shelves_move">📚 Move to Another Shelf</string>
+    <string name="shelves_manage">Manage Shelves</string>
+    <string name="shelf_empty_hint">This shelf is empty — add a file</string>
+    <string name="ekolayzir_ac">Equalizer</string>
+    <string name="panel_hiz">Speed (0.5x – 2.0x)</string>
+
+    <!-- Book deletion -->
+    <string name="kitap_sil">Delete</string>
+    <string name="kitap_sil_soru">Delete this PDF from the library along with its files, cover and reading history?</string>
+    <string name="kitap_silindi">\"%1$s\" deleted from library</string>
+
+    <!-- AI quota -->
+    <string name="ai_limit">You reached your daily AI limit. Watch a rewarded ad or spend points to earn more!</string>
+
+    <!-- Edge Neural voice -->
+    <string name="ses_yerlesik_yedek">Offline: built-in voice</string>
+    <string name="ses_yerlesik_yedek_ipucu">On: when Edge Neural is unreachable (no internet) reading continues with the built-in voice. Off: the mechanical voice is never used.</string>
+
+    <!-- Schedule preview -->
+    <string name="program_onizleme_baslik">Review Classes</string>
+    <string name="program_onizleme_ipucu">Extracted classes are below. Fix missing or wrong rows, add new ones with \"＋ Add Class\", then save.</string>
+    <string name="ders_satir_ekle">＋ Add Class</string>
+    <string name="ders_adi_zorunlu">At least one course name is required.</string>
+    <string name="program_ai_okunuyor">Reading the image with AI…</string>
+    <string name="program_ai_analiz">AI found %1$d classes — review and save.</string>
+    <string name="program_bos_elle">The schedule could not be read automatically — you can add classes manually and save.</string>
+
+    <!-- v13 — New screens -->
+    <string name="onboarding_gec">Skip</string>
+    <string name="onboarding_basla">Let\'s Get Started</string>
+    <string name="profile_title">My Profile</string>
+    <string name="vault_title">Secure Vault</string>
+    <string name="settings_look_title">PROFILE &amp; APPEARANCE</string>
+    <string name="btn_profile">👤 My Profile</string>
+    <string name="btn_vault">🔒 Secure Vault (PIN + Fingerprint)</string>
+    <string name="theme_mode">Theme: Dark / Light / System</string>
+    <string name="night_pdf">Darken PDF pages in dark mode</string>
+    <string name="haftalik_program">Weekly Class Schedule</string>
+
+    <!-- v13 (AGENT 22 — A3) — Language selection -->
+    <string name="lang_title">Uygulama dili / App language</string>
+    <string name="lang_button">🌐 Dil / Language: Türkçe — English</string>
+
+    <!-- v13 (AGENT 22 — A3) — Social login (demo) + logout -->
+    <string name="social_login_hint">Quick sign-in (demo)</string>
+    <string name="soc_google">Google</string>
+    <string name="soc_apple">Apple</string>
+    <string name="soc_facebook">Facebook</string>
+    <string name="soc_instagram">Instagram</string>
+    <string name="social_login_title">Sign in with %1$s</string>
+    <string name="social_login_msg">Sign in quickly with %1$s?\n\n(Demo flow: real account verification requires Play Console + an app ID; your choice is shown in Profile and stored on this device.)</string>
+    <string name="social_login_ok">Sign in</string>
+    <string name="social_login_done">Signed in with %1$s ✓</string>
+    <string name="social_logged_in">Session: signed in with %1$s</string>
+    <string name="social_not_logged_in">You are in guest mode — no social sign-in</string>
+    <string name="logout">Log Out</string>
+    <string name="logout_confirm">End the session? The app returns to the first sign-in screen. Your books and settings are NOT deleted.</string>
+    <string name="logout_yes">Yes, log out</string>
+
+    <!-- v13 (AGENT 22 — A4) — Multi-provider AI + free guide -->
+    <string name="ay_ai_provider">AI Provider</string>
+    <string name="ay_api_base">Server address (OpenAI-compatible endpoint)</string>
+    <string name="ay_api_guide">Free key guide (step by step)</string>
+    <string name="ay_api_key_builtin_hint">Not needed — the built-in free Gemini key is active</string>
+    <string name="guide_gemini">FREE Gemini key (recommended — no code needed; the app already ships a built-in key):\n\n1) Go to aistudio.google.com\n2) Sign in with your Google account (free)\n3) Click \"Get API key\" in the left menu\n4) Click \"Create API key\" → copy the key (starts with AIza…)\n5) Paste it here → Test → Save\n\nThe free daily quota is usually enough; NO credit card required.</string>
+    <string name="guide_openrouter">FREE OpenRouter key (many free models):\n\n1) Go to openrouter.ai\n2) Sign in (Google/GitHub)\n3) Click Keys → \"Create Key\" in the left menu\n4) Copy the key (starts with sk-or-…)\n5) Paste it here → Test → Save\n6) Enter a free model in the model field (e.g. \"deepseek/deepseek-chat-v3-0324:free\" — pick from openrouter.ai/models)</string>
+    <string name="guide_openai">OpenAI key (paid service — use carefully):\n\n1) Go to platform.openai.com\n2) Sign up / sign in\n3) Go to API keys → \"Create new secret key\"\n4) Copy the key (starts with sk-…)\n5) Paste it here → Test → Save\n\n⚠ OpenAI quotas are PAID; choose Gemini or OpenRouter for free usage.</string>
+    <string name="guide_custom">Custom server (OpenAI-compatible — Ollama, LM Studio, vLLM, LocalAI):\n\n1) Run a local server like Ollama/LM Studio on your computer\n2) Enter its address (e.g. http://192.168.1.4:11434/v1/chat/completions)\n3) Enter the server API key (type \"ollama\" if none)\n4) Enter the model name (e.g. llama3.1)\n5) Test → Save\n\nPhone and computer must be on the same Wi-Fi network.</string>
+    <string name="guide_open_link">Open in browser: %1$s</string>
+
+    <!-- v14 (V5.0 §3) — Recent shelf -->
+    <string name="recent_shelf_title">📚 Recently Read</string>
+    <string name="recent_shelf_percent">%1$d%% read</string>
+    <string name="book_share">Share book (PDF)</string>
+    <string name="book_shared">Book is in the share sheet ✓</string>
+
+    <!-- v14 (V5.0 §3) — Deep scan: all-files access -->
+    <string name="deep_all_files_title">All files access permission</string>
+    <string name="deep_all_files_msg">Android 11+ permission is needed to find ALL PDFs on your phone. Grant Umay the permission on the settings screen and come back — the scan starts automatically.</string>
+    <!-- v16 (GÖREV 3) — TR'de olup EN'de eksik olan anahtarlar tamamlandı -->
+    <string name="notification_channel_id">umay_alarms</string>
+    <string name="deep_saf">📂 Pick Document (SAF)</string>
+    <string name="folder_import">📚 Import Folder into Courses</string>
+    <string name="folder_import_info">Scans Download/UmayKaynak recursively; each file is added to the matching course shelf (Book / Slide / Document). Source files are not deleted.</string>
+    <string name="folder_import_running">Importing</string>
+    <string name="folder_import_none">No supported files found (PDF, PPTX, DOCX).</string>
+    <string name="folder_import_done">Import finished</string>
+    <string name="pool_organize">🧩 Organize Pool (name → content)</string>
+    <string name="pool_organize_info">Scans books that are not linked to any group; matches by name, then by the first pages\' text, and files them onto the right shelf. Files are never moved or deleted.</string>
+    <string name="deep_saf_error">Document picker could not open.</string>
+    <string name="deep_all_files_ok">Permission granted — deep scan starting.</string>
+    <string name="deep_all_files_denied">All files access not granted — scanning is limited.</string>
+    <string name="deep_all_files_manual">If the switch cannot be enabled: open Settings › Apps › Umay › Permissions › All files access, or add files with \"Pick Document (SAF)\".</string>
+    <string name="deep_empty_no_access">No documents found — \"All files access\" may be off. Enable it or use SAF.</string>
+    <string name="deep_all_files_go">Open permission screen</string>
+
+    <!-- v14 (V5.0) — Common -->
+    <string name="geri">← Back</string>
+    <string name="sil">Delete</string>
+    <string name="disa_aktarildi">Exported ✓</string>
+    <string name="disa_aktarilamadi">Export failed</string>
+
+    <!-- v14 (V5.0) — Theme studio -->
+    <string name="tema_studio_title">Custom Theme Studio</string>
+    <string name="tema_studio_sub">Pick background, panel, accent and shelf-frame colors — changes preview instantly and are saved.</string>
+    <string name="tema_preview_label">LIVE PREVIEW</string>
+    <string name="tema_preview_shelf">Sample shelf card (frame color)</string>
+    <string name="tema_preview_button">Sample button</string>
+    <string name="tema_presets">Ready-made matte palettes</string>
+    <string name="tema_reset">Reset to default (Cyber Academic)</string>
+    <string name="tema_reset_done">Default theme restored ✓</string>
+    <!-- v16 (GÖREV 2 + GÖREV 3) — theme mode / studio strings (EN) -->
+    <string name="uygula">Apply</string>
+    <string name="tema_mod_sistem">System (automatic)</string>
+    <string name="tema_mod_gece">Night (dark)</string>
+    <string name="tema_mod_gunduz">Day (light)</string>
+    <string name="tema_mod_ozel_uyari">Theme mode — custom theme WILL BE TURNED OFF</string>
+    <string name="tema_ozel_kapatildi">Custom theme off, selected mode applied ✓</string>
+    <string name="tema_auto_btn">Back to automatic (Night / Day / System)</string>
+    <string name="tema_auto_done">Automatic mode on — custom theme turned off ✓</string>
+    <string name="tema_row_bg">Background color</string>
+    <string name="tema_row_panel">Panel / card color</string>
+    <string name="tema_row_accent">Accent color</string>
+    <string name="tema_row_shelf">Shelf frame color</string>
+    <string name="tema_row_bg_kisa">Background</string>
+    <string name="tema_row_panel_kisa">Panel / card</string>
+    <string name="tema_row_accent_kisa">Accent</string>
+    <string name="tema_row_shelf_kisa">Shelf frame</string>
+
+    <!-- v14 (V5.0 §5) — Alarm sound -->
+    <string name="alarm_sound_pick">Pick Alarm Sound</string>
+    <string name="alarm_sound_current">Current alarm sound: %1$s</string>
+    <string name="alarm_sound_default">System default</string>
+
+    <!-- v14 (V5.0 §7) — Cloud backup -->
+    <string name="backup_title">Backup (Create / Restore)</string>
+    <string name="backup_take">Create backup (zip → Documents/UmayPDF)</string>
+    <string name="backup_restore">Restore from backup (pick zip)</string>
+    <string name="backup_done">Backup created: %1$s</string>
+    <string name="backup_restored">Backup restored ✓ — reloading library</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+
+    <!-- v14 (V5.0 §6) — Transcript & GPA -->
+    <string name="transcript_title">Transcript &amp; GPA Calculator</string>
+    <string name="transcript_add">Add Course</string>
+    <string name="transcript_semester">Semester</string>
+    <string name="transcript_agno">GPA: %1$s</string>
+    <string name="transcript_sem_agno">Semester avg: %1$s</string>
+    <string name="transcript_empty">No courses this semester yet. Tap "Add Course".</string>
+    <string name="transcript_export">Export (.md)</string>
+
+    <!-- v14 (V5.0 §2) — External PDF import -->
+    <string name="ow_ask_title">Import to Umay</string>
+    <string name="ow_ask_import">Import this PDF into Umay and analyze it with AI?</string>
+    <string name="ow_import_now">Import to Umay</string>
+    <string name="guide_link_error">Browser could not be opened — you can visit the address manually.</string>
+
+    <!-- v13 (AGENT 22 — A2) — Summary editing -->
+    <string name="summary_edit">✏️ Edit</string>
+    <string name="summary_edit_title">Edit summary</string>
+    <string name="summary_saved">Summary updated ✓</string>
+    <string name="summary_revert">Revert to original</string>
+
+    <!-- v13 (AGENT 22 — A2) — Flashcard editing -->
+    <string name="flashcard_edit">✏️ Edit Card</string>
+    <string name="flashcard_edit_title">Edit card</string>
+    <string name="flashcard_edit_question">Question</string>
+    <string name="flashcard_edit_options">Options (A/B/C/D)</string>
+    <string name="flashcard_edit_answer">Correct answer</string>
+    <string name="flashcard_edit_explanation">Explanation</string>
+    <string name="flashcard_edited">Card updated ✓</string>
+
+    <!-- v14 (V5.0 §7) — Student profile card (contentDescription) -->
+    <string name="profil">Profile</string>
+
+    <!-- v15 (V5.1 STEP B.1 / #19) — Pomodoro Focus Mode -->
+    <string name="pomodoro_channel">Pomodoro Focus</string>
+    <string name="pomodoro_start">🍅 Focus (25 min)</string>
+    <string name="pomodoro_done_title">Pomodoro complete 🍅</string>
+    <string name="pomodoro_done_text">%1$d-minute focus session done. Great job — take a short break!</string>
+    <string name="pomodoro_cancel_title">Cancel this pomodoro?</string>
+    <string name="pomodoro_cancel_text">The running focus time will not be counted.</string>
+    <string name="pomodoro_yes">Cancel</string>
+    <string name="pomodoro_no">Keep going</string>
+
+    <!-- v15 (V5.1 STEP B.4 / #5) — OCR text layer on scanned pages -->
+    <string name="scan_ocr_running">Recognizing text (OCR)…</string>
+    <string name="scan_upright_progress">Page %1$d/%2$d: correcting orientation and reading text…</string>
+
+    <!-- v15 (V5.1 STEP B.5 / #1) — Bookshelf background theme -->
+    <string name="ay_raf_temasi">Shelf Theme</string>
+    <string name="ay_raf_temasi_aciklama">Look of the bookshelf planks. Applied instantly and saved.</string>
+    <string name="shelf_wood">Wood</string>
+    <string name="shelf_metal">Metal</string>
+    <string name="shelf_dark">Dark (Night)</string>
+    <!-- v16 (YENİ GÖREV 1) — Course detail 3 main shelves -->
+    <string name="shelf_books">Course books</string>
+    <string name="shelf_slides">Slides</string>
+    <string name="shelf_docs">Documents / Extras</string>
+    <string name="shelf_move_title">Move to another shelf</string>
+    <!-- v16 (YENİ GÖREV 2) — Exam type / weight / alarm -->
+    <string name="exam_weight_hint">Grade weight % (e.g. 40)</string>
+    <string name="exam_alarm_on">🔔 Reminder: On</string>
+    <string name="exam_alarm_off">🔕 Reminder: Off</string>
+    <string name="exam_alarm_set">Reminder scheduled ✓</string>
+    <string name="hw_alarm_on">🔔 Due reminder: On</string>
+    <string name="hw_alarm_off">🔕 Due reminder: Off</string>
+    <!-- v16 (YENİ GÖREV 6) — Gallery multi page selection -->
+    <string name="tara_gallery">🖼 Pick Pages from Gallery (multi)</string>
+    <string name="tara_add_page">📷 Add Page (+)</string>
+    <!-- v16 (GÖREV 3) — Page range mode: stop at range end -->
+    <string name="sayfa_araligi_bitti">Selected page range completed (page %1$d) — reading stopped.</string>
+    <string name="tts_range_label">Page Range</string>
+    <string name="tts_range_all">All pages (no range)</string>
+    <string name="tts_range_value">Pages %1$d – %2$d</string>
+    <string name="tts_range_from">Start page (e.g. 15)</string>
+    <string name="tts_range_to">End page (e.g. 40 · 0 = unlimited)</string>
+    <!-- v16 — Home screen APK install shortcut -->
+    <string name="apk_install_shortcut">📦 Install Latest APK (Download)</string>
+    <string name="apk_not_found">UmayPDF_Guncel.apk not found — the file must be in the Download folder (and Files access permission granted).</string>
+    <string name="apk_install_failed">Could not start installer: %1$s</string>
+    <!-- v16 (YENİ GÖREV 7) — OCR no text warning -->
+    <string name="ocr_no_text">No text found — pages added as images. Scan sharper photos for voice reading.</string>
+    <string name="ocr_pages_added">%1$d pages added • OCR text: %2$s</string>
+    <!-- v16 (YENİ GÖREV 8) — Profile authentication (local) -->
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_login">Sign in</string>
+    <string name="auth_register">Sign up</string>
+    <string name="auth_google">Sign in with Google</string>
+    <string name="auth_login_ok">Signed in ✓</string>
+    <string name="auth_register_ok">Account created ✓</string>
+    <string name="auth_bad_credentials">Wrong email or password</string>
+    <string name="auth_weak">Password must be at least 4 characters</string>
+    <string name="auth_invalid_email">Enter a valid email address</string>
+    <string name="auth_logged_in_as">Session: %1$s</string>
+    <string name="auth_google_local">Google session opened (local) ✓</string>
+    <string name="auth_hint">Local account — data is stored only on this device.</string>
+    <!-- v16 (YENİ GÖREV 8) — SAF JSON backup / restore -->
+    <string name="json_take">Create JSON backup (.json)</string>
+    <string name="json_restore">Restore JSON backup (.json)</string>
+    <string name="json_done">JSON backup written: %1$s</string>
+    <string name="json_restored">JSON backup restored ✓ — reloading library</string>
+    <string name="json_failed">JSON operation failed: %1$s</string>
+    <!-- v20 (ADIM 3) — Move to shelf / remove from shelf menu -->
+    <string name="raf_tasi">📚 Move to shelves…</string>
+    <string name="raftan_cikar">⬅ Remove from shelf</string>
+    <string name="raf_tasi_baslik">Move to which shelf?</string>
+    <string name="tasindi_raf">Moved to "%1$s"</string>
+    <string name="raftan_cikildi">Book removed from shelves</string>
+    <string name="raf_yok_once_ekle">First add a shelf via the "Shelves" button</string>
+    <string name="devam_kaldigin">Continue where you left</string>
+    <string name="en_son_okunan">LAST READ</string>
+    <string name="sayfa_ayrac">/</string>
+    <string name="hero_ses_hint">Read aloud ready</string>
+    <string name="araclar">TOOLS</string>
+    <string name="ders_etiketi">COURSE</string>
+    <string name="son_okuma_bugun">Read today at %1$s</string>
+    <string name="son_okuma_tarih">Read on %1$s</string>
+    <string name="ders_raflar">Shelves</string>
+    <string name="ders_raflar_ipucu">Long-press a source → move between shelves</string>
+    <string name="raf_ekle">＋ New shelf</string>
+    <string name="raf_adi">Shelf name</string>
+    <string name="raf_adlandir">Rename shelf</string>
+    <string name="raf_sil">Delete shelf</string>
+    <string name="raf_sil_soru">Delete this shelf? Its sources are not deleted, they return to their built-in shelves.</string>
+    <string name="raf_yukari">↑ Move up</string>
+    <string name="raf_tasindi">Moved between shelves</string>
+    <string name="bu_raftan_cikar">Remove from this shelf</string>
+    <string name="dersten_cikar">Remove from course</string>
+    <string name="kitabi_ac">Open book</string>
+    <string name="shelf_homework">HOMEWORK &amp; PROJECTS</string>
+    <!-- v24 — course video shelf -->
+    <string name="shelf_videos">VIDEOS</string>
+    <string name="shelf_videos_empty">No videos yet — tap “＋” to add a local video or a YouTube link</string>
+    <string name="ses_kaydi_baslat">⏺  AR · Start lecture recording</string>
+    <string name="ses_kaydi_durdur">⏹  Stop recording</string>
+    <string name="shelf_audio">AUDIO RECORDINGS</string>
+    <string name="shelf_audio_empty">No recordings yet — tap “＋” to add a lecture recording</string>
+    <string name="audio_remove_note">Removing from the shelf deletes only the app copy; the original recording on your phone stays untouched.</string>
+    <string name="video_local">Local video</string>
+    <string name="video_link_hint">Link · needs internet</string>
+    <string name="video_pick_local">Pick a video from device</string>
+    <string name="video_add_link">Add YouTube / link</string>
+    <string name="hw_overdue_badge">OVERDUE</string>
+    <string name="hw_open_badge">OPEN</string>
+    <string name="hw_mark_open">Mark as not done</string>
+    <string name="hw_mark_done">Mark as done</string>
+    <string name="kasa_baslik">Private Vault</string>
+    <string name="kasa_ipucu">Protected by fingerprint / PIN</string>
+    <string name="kasa_ac">Open vault</string>
+    <string name="ay_guncelleme">App Update</string>
+    <string name="ay_apk_kur">Install the latest APK</string>
+    <string name="ay_apk_ipucu">Finds the newest UMAY APK in Downloads and opens the installer</string>
+    <string name="apk_pick">Select an APK file to install</string>
+    <string name="apk_pick_failed">Could not open file picker</string>
+    <string name="apk_open_downloads">Open Downloads folder</string>
+    <string name="ay_guncelleme_yok">No new UMAY APK found in Downloads.</string>
+    <string name="sec_bildirim">NOTIFICATIONS &amp; PERMISSIONS</string>
+    <string name="sec_bildirim_ipucu">Manage notification, alarm and battery permissions here so reminders fire on time.</string>
+    <string name="sec_guncelleme">ABOUT &amp; UPDATE</string>
+    <string name="ayarlar_alt_baslik">Reading, appearance and academic settings in one place</string>
+    <string name="sec_okuma">READING &amp; AUDIO</string>
+    <string name="sec_ceviri">TRANSLATION</string>
+    <string name="sec_gorunum">APPEARANCE &amp; PROFILE</string>
+    <string name="sec_yapayzeka">ARTIFICIAL INTELLIGENCE</string>
+    <string name="sec_kisisel">PERSONAL &amp; APP</string>
+    <string name="sec_veri">DATA, BACKUP &amp; SECURITY</string>
+    <string name="ekran_acik_kalsin">Keep screen on while reading</string>
+    <string name="ay_apk_kuruluyor">Preparing %1$s for install…</string>
+    <string name="ay_surum">Version %1$s</string>
+    <string name="kasa_kilitli">Locked</string>
+    <string name="kasa_kitaplar">%1$d items in vault</string>
+
+    <!-- v25 (A–Z denetim) — eksik İngilizce çeviriler (lint MissingTranslation) -->
+    <string name="tara_kaydedilemedi">Couldn\'t save the photo — try again? (storage/file permission)</string>
+    <string name="perm_center_title">🔔 Notification &amp; Alarm permissions</string>
+    <string name="favorilerim">⭐ FAVOURITES</string>
+    <string name="favori_ekle">⭐ Add to favourites</string>
+    <string name="favori_cikar">☆ Remove from favourites</string>
+    <string name="favori_eklendi">Added to favourites</string>
+    <string name="favori_cikarildi">Removed from favourites</string>
+    <string name="favori_bos">No favourites yet — long-press a book and choose \"⭐ Add to favourites\"</string>
+    <!-- v35 / A5: page link in chat answers -->
+    <string name="sohbet_sayfa_yok">Page %1$d does not exist — book has %2$d pages</string>
+    <string name="sohbet_sayfa_acilmadi">Could not open the page</string>
+    <!-- v36.1: broken text layer while AR mode is off -->
+    <string name="arapca_modu_onerisi">This page has a broken text layer. Turn on AR (Arabic OCR) mode in the reader to read it from the page image.</string>
+    <string name="ayar_prep">Background preparation</string>
+    <string name="ayar_prep_acik">Preparation: ON — prepares books while idle</string>
+    <string name="ayar_prep_kapali">Preparation: OFF</string>
+    <string name="ayar_prep_son"> · last: %1$s</string>
+    <string name="ayar_prep_acildi">Preparation on (charging + idle only)</string>
+    <string name="ayar_prep_kapandi">Preparation turned off</string>
+    <string name="ayar_lamp_ses">Lamp alert sound</string>
+    <string name="ayar_lamp_ses_acik">Lamp sound: ON — beep on amber/red</string>
+    <string name="ayar_lamp_ses_kapali">Lamp sound: OFF</string>
+</resources>

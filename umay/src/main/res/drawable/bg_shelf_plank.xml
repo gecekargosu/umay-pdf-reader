@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — Raf teması "Varsayılan": lacivert şerit + turuncu sol kenar. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/umay_shelf_bar" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1dp" android:color="@color/umay_shelf_edge" />
+        </shape>
+    </item>
+    <item android:width="4dp" android:left="0dp" android:gravity="start|fill_vertical">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/umay_orange" />
+            <corners
+                android:bottomLeftRadius="10dp"
+                android:topLeftRadius="10dp" />
+        </shape>
+    </item>
+</layer-list>

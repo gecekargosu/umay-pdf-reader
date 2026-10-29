@@ -8,6 +8,17 @@ import java.util.Locale
  */
 object TextUtil {
 
+    /**
+     * v5 — Ders programından çıkarılan tek satır (OCR/PDF içe aktarma).
+     * `day` 0=Pazartesi … 6=Pazar, `minuteOfDay` ders BAŞLANGICI.
+     */
+    data class ParsedClass(
+        val day: Int,
+        val minuteOfDay: Int,
+        val name: String,
+        val room: String
+    )
+
     // ── Cümle ayırma ──────────────────────────────────────────
 
     /**
@@ -15,8 +26,68 @@ object TextUtil {
      * Noktalama ve satır sonlarına göre cümleleştirir, çok kısa
      * parçaları birleştirir, tek parça 450 karakteri geçmez.
      */
+    /**
+     * v33 — KOD SATIRI SÜZGECİ (kullanıcı isteği).
+     *
+     * "Veri Yapıları" gibi kitaplarda sayfanın yarısı C/Java kodu oluyor;
+     * sesli okuma kodu sembol sembol heceliyor ve anlaşılmaz gürültü
+     * üretiyor. Bu yüzden kod satırları SESLENDİRİLMEZ; sayfadaki düz metin
+     * normal okunur. Ekrandaki görüntü ve vurgulama değişmez.
+     */
+    private val codeLineStart = Regex(
+        "^\\s*(@{1,2}[A-Za-z]|#include|#define|#import|import\\s|from\\s+\\S+\\s+import|package\\s|using\\s+namespace|namespace\\s|" +
+            "public\\s|private\\s|protected\\s|internal\\s|static\\s|final\\s|class\\s|interface\\s|enum\\s|struct\\s|" +
+            "fun\\s|def\\s|void\\s|int\\s+[A-Za-z_]|float\\s|double\\s|char\\s|bool\\s|boolean\\s|" +
+            "String\\s+[a-z]|var\\s|val\\s|let\\s|const\\s|return\\b|break\\b|continue\\b|throw\\s|" +
+            "for\\s*\\(|while\\s*\\(|if\\s*\\(|else\\s*\\{|switch\\s*\\(|case\\s|try\\s*\\{|catch\\s*\\(|" +
+            "System\\.out|console\\.log|printf\\s*\\(|cout\\s*<<|cin\\s*>>|print\\s*\\(|" +
+            "SELECT\\s|INSERT\\s+INTO|UPDATE\\s+\\w+\\s+SET|DELETE\\s+FROM|CREATE\\s+TABLE)"
+    )
+
+    /** Satır kod mu (sesli okumada atlanacak mı)? */
+    fun looksLikeCodeLine(line: String): Boolean {
+        val t = line.trim()
+        if (t.isEmpty()) return false
+        // 0) Yalnız noktalama ("}", ")", ";") — okunacak bir şey yok
+        if (t.length < 5) return t.none { it.isLetterOrDigit() }
+        // 1) Yorum satırları ve önişlemci (C/Java/JS) — kod sayılır
+        if (t.startsWith("//") || t.startsWith("/*") || t.startsWith("*/") ||
+            t.startsWith("* ") || t.startsWith("#include") || t.startsWith("#define") ||
+            t.startsWith("-- ")
+        ) return true
+        // 2) Kod anahtar sözcüğüyle başlıyor
+        if (codeLineStart.containsMatchIn(t)) return true
+        // 2) Sembol yoğunluğu yüksek (kod noktalaması)
+        val symbols = t.count { it in "{}[]();=<>|&*/#\\_\$@" }
+        if (symbols >= 3 && symbols * 6 >= t.length) return true
+        // 3) Satır kod bloğu kapanışı/açılışı gibi bitiyor
+        if ((t.endsWith("{") || t.endsWith("}") || t.endsWith(";")) && symbols >= 1) return true
+        return false
+    }
+
+    /**
+     * v33 — ARAPÇA NORMALİZASYONU.
+     *
+     * PDF'ten gelen Arapça bazen "sunum biçimi" (U+FB50–U+FEFF) harflerle ve
+     * tatweel (U+0640) ile geliyor; ses motoru bunları hece hece okuyup
+     * anlaşılmaz hale getiriyordu. NFKC bu harfleri normal biçime çevirir.
+     */
+    fun normalizeArabic(text: String): String {
+        if (text.isEmpty() || text.none { isArabicChar(it) }) return text
+        return try {
+            java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFKC)
+                .replace("\u0640", "")
+        } catch (_: Throwable) {
+            text
+        }
+    }
+
     fun speechChunks(pageText: String): List<String> {
-        val cleaned = pageText
+        // v33 — kod satırları seslendirilmez (düz metin okunur)
+        val textOnly = if (pageText.contains('\n')) {
+            pageText.lines().filterNot { looksLikeCodeLine(it) }.joinToString("\n")
+        } else pageText
+        val cleaned = normalizeArabic(textOnly)
             .replace(Regex("[ \\t]+"), " ")
             .replace(Regex("\\n{2,}"), "\n")
             .trim()
@@ -417,21 +488,306 @@ object TextUtil {
     )
 
     /**
+     * v16 (YENİ GÖREV 7) — FORMÜL SANİTİZASYONU: LaTeX / Markdown matematik
+     * kalıplarını DÜZ METNE çevirir (\hat{y} → y, $\sigma^2$ → sigma kare,
+     * \frac{a}{b} → a / b). Böylece istatistik/regresyon formülleri TTS'e
+     * "yanıt vermedi" hatası olarak geri dönmez.
+     *
+     * Sıra ÖNEMLİ: yapısal dönüşümler burada, Yunan/simge sözlükleri
+     * `forSpeech` içinde çalışır → bilinmeyen `\komut`lar da LATEX sonrası
+     * temizlenir.
+     */
+    fun sanitizeText(raw: String): String {
+        if (raw.isEmpty()) return raw
+        var s = raw
+        // 1) Matematik sınırlayıcıları: $$…$$, $…$, \(…\), \[…\]
+        s = s.replace(Regex("""\$\$([^$]*)\$\$"""), " $1 ")
+        s = s.replace(Regex("""\$([^$]*)\$"""), " $1 ")
+        s = s.replace(Regex("""\$"""), " ")
+        s = s.replace(Regex("""\\\(|\\\)|\\\[|\\\]"""), " ")
+        // 2) Aksan/vurgu komutları: içeriği KORU, komutu at
+        s = s.replace(
+            Regex("""\\(?:hat|bar|tilde|vec|dot|ddot|widehat|overline)\{([^{}]*)\}""")
+        ) { it.groupValues[1] }
+        // 3) Metin sarmalayıcıları: \text{…}, \mathrm{…}, \mathbf{…}
+        s = s.replace(
+            Regex("""\\(?:text|mathrm|mathbf|textbf|operatorname)\{([^{}]*)\}""")
+        ) { it.groupValues[1] }
+        // 4) \frac{a}{b} → a / b · \sqrt{x} → karekök x (LATEX sözlüğü yutar)
+        s = s.replace(
+            Regex("""\\frac\{([^{}]*)\}\{([^{}]*)\}""")
+        ) { " ${it.groupValues[1]} / ${it.groupValues[2]} " }
+        s = s.replace(Regex("""\\sqrt\{([^{}]*)\}""")) { " karekök ${it.groupValues[1]} " }
+        // 5) Artık boş kalmış gruplar: {y} → y
+        s = s.replace(Regex("""\{([^{}]*)\}"""), " $1 ")
+        return speechSafe(s)
+    }
+
+    /**
+     * TTS'e GİDEN metnin son süzgeci (v16 GÖREV 3 — TTS ÇÖKME KORUMASI).
+     *
+     * Neden gerekli:  • Yetim surrogate (yarım emoji) Edge TTS WebSocket'ini
+     * patlatır  • Biçim kontrol karakterleri (LRM/RLM/ZWJ, U+200B…U+FEFF)
+     * ses motorunda kilitlenmeye yolaçar  • Arapça karışık metin Türkçe
+     * locale'de okunamaz (dil yönlendirmesi ister)  • Bilinmeyen çizim
+     * sembolleri "kutu" sesi üretir.
+     *
+     * SAF fonksiyon (Android bağımlı değil) → TextUtilSpeechTest ile sınanır.
+     */
+    /**
+     * v16 (GÖREV 3) — SÜZGEÇ TABLOLARI (regex DEĞİL, code-point döngüsüyle okunur).
+     *
+     * NEDEN REGEX DEĞİL: Java `Pattern` surrogate ÇİFTLERİNİ (emoji, nadir yazı
+     * sistemleri) `[\uD800-\uDBFF][\uDC00-\uDFFF]` karakter sınıfıyla
+     * **eşleştirmez** (JDK 17 ile doğrulandı: `matcher.find() == false`).
+     * Bu yüzden `speechSafe` tek geçişte `codePointAt` ile gezer.
+     */
+    private const val CP_ORPHAN_LO = 0xD800
+    private const val CP_ORPHAN_HI = 0xDFFF
+
+    /** Sıfır-genişlik + yön/biçim işaretleri (ZWNJ/RLM/ALM/emoji ZWJ/BOM…). */
+    private val INVISIBLE_CODEPOINTS = setOf(
+        0x00AD, 0x061C, 0x180E,
+        0x200B, 0x200C, 0x200D, 0x200E, 0x200F,
+        0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+        0x2060, 0x2061, 0x2062, 0x2063, 0x2064,
+        0x2066, 0x2067, 0x2068, 0x2069,
+        0xFEFF
+    )
+
+    /** Emoji/BMP çizim sembolleri (TTS bunları "kalp" diye okur → okunmamalı). */
+    private fun isBmpDecoration(cp: Int): Boolean =
+        cp in 0x2190..0x21FF || cp in 0x2300..0x23FF || cp in 0x25A0..0x27BF ||
+            cp in 0x2B00..0x2BFF || cp in 0xFE00..0xFE0F
+
+    /** Arapça alfabesi (Kur'an metinleri): Arapça-Latince karışık kontrolü. */
+    private val ARABIC_RE = Regex("""[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+""")
+    private val LATIN_WORD_RE = Regex("""[A-Za-zÇĞİÖŞÜçğıöşü]{3,}""")
+
+    /** Metin ağırlıklı olarak Arapça mı? (>%20 Arapça token → evet) */
+    fun isArabicHeavy(text: String): Boolean {
+        if (text.isBlank()) return false
+        val sample = text.take(4000)
+        val arabicChars = ARABIC_RE.findAll(sample).sumOf { it.value.length }
+        val latinWords = LATIN_WORD_RE.findAll(sample).count()
+        val total = arabicChars + latinWords * 3
+        if (total == 0) return false
+        return arabicChars * 100 / total >= 20
+    }
+
+    // ── v5.12: YAZI SİSTEMİNE GÖRE PARÇALAMA (Arapça + Türkçe karışık) ──────
+
+    /** Arapça/İbranice bloklardaki bir karakter mi? */
+    fun isArabicChar(c: Char): Boolean =
+        c in '\u0600'..'\u06FF' || c in '\u0750'..'\u077F' ||
+            c in '\uFB50'..'\uFDFF' || c in '\uFE70'..'\uFEFF'
+
+    /** Metindeki Arapça karakter oranı (0..1) — ses seçimi için. */
+    fun arabicRatio(text: String): Double {
+        if (text.isBlank()) return 0.0
+        var ar = 0
+        var letters = 0
+        for (c in text) {
+            if (c.isLetter()) {
+                letters++
+                if (isArabicChar(c)) ar++
+            }
+        }
+        return if (letters == 0) 0.0 else ar.toDouble() / letters
+    }
+
+    // ── v31 (OKUMA KALİTESİ) — BOZUK METİN KATMANI SÜZGECİ ────────────────
+    //
+    // Bazı PDF'ler (ör. Kur'an meali) gömülü Arapça fontları Unicode'a
+    // eşlenmediği için metin katmanı çöp üretir: "0.,f� ::; r� > Q.1. .)".
+    // Bu satırlar hem ekranda hem sesde anlamsız okunuyordu. Aşağıdaki iki
+    // fonksiyon bu çöpü ayıklar; Arapça gerçekten okunacaksa OCR metni
+    // (ArabicOcr) kullanılır.
+
+    /**
+     * Sözcük gerçekten okunabilir mi?
+     *  • En az 2 harf (Arapça harekeler de harf sayılır) ve yarısından
+     *    fazlası harf → gerçek sözcük.
+     *  • Sadece sayı/noktalama → sayı (formül, dipnot) → korunur.
+     *  • "0.,f", "::;", "Q.1.", "ts.)..." gibi font çöpü → atılır.
+     */
+    private fun isSpeakableWord(w: String): Boolean {
+        if (w.isEmpty()) return false
+        var forms = 0
+        for (c in w) {
+            if (c.isLetter() || isArabicChar(c)) forms++
+        }
+        if (forms >= 2 && forms.toDouble() / w.length >= 0.5) return true
+        if (w.all { it.isDigit() || it in ".,%-+/=" }) return true
+        return false
+    }
+
+    /** Metindeki "çöp sözcük" oranı (0..1). Bozuk font eşlemesinde yükselir. */
+    fun garbageTokenShare(text: String): Double {
+        if (text.isBlank()) return 0.0
+        val sample = if (text.length > 8000) text.take(8000) else text
+        var total = 0
+        var bad = 0
+        for (tok in sample.split(' ', '\n', '\t', '\r')) {
+            if (tok.isBlank()) continue
+            total++
+            if (!isSpeakableWord(tok)) bad++
+        }
+        return if (total == 0) 0.0 else bad.toDouble() / total
+    }
+
+    /** Metinde bozuk font eşlemesi izi (değiştirme / özel kullanım karakteri) var mı? */
+    fun hasFontBreakage(text: String): Boolean =
+        text.any { it == '\uFFFD' || it in '\uE000'..'\uF8FF' }
+
+    /**
+     * Metin katmanının bozuk olup olmadığına dair sezgi.
+     *
+     * DİKKAT: yalnız "çok çöp sözcük" yeterli değil — kod sayfaları (C/Java)
+     * da bol sembol üretir; onları yanlışlıkla "bozuk" sayıp okumayı
+     * kırpmamak için asıl kanıt **değiştirme karakteri** aranır.
+     */
+    fun looksBrokenExtraction(text: String): Boolean {
+        if (text.isBlank()) return false
+        val sample = if (text.length > 8000) text.take(8000) else text
+        if (hasFontBreakage(sample)) return true
+        return garbageTokenShare(sample) >= 0.45
+    }
+
+    /**
+     * Bozuk metin katmanındaki çöp sözcükleri atar; gerçek sözcükler,
+     * sayılar ve noktalama korunur (satır yapısı bozulmaz).
+     */
+    fun dropGarbageWords(text: String): String {
+        if (text.isBlank()) return text
+        val out = StringBuilder(text.length)
+        var i = 0
+        while (i < text.length) {
+            val c = text[i]
+            if (c == '\n') {
+                out.append('\n')
+                i++
+                continue
+            }
+            if (c.isWhitespace()) {
+                var j = i
+                while (j < text.length && text[j].isWhitespace() && text[j] != '\n') j++
+                out.append(' ')
+                i = j
+                continue
+            }
+            var j = i
+            while (j < text.length && !text[j].isWhitespace()) j++
+            var word = text.substring(i, j)
+            if (word.any { it == '\uFFFD' || it in '\uE000'..'\uF8FF' }) {
+                word = word.filter { it != '\uFFFD' && it !in '\uE000'..'\uF8FF' }
+            }
+            if (word.isNotEmpty() && isSpeakableWord(word)) {
+                out.append(word).append(' ')
+            }
+            i = j
+        }
+        return out.toString().replace(Regex("[ \\t]{2,}"), " ").trim()
+    }
+
+    /**
+     * Parçaları yazı sistemine göre böler: bir ses parçası ASLA hem Arapça
+     * hem Latin metin taşımaz. Aksi hâlde tek bir Edge sesi seçilir ve diğer
+     * dil yanlış (anlaşılmaz) okunur — meal/tefsir sayfalarında tam bu oluyordu.
+     *
+     * Nötr karakterler (boşluk, rakam, noktalama) o anki bloğa eklenir.
+     */
+    fun splitByScript(chunks: List<String>): List<String> {
+        val out = ArrayList<String>(chunks.size + 8)
+        for (chunk in chunks) {
+            if (chunk.isBlank()) continue
+            val pieces = ArrayList<String>()
+            val buf = StringBuilder()
+            var current: Boolean? = null   // true = Arapça blok
+            for (c in chunk) {
+                val isArabic = isArabicChar(c)
+                val neutral = !c.isLetter()
+                if (!neutral && current != null && isArabic != current) {
+                    // Çok kısa blokları ("و" gibi) ayrı parça yapma
+                    if (buf.count { it.isLetter() } >= 2) {
+                        pieces.add(buf.toString().trim())
+                        buf.setLength(0)
+                    }
+                }
+                if (!neutral) current = isArabic
+                buf.append(c)
+            }
+            if (buf.isNotBlank()) pieces.add(buf.toString().trim())
+            out.addAll(pieces.filter { it.isNotBlank() })
+        }
+        return out
+    }
+
+    /**
+     * TTS güvenli sadeleştirme: kontrol/biçim karakterleri + yetim surrogate
+     * + emoji temizlenir, boşluklar toplanır. Metin DEĞİL yalnızca bozulma
+     * kaynağı olan karakterler atılır (görünen metne dokunulmaz).
+     */
+    fun speechSafe(text: String): String {
+        if (text.isEmpty()) return text
+        val sb = StringBuilder(text.length)
+        var i = 0
+        while (i < text.length) {
+            val cp = text.codePointAt(i)
+            i += Character.charCount(cp)
+
+            // 1) Yalnız kalan surrogate (çift olmayan yarım emoji parçası) → SİL
+            if (cp in CP_ORPHAN_LO..CP_ORPHAN_HI) continue
+            // 1b) EK DİL ÖTESİ (emoji + nadir yazı sistemleri) — `codePointAt`
+            //     çiftleri tek code-point olarak VERİR; charCount==2 → atla
+            //     (çökme kaynağı; TTS yalnız BMP metni güvenle okur).
+            if (Character.charCount(cp) == 2) { sb.append(' '); continue }
+
+            // 2) Kontrol karakterleri (\n hariç) → boşluk
+            if (cp < 0x20) {
+                if (cp == '\n'.code || cp == '\r'.code) sb.append('\n') else sb.append(' ')
+                continue
+            }
+            if (cp == 0x7F || cp in 0x80..0x9F) { sb.append(' '); continue }
+
+            // 3) Sıfır-genişlik / yön / biçim işaretleri → tamamen at
+            if (cp in INVISIBLE_CODEPOINTS) continue
+
+            // 4) BMP emoji/çizim sembolleri → boşluk (paragraf noktalaması korunur)
+            if (isBmpDecoration(cp)) { sb.append(' '); continue }
+
+            sb.appendCodePoint(cp)
+        }
+        // 5) Boşlukları topla, noktalama öncesi fazla boşluğu temizle
+        var s = sb.toString().replace(Regex("[ \\t]{2,}"), " ")
+        s = s.replace(Regex(" +([,.;:!?])"), "$1")
+        return s.trim()
+    }
+
+    /**
      * Sembolleri Türkçe okunuşlarıyla değiştirir; TTS'e giden metin
      * bu fonksiyondan geçer (ekrandaki metin DEĞİŞMEZ).
      *
      * Örnek: "x² + y² ≤ 100 → %50 artış" →
      *        "x kare artı y kare küçük veya eşittir 100 ise yüzde 50 artış"
+     *
+     * v16 (GÖREV 3): ilk satırda `speechSafe` uygulanır (çökme koruması)
+     * ve Arapça ağır metinler TTS'e verilmeden ÖNCE ayıklanır.
      */
     fun forSpeech(raw: String): String {
         if (raw.isEmpty()) return raw
-        var s = raw
+        // v16 (YENİ GÖREV 7): önce formül sanitizasyonu (LaTeX → düz metin),
+        // ardından karakter süzgeci SpeechSafe dahil edilmiş hâlde devam eder.
+        var s = sanitizeText(raw)
 
         // HTML/XML etiketleri tamamen çık (matematikte < harfle başlamaz:
         // "n<10" gibi ifadelere dokunmaz)
         s = s.replace(Regex("</?[A-Za-z][A-Za-z0-9]*(?:\\s[^<>]*?)?/?>"), " ")
 
         LATEX.forEach { (k, v) -> s = s.replace(k, v) }
+        // v16 (YENİ GÖREV 7): LATEX sözlüğünde olmayan kalan `\komut`lar
+        // da temizlenir (TTS "hat" gibi anlamsız parçalar okumasın)
+        s = s.replace(Regex("""\\[A-Za-z]+"""), " ")
         TWO_CHAR.forEach { (k, v) -> s = s.replace(k, v) }
 
         // Üst simge kalıpları: x^2 → x kare, x^4 → x üzeri 4
@@ -458,5 +814,157 @@ object TextUtil {
         s = s.replace(Regex(" +([,.;:!?])"), "$1")
         s = s.replace(Regex("\\n +"), "\n")
         return s.trim()
+    }
+
+    // ── v5: Ders programı satır ayrıştırma (ADIM A) ────────────────
+
+    /**
+     * Türkçe gün adları → 0..6 (Pazartesi=0 … Pazar=6).
+     *
+     * **v5.1 ÇÖKME DÜZELTMESİ (9 Ekim 2026):**
+     *  - Android `Pattern` motoru `UNICODE_CHARACTER_CLASS` bayrağını
+     *    DESTEKLEMEZ (AOSP'te `CANON_EQ` ile birlikte bilinçli çıkarılmıştır).
+     *    Bu `object`'in `<clinit>`'inde fırlatılan `IllegalArgumentException`,
+     *    `ExceptionInInitializerError` olarak tüm uygulamayı açılışta
+     *    çöküyordu (`refreshContinueCard` → `TextUtil.readPercent` → ilk erişim).
+     *  - Sadece bayrağı kaldırmak da YETMEZ: `\b` (kelime sınırı) bu bayrak
+     *    olmadan Türkçe karakterleri (ı, ç, ş, ğ, ö, ü) kelime SAYMAZ →
+     *    "Salı" yalnız "Sal" kalır, "Çarşamba" hiç eşleşmezdi.
+     *    Bu yüzden sınır `\b` yerine açık karakter sınıflı **lookaround** ile
+     *    kuruldu: JVM ve Android'de birebir aynı davranış (test = üretim).
+     *  - `UNICODE_CASE` korundu (Android destekler): "SALI"/"ÇARŞAMBA" gibi
+     *    Türkçe büyük harfli OCR çıktısı da eşleşsin.
+     */
+    private val DAY_PATTERN: java.util.regex.Pattern = java.util.regex.Pattern.compile(
+        """(?<![A-Za-z0-9_çğıöşüÇĞİÖŞÜ])(""" +
+            """pazartesi|pazar|pzt|salı|sali|sal|çarşamba|carsamba|çar|car|""" +
+            """perşembe|persembe|per|cuma|cumartesi|cum|cmt|pazr|""" +
+            """monday|tuesday|wednesday|thursday|friday|saturday|sunday|""" +
+            """mon|tue|wed|thu|fri|sat|sun)""" +
+            """(?![A-Za-z0-9_çğıöşüÇĞİÖŞÜ])""",
+        java.util.regex.Pattern.CASE_INSENSITIVE or
+            java.util.regex.Pattern.UNICODE_CASE
+    )
+
+    private val TIME_RE = Regex("""\b(\d{1,2})[:.](\d{2})\b""")
+
+    /** Sondaki derslik kodu: "B-204", "A101", "D-3" gibi. */
+    private val ROOM_RE = Regex(
+        """\s+([A-Za-zÇĞİÖŞÜçğıöşü]{1,12}\s*-\s*\d{1,4}[A-Za-z]?)\s*$"""
+    )
+
+    /** Tek başına sonda duran sayısal derslik: " 204", " 101". */
+    private val ROOM_NUM_RE = Regex("""\s+(\d{3,4})\s*$""")
+
+    /**
+     * Ders programı satırlarından ders listesi çıkarır (ADIM A).
+     *
+     * Girdi: OCR/PDF metin satırları. Her satırda EN AZ bir gün adı ve
+     * bir saat (`09:00` / `09.00`, `09:00-11:00` aralıkları) aranır;
+     * gün/saat içermeyen satırlar (başlık, açıklama) atlanır.
+     * Kalan metin ders adı, sondaki `B-204` gibi kod dersliktir.
+     *
+     * **Saf fonksiyon** (Android bağımlılığı yok) → TextUtilTest ile sınanır.
+     */
+    fun parseSchedule(lines: List<String>): List<ParsedClass> {
+        val out = mutableListOf<ParsedClass>()
+        val seen = mutableSetOf<Triple<Int, Int, String>>()
+
+        for (raw in lines) {
+            // v5.1: Tek bozuk/taşkın OCR satırı (sınır değeri aşan sayı,
+            // garip noktalama yığını…) tüm aktarımı düşürmesin — satır
+            // atlanır, diğer satırlarla devam edilir.
+            try {
+                val line = raw.trim()
+                if (line.length < 3 || line.length > 500) continue
+
+                val day = findDay(line) ?: continue
+                val start = findStartTime(line) ?: continue
+
+                // Gün ve tüm saat ifadelerini temizle → kalan: ders + derslik
+                var rest = DAY_PATTERN.matcher(line).replaceAll(" ")
+                rest = TIME_RE.replace(rest, " ")
+                rest = rest.replace(Regex("""\d{1,2}\s*[-–—]\s*\d{1,2}(?:[:.]\d{2})?"""), " ")
+
+                var room = ""
+                ROOM_RE.find(rest)?.let { m ->
+                    room = m.groupValues[1].replace(Regex("\\s+"), "").uppercase(Locale.US)
+                    rest = rest.removeRange(m.range)
+                } ?: ROOM_NUM_RE.find(rest)?.let { m ->
+                    room = m.groupValues[1]
+                    rest = rest.removeRange(m.range)
+                }
+
+                val name = rest
+                    .replace(Regex("""[\s:;,.|/·•\-–—]+"""), " ")
+                    .replace(Regex("""\s+"""), " ")
+                    .trim()
+                if (name.length < 2 || name.length > 120) continue
+
+                // Aynı gün/saat/ders tekrarlanmasın (OCR satır bölünmeleri)
+                val key = Triple(day, start, name.lowercase(Locale.US))
+                if (!seen.add(key)) continue
+
+                out += ParsedClass(day, start, name, room)
+            } catch (_: RuntimeException) {
+                // IndexOutOfBounds / IllegalArgument vb. → yalnız bu satır atlanır
+                continue
+            }
+        }
+        return out
+    }
+
+    /** Satırda gün adı varsa 0..6, yoksa null. */
+    private fun findDay(line: String): Int? {
+        val m = DAY_PATTERN.matcher(line)
+        if (!m.find()) return null
+        return dayIndexOf(foldDayToken(m.group(1)))
+    }
+
+    /**
+     * v5.1: Gün adını ASCII'ye katlar (SALI→sali, Çarşamba→carsamba,
+     * CUMARTESİ→cumartesi).
+     *
+     * Neden: `"CUMARTESİ".lowercase()` bazı JVM/Android sürümlerinde
+     * `i` + `U+0307` (birleşik nokta) olarak İNİYOR → `dayIndexOf` hiçbir
+     * anahtarla eşleşmiyordu (büyük harfli OCR satırları sessizce
+     * kayboluyordu). Char-char katlama hem bu tuzağı hem de Türkçe
+     * büyük harf varyantlarını tek hamlede çözer; `dayIndexOf`'taki
+     * ASCII anahtarlar (sali, carsamba, persembe …) ile birebir eşleşir.
+     */
+    private fun foldDayToken(t: String): String = buildString(t.length) {
+        for (ch in t) {
+            when (ch) {
+                'İ', 'I' -> append('i')
+                'ı' -> append('i')
+                'Ğ', 'ğ' -> append('g')
+                'Ş', 'ş' -> append('s')
+                'Ç', 'ç' -> append('c')
+                'Ö', 'ö' -> append('o')
+                'Ü', 'ü' -> append('u')
+                '\u0307' -> Unit   // birleşik nokta (İ→i dönüşümünden kalır) → atla
+                else -> append(Character.toLowerCase(ch))
+            }
+        }
+    }
+
+    private fun dayIndexOf(token: String): Int? = when (token) {
+        "pazartesi", "pzt", "monday", "mon" -> 0
+        "salı", "sali", "sal", "tuesday", "tue" -> 1
+        "çarşamba", "carsamba", "çar", "car", "wednesday", "wed" -> 2
+        "perşembe", "persembe", "per", "thursday", "thu" -> 3
+        "cuma", "cum", "friday", "fri" -> 4
+        "cumartesi", "cmt", "saturday", "sat" -> 5
+        "pazar", "pazr", "sunday", "sun" -> 6
+        else -> null
+    }
+
+    /** Satırdaki İLK saatin dakikası (0..1439); yoksa null. */
+    private fun findStartTime(line: String): Int? {
+        val m = TIME_RE.find(line) ?: return null
+        val h = m.groupValues[1].toIntOrNull() ?: return null
+        val min = m.groupValues[2].toIntOrNull() ?: return null
+        if (h !in 0..23 || min !in 0..59) return null
+        return h * 60 + min
     }
 }

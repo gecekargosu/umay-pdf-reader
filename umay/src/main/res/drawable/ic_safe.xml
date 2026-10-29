@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v21 — KASA ikonu: gerçek çelik kasa (gövde + kadran + kol + menteşe). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Gövde -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:pathData="M3.2,3.2 h14.6 a2.4,2.4 0 0 1 2.4,2.4 v12.8 a2.4,2.4 0 0 1 -2.4,2.4 H3.2 Z" />
+
+    <!-- Kadran -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.4"
+        android:pathData="M10.6,12 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0" />
+
+    <!-- Kadran kolları -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10.0,8.6 h1.2 v2.0 h-1.2 Z M10.0,13.4 h1.2 v2.0 h-1.2 Z M7.2,11.4 h2.0 v1.2 h-2.0 Z M12.0,11.4 h2.0 v1.2 h-2.0 Z" />
+
+    <!-- Kol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M17.2,10.6 h1.6 v2.8 h-1.6 Z" />
+
+    <!-- Menteşeler -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3.2,6.0 h1.0 v2.0 h-1.0 Z M3.2,16.0 h1.0 v2.0 h-1.0 Z" />
+</vector>

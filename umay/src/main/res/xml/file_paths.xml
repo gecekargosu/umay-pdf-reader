@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Kamerayla çekilen sayfaların paylaşımı (FileProvider) -->
+<!-- Kamerayla çekilen sayfalar + v12 paylaşım yolları (FileProvider) -->
 <paths>
     <files-path name="capture" path="capture/" />
+    <!-- v33 — taranan fotoğrafların yönü düzeltilmiş kopyaları -->
+    <files-path name="scanfix" path="scanfix/" />
+    <!-- v14 (V5.0 §3): kitap PDF'i paylaşımı (ReaderActivity uzun basma) -->
+    <files-path name="books_src" path="books/" />
     <cache-path name="capture_cache" path="capture/" />
+    <!-- v5.4 (ONARIM) — "Güncel APK'yi Kur": önbelleğe kopyalanan APK -->
+    <cache-path name="apk_update" path="update/" />
+    <!-- v24 — ders video rafındaki yerel videolar (oynatma/paylaşım) -->
+    <files-path name="course_videos" path="videos/" />
+    <!-- v33 — ders ses kayıtları (raflardan oynatma) -->
+    <files-path name="course_audio" path="audio/" />
+    <!-- v24 — gizli kasadaki medya açılırken çözülen geçici kopya -->
+    <cache-path name="vault_view" path="vault_view/" />
+    <!-- v12: alıntı kartı PNG'leri (ExportManager) -->
+    <cache-path name="share_cache" path="share/" />
+    <!-- v12: dışa aktarılan özet .md dosyaları (Documents/UmayPDF) -->
+    <external-files-path name="docs_umay" path="Documents/UmayPDF/" />
+    <external-path name="external_docs" path="Documents/UmayPDF/" />
+    <!-- v16 — APK kısayolu: Download/UmayPDF_Guncel.apk (kurulum paylaşımı) -->
+    <external-path name="download_umay" path="Download/" />
+    <!-- v17 (GÖREV 2) — umay_error.log:
+         1) davetçi genel dizin: Documents/UmayPDF/ (external_docs yukarıda) -->
+    <!-- 2) yedek: getExternalFilesDir kökü (izin verilemese bile paylaşılabilsin) -->
+    <external-files-path name="ext_root" path="." />
 </paths>

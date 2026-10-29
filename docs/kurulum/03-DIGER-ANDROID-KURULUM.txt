@@ -1,0 +1,42 @@
+﻿DİĞER ANDROID MARKALARI — KURULUM
+=================================
+(Google Pixel, Huawei/Honor, Oppo, Realme, Vivo, OnePlus, Motorola,
+ Asus, Nokia, TCL, General Mobile ve diğerleri)
+
+Genel kural: Android, Play Store dışından gelen APK için o uygulamaya
+"bilinmeyen uygulama yükleme" izni ister. Yol markaya göre değişir:
+
+GOOGLE PIXEL / saf Android
+  Ayarlar → Uygulamalar → Özel uygulama erişimi →
+  "Bilinmeyen uygulamaları yükle" → Dosyalar (veya Chrome) → izin ver.
+
+HUAWEI / HONOR
+  Ayarlar → Güvenlik → Daha fazla güvenlik ayarı →
+  "Bilinmeyen kaynaklardan uygulama yükleme" → Dosyalar → izin ver.
+  (Huawei'de Play Protect yoktur; "Sahte uygulama" uyarısını yoksay.)
+
+OPPO / REALME / VIVO / ONEPLUS
+  Ayarlar → Uygulama yönetimi → Özel erişim →
+  "Bilinmeyen uygulamaları yükle" → Dosyalar → izin ver.
+  Oppo/Realme'de kurulum sırasında "Güvenlik taraması" uyarısı çıkarsa
+  "Yine de yükle" / "Devam et".
+
+MOTOROLA / NOKIA / ASUS / GENERAL MOBILE
+  Ayarlar → Uygulamalar → Özel erişim (veya Güvenlik) →
+  "Bilinmeyen uygulamaları yükle" → izin ver.
+
+ORTAK ADIMLAR
+  1) APK'yı indir (WhatsApp/Telegram/Drive/kablo fark etmez).
+  2) Dosya yöneticisinden APK'ya dokun.
+  3) "Yükle" → uyarı çıkarsa "Yine de yükle".
+  4) Kurulum bitince "Aç".
+  5) İzinler: Bildirim, Tüm dosyalara erişim, Pil "Kısıtlama yok".
+
+Play Protect uyarısı (Google Play olan tüm cihazlarda)
+  "Yine de yükle" ile geçilir. İnatçıysa Play Store → profil →
+  Play Protect → dişli → taramayı geçici kapat.
+
+Android sürümü
+  Program Android 8.0 (API 26) ve üstünde çalışır.
+  Android 10 ve altında "tüm dosyalara erişim" izni yerine normal
+  depolama izni istenir.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — Kitap sırtı: kapak sol kenarında derinlik bandı (tema token'lı). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="0"
+        android:centerColor="@color/umay_hero_stroke"
+        android:endColor="@color/umay_bg"
+        android:startColor="@color/umay_frame"
+        android:type="linear" />
+</shape>

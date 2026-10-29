@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — DERS KARTI (çizimdeki "Ders Logosu / Ders" kutuları).
+     Yatay kaydırmalı; zemin/çerçeve adaptör tarafından bg_course_card_* ile
+     atanır. Kimlikler (courseName/courseMeta/courseNext) korunmuştur. -->
+<com.umay.pdfreader.NeonCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/courseCardRoot"
+    android:layout_width="132dp"
+    android:layout_height="104dp"
+    android:layout_marginEnd="10dp"
+    android:background="@drawable/bg_course_card_0"
+    android:clickable="true"
+    android:elevation="3dp"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:padding="11dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.14"
+        android:text="@string/ders_etiketi"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="8.5sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/courseName"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="3dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="@color/umay_text"
+        android:textSize="13.5sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="24dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="2dp"
+        android:background="@color/umay_orange" />
+
+    <TextView
+        android:id="@+id/courseMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/courseNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/umay_accent"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+</com.umay.pdfreader.NeonCardLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v6 — Çöp kutusu (kitap silme) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M4,7 L20,7 M9,7 L9,5.2 C9,4.5 9.5,4 10.2,4 L13.8,4 C14.5,4 15,4.5 15,5.2 L15,7 M6.5,7 L7.4,19.2 C7.5,20.2 8.3,21 9.3,21 L14.7,21 C15.7,21 16.5,20.2 16.6,19.2 L17.5,7 M10,11 L10,17 M14,11 L14,17"
+        android:strokeColor="@color/umay_text"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.7"
+        android:fillColor="@android:color/transparent" />
+</vector>

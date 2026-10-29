@@ -1,0 +1,35 @@
+﻿UMAY PDF READER — ARKADAŞA GÖNDERME PAKETİ
+==========================================
+
+Bu klasörde ne var?
+  UmayPdfReader.apk ............ Programın kendisi (tek dosya, kurulunca çalışır)
+  00-ONCE-BUNU-OKU.txt ......... Bu dosya (genel anlatım)
+  01-SAMSUNG-KURULUM.txt ....... Samsung telefonlar için adım adım
+  02-XIAOMI-REDMI-KURULUM.txt .. Xiaomi / Redmi / POCO için adım adım
+  03-DIGER-ANDROID-KURULUM.txt . Diğer tüm Android markaları
+  04-WHATSAPP-TELEGRAM.txt ..... APK'yı WhatsApp/Telegram ile yollama
+  05-GITHUB-LINKI.txt .......... Link ile indirtme (dosya yollamadan)
+  surum-bilgisi.txt ............ Sürüm + dosya doğrulama kodu
+
+Neden "bilinmeyen uygulama" uyarısı çıkıyor?
+  Program Google Play'de değil, bu yüzden Android ve Google Play Protect
+  "bu kaynağı tanımıyorum" diye uyarır. APK'yı biz ürettik; kuruluma
+  devam etmek için uyarıyı "Yine de yükle" ile geçmek gerekir.
+  Markaya özel adımlar 01 / 02 / 03 dosyalarında.
+
+En kısa yol (3 adım):
+  1) UmayPdfReader.apk dosyasını telefona kopyala (kablo, WhatsApp, Telegram,
+     e-posta, Google Drive — hepsi olur).
+  2) Telefonda Dosyalarım/Downloads uygulamasından APK'ya dokun.
+  3) "Yükle" → uyarı çıkarsa "Yine de yükle" → "Aç".
+
+İlk açılışta istenen izinler (önerilen):
+  • Bildirim .................. sesli okuma kontrolü ve ders/sınav hatırlatması
+  • Tüm dosyalara erişim ...... cihazdaki PDF/slayt/dokümanları kütüphaneye ekleme
+  • Pil: "Kısıtlama yok" ...... ekran kapalıyken okumanın devam etmesi
+  • Tam alarm ................. ders/sınav alarmlarının tam zamanında çalması
+  Bunlar verilmezse program açılır ama bu özellikler kısıtlanır.
+
+Not: Bu sürüm bir test sürümüdür; reklam alanında "Test Reklamı" yazması
+normaldir (yayın sürümünde gerçek reklam olacak). Kitaplar telefonun
+içinde kalır, sunucuya yüklenmez.

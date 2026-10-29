@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v25 (H5) — ANDROID 11 VE ÖNCESİ için yedekleme dışlamaları.
+  Gizli kasa verisi BULUT YEDEĞİNE ÇIKMAZ:
+    • umay_vault.xml  → PIN özeti, tuz, parmak izi ile sarmalanmış PIN, kasa kayıtları
+    • files/vault/    → AES ile şifrelenmiş kasa içerikleri (.enc)
+  Böylece telefon değişse/yedek geri yüklense bile kasa başka cihazda açılamaz,
+  PIN taşınmaz. Kullanıcı kasa içeriğini kaybetmemek için "Kasadan Çıkar" kullanmalı.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="umay_vault.xml" />
+    <exclude domain="file" path="vault" />
+    <exclude domain="file" path="vault_view" />
+</full-backup-content>

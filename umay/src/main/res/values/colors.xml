@@ -1,13 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="umay_bg">#0B1220</color>
-    <color name="umay_panel">#141E30</color>
-    <color name="umay_panel2">#1B2A44</color>
-    <color name="umay_accent">#22D3EE</color>
-    <color name="umay_orange">#FF9F45</color>
-    <color name="umay_accent_dark">#0891B2</color>
-    <color name="umay_text">#E5EFFF</color>
-    <color name="umay_text_dim">#8AA0C2</color>
-    <color name="umay_danger">#F87171</color>
-    <color name="umay_ok">#4ADE80</color>
+    <!-- ══ UMAY — GÜNDÜZ PALETİ (v5.6) ══
+         Marka: LACİVERT + TURUNCU + MAVİ + KOYU GRİ.
+         Referans: kullanıcının onayladığı tasarım görseli (koyu lacivert zemin,
+         turuncu ana eylem, mavi ikincil vurgu).
+         Gündüz modu aynı marka ailesinin AÇIK tonudur: kirli beyaz zemin,
+         lacivert metin, turuncu/mavi vurgular. Gece paleti values-night'ta.
+         KURAL: Ekranlarda ham renk (#RRGGBB) KULLANILMAZ; her renk buradan gelir. -->
+    <color name="umay_bg">#F2F0E9</color>
+    <color name="umay_panel">#FCFAF4</color>
+    <color name="umay_panel2">#E8E3D7</color>
+    <color name="umay_icon">#12233C</color>
+    <color name="umay_shadow">#260B1929</color>
+    <color name="umay_card_grad_start">#FDFBF6</color>
+    <color name="umay_card_grad_end">#F4F1E8</color>
+    <color name="umay_avatar_bg">#E1EAF7</color>
+    <!-- Renkli ders kartları — açık temada pastel zemin + koyu çerçeve -->
+    <color name="umay_course_0">#DBEAFE</color>
+    <color name="umay_course_1">#EDE9FE</color>
+    <color name="umay_course_2">#D1FAE5</color>
+    <color name="umay_course_3">#FEF3C7</color>
+    <color name="umay_course_4">#FFE4E6</color>
+    <color name="umay_course_stroke_0">#1D4ED8</color>
+    <color name="umay_course_stroke_1">#6D28D9</color>
+    <color name="umay_course_stroke_2">#047857</color>
+    <color name="umay_course_stroke_3">#B45309</color>
+    <color name="umay_course_stroke_4">#BE123C</color>
+    <!-- v21 — RAF ZEMİNLERİ: her raf farklı ton (gündüz pastel)
+         v24 — tonlar belirginleştirildi: arkadaki rengin farklı olduğu
+         ilk bakışta anlaşılsın (kullanıcı isteği). -->
+    <color name="umay_shelf_bg_0">#CFE0F7</color>
+    <color name="umay_shelf_bg_1">#E2D6F7</color>
+    <color name="umay_shelf_bg_2">#C9EEDF</color>
+    <color name="umay_shelf_bg_3">#F7E3C0</color>
+    <color name="umay_shelf_bg_4">#F7D2DA</color>
+    <!-- v24 — RAF NEON ÇERÇEVELERİ: her raf kendi zeminiyle uyumlu parlak
+         dış çizgi (yanıp sönmez; yalnız rafları birbirinden ayırır). -->
+    <color name="umay_shelf_neon_0">#2563EB</color>
+    <color name="umay_shelf_neon_1">#7C3AED</color>
+    <color name="umay_shelf_neon_2">#0D9488</color>
+    <color name="umay_shelf_neon_3">#D97706</color>
+    <color name="umay_shelf_neon_4">#DB2777</color>
+
+    <!-- MAVİ vurgu: bağlantılar, ikincil butonlar, aktif çipler -->
+    <color name="umay_accent">#1D63D8</color>
+    <!-- TURUNCU: ana eylem (Devam Et, ekle, kaydet) -->
+    <color name="umay_orange">#F2620C</color>
+    <color name="umay_orange_dark">#C94F00</color>
+    <color name="umay_accent_dark">#144CAB</color>
+    <color name="umay_on_accent">#FFFFFF</color>
+    <color name="umay_text">#0B1929</color>
+    <color name="umay_text_dim">#53657C</color>
+    <color name="umay_border">#D6D0C2</color>
+    <color name="umay_frame">#ECE8DC</color>
+    <color name="umay_danger">#DC2626</color>
+    <color name="umay_ok">#0E9F6E</color>
+    <color name="umay_bg_mid">#EDE9DF</color>
+    <color name="umay_bg_haze">#E2DCCC</color>
+    <color name="umay_glass">#F7FFFFFF</color>
+    <color name="umay_glass_edge_start">#591D63D8</color>
+    <color name="umay_glass_edge_end">#4DF2620C</color>
+    <!-- Raf teması (ahşap yerine artık lacivert ailesi — bkz. bg_shelf_plank) -->
+    <color name="umay_wood_light">#2C4568</color>
+    <color name="umay_wood_mid">#1E3251</color>
+    <color name="umay_wood_dark">#152541</color>
+    <color name="umay_wood_edge">#0E1B30</color>
+    <color name="umay_neon">#1D63D8</color>
+    <color name="umay_input">#F8F5EE</color>
+
+    <!-- Koyu marka paleti (bazı ekranlar doğrudan bu adları kullanıyor) -->
+    <color name="umay_primary_background">#0A1220</color>
+    <color name="umay_surface">#111C2E</color>
+    <color name="umay_primary_accent">#F2620C</color>
+    <color name="umay_secondary_accent">#1D63D8</color>
+    <color name="umay_text_primary">#0B1929</color>
+    <color name="umay_text_secondary">#53657C</color>
+    <color name="umay_card">#FFFFFF</color>
+    <color name="umay_shelf_wood">#1E3251</color>
+    <color name="umay_shelf_metal">#3F5371</color>
+    <color name="umay_wave">#1D63D8</color>
+    <color name="umay_night_bg">#0A1220</color>
+    <color name="umay_night_text">#E8EEF7</color>
+
+    <!-- Gece okuma (invert) -->
+    <color name="umay_invert_bg">#101A2B</color>
+    <color name="umay_invert_text">#E8EEF7</color>
+
+    <!-- Yazı tipi -->
+    <color name="umay_font_primary">#0B1929</color>
+    <color name="umay_font_secondary">#53657C</color>
+
+    <!-- Sınav/Ödev -->
+    <color name="umay_exam_admin">#0E9F6E</color>
+    <color name="umay_exam_study">#1D63D8</color>
+    <color name="umay_exam_task">#F2620C</color>
+    <color name="umay_exam_deadline">#DC2626</color>
+
+    <!-- Saklama sınırı (ShelfManager) -->
+    <color name="umay_shelf_limit">#B45309</color>
+
+    <!-- Tema -->
+    <color name="umay_theme_accent">#F2620C</color>
+    <color name="umay_theme_primary">#0A1220</color>
+
+    <!-- Sidebar (Nav) -->
+    <color name="umay_sidebar_bg">#0A1220</color>
+    <color name="umay_sidebar_text">#E8EEF7</color>
+    <color name="umay_sidebar_accent">#4C8DFF</color>
+    <color name="umay_sidebar_active">#FF7A18</color>
+
+    <!-- Özet ekranı -->
+    <color name="umay_bg_summary">#EEF4FB</color>
+    <color name="umay_bg_summary_dim">#D9E2EF</color>
+
+    <!-- Kaynak görüntüleyici (kod/metin) -->
+    <color name="umay_source_bg">#0A1220</color>
+    <color name="umay_source_fg">#E8EEF7</color>
+    <color name="umay_source_gutter">#22334D</color>
+    <color name="umay_source_accent">#4C8DFF</color>
+
+    <!-- Gece modu -->
+    <color name="umay_night">#0A1220</color>
+    <color name="umay_night_accent">#4C8DFF</color>
+    <color name="umay_night_panel">#111C2E</color>
+
+    <!-- Widget -->
+    <color name="umay_widget_bg">#111C2E</color>
+    <color name="umay_widget_accent">#FF7A18</color>
+
+    <!-- Logo zemini -->
+    <color name="umay_puzzle_bg">#0A1220</color>
+    <color name="umay_puzzle_fg">#E8EEF7</color>
+
+    <!-- Tema modu -->
+    <color name="umay_theme_gece">#0A1220</color>
+    <color name="umay_theme_light">#F2F6FC</color>
+
+    <!-- Video -->
+    <color name="umay_video_bg">#0A1220</color>
+    <color name="umay_video_fg">#E8EEF7</color>
+
+    <!-- Ses -->
+    <color name="umay_audio_bg">#111C2E</color>
+    <color name="umay_audio_fg">#E8EEF7</color>
+    <color name="umay_audio_accent">#FF7A18</color>
+
+    <!-- Tasarım (agent 22) -->
+    <color name="umay_agent22_bg">#0A1220</color>
+    <color name="umay_agent22_fg">#E8EEF7</color>
+    <color name="umay_agent22_card">#111C2E</color>
+    <color name="umay_agent22_accent">#FF7A18</color>
+
+    <!-- Liste -->
+    <color name="umay_divider">#C6D6E9</color>
+    <color name="umay_list_item">#E6EEF9</color>
+    <color name="umay_list_item_active">#F2620C</color>
+    <color name="umay_list_item_text">#0B1929</color>
+    <color name="umay_list_item_text_secondary">#53657C</color>
+    <color name="umay_card_corner">#E6EEF9</color>
+    <color name="umay_card_badge">#1D63D8</color>
+    <color name="umay_card_badge_text">#FFFFFF</color>
+
+    <!-- ══ v5.6 — ANA EKRAN (çizimdeki düzen) için yeni token'lar ══ -->
+    <color name="umay_hero_start">#FFFFFF</color>
+    <color name="umay_hero_end">#EAF1FB</color>
+    <color name="umay_hero_stroke">#C6D6E9</color>
+    <color name="umay_hero_glow">#33F2620C</color>
+    <color name="umay_eq_bg">#E6EEF9</color>
+    <color name="umay_chip_bg">#E6EEF9</color>
+    <color name="umay_chip_active">#F2620C</color>
+    <color name="umay_shelf_bar">#E6EEF9</color>
+    <color name="umay_shelf_edge">#C6D6E9</color>
 </resources>

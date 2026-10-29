@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "JarvisMobile"
-include(":app")
+
 include(":umay")

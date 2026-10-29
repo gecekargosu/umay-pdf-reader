@@ -344,4 +344,168 @@ class TextUtilTest {
         assertEquals(0, TextUtil.readPercent(page = -1, pageCount = 10)) // hiç okunmamış
         assertEquals(50, TextUtil.readPercent(page = 4, pageCount = 10)) // normal
     }
+
+    // ── v5: Ders programı OCR/PDF satır ayrıştırma (ADIM A) ─────
+
+    @Test
+    fun parseSchedule_tamSatir_gunSaatDersDerslik() {
+        val out = TextUtil.parseSchedule(listOf("Pazartesi 09:00-11:00 Veri Yapıları B-204"))
+        assertEquals(1, out.size)
+        val row = out[0]
+        assertEquals(0, row.day)                 // Pazartesi = 0
+        assertEquals(9 * 60, row.minuteOfDay)    // 09:00 → 540
+        assertEquals("Veri Yapıları", row.name)
+        assertEquals("B-204", row.room)
+    }
+
+    @Test
+    fun parseSchedule_kisaltmaVeNoktaSaat() {
+        val out = TextUtil.parseSchedule(listOf("Sal 10.30 Lineer C-3"))
+        assertEquals(1, out.size)
+        assertEquals(1, out[0].day)
+        assertEquals(10 * 60 + 30, out[0].minuteOfDay)
+        assertEquals("Lineer", out[0].name)
+        assertEquals("C-3", out[0].room)
+    }
+
+    @Test
+    fun parseSchedule_derslikYoksaBosDoner() {
+        val out = TextUtil.parseSchedule(listOf("Pzt 08:15 Fizik"))
+        assertEquals(1, out.size)
+        assertEquals("", out[0].room)
+        assertEquals("Fizik", out[0].name)
+    }
+
+    @Test
+    fun parseSchedule_gunsuzVeyaSaatsizSatirAtlanir() {
+        val out = TextUtil.parseSchedule(
+            listOf(
+                "Ders Programı 2026-2027",   // gün yok
+                "Pazartesi Dersler",          // saat yok
+                "Bu bir açıklama satırıdır"  // gün yok
+            )
+        )
+        assertTrue(out.isEmpty())
+    }
+
+    @Test
+    fun parseSchedule_ayniSatirTekrars() {
+        val line = "Çarşamba 14:00 Kimya A-10"
+        val out = TextUtil.parseSchedule(listOf(line, line))
+        assertEquals(1, out.size)
+        assertEquals(2, out[0].day)
+        assertEquals(14 * 60, out[0].minuteOfDay)
+    }
+
+    @Test
+    fun parseSchedule_ardisikGunlerAyrilir() {
+        val out = TextUtil.parseSchedule(
+            listOf(
+                "Pazartesi 09:00 Matematik A-101",
+                "Salı 09:00 Fizik B-2"
+            )
+        )
+        assertEquals(2, out.size)
+        assertEquals(0, out[0].day)
+        assertEquals(1, out[1].day)
+        assertEquals("Matematik", out[0].name)
+        assertEquals("Fizik", out[1].name)
+    }
+
+    @Test
+    fun parseSchedule_ingilizceGunAdlari() {
+        val out = TextUtil.parseSchedule(listOf("Monday 13:00 Physics D-1"))
+        assertEquals(1, out.size)
+        assertEquals(0, out[0].day)
+        assertEquals("Physics", out[0].name)
+        assertEquals("D-1", out[0].room)
+    }
+
+    @Test
+    fun parseSchedule_bosListe_bosDoner() {
+        assertTrue(TextUtil.parseSchedule(emptyList()).isEmpty())
+    }
+
+    // ── v5.1: UNICODE_CHARACTER_CLASS çökmesi regresyon testleri ────
+    // Android Pattern bu bayrağı DESTEKLEMEZ; DAY_PATTERN artık açık
+    // karakter sınıflı lookaround ile sınır kuruyor. Bu testler hem
+    // eşleşmeyi hem de kelime sınırının Türkçe karakterlerle doğru
+    // çalıştığını ("pazarlama" ≠ "pazar") güvence altına alır.
+
+    @Test
+    fun parseSchedule_turkceGunAdlariTamEslesir() {
+        val out = TextUtil.parseSchedule(
+            listOf(
+                "Çarşamba 14:00 Kimya A-10",
+                "Perşembe 11:00 Fizik 2",
+                "Salı 09:30 Matematik B-1"
+            )
+        )
+        assertEquals(3, out.size)
+        assertEquals(2, out[0].day)   // Çarşamba
+        assertEquals(3, out[1].day)   // Perşembe
+        assertEquals(1, out[2].day)   // Salı
+        assertEquals("Kimya", out[0].name)
+        assertEquals("Fizik 2", out[1].name)
+        assertEquals("Matematik", out[2].name)
+    }
+
+    @Test
+    fun parseSchedule_buyukHarfliGunAdlariEslesir() {
+        // v5.1 kök nedeni: "CUMARTESİ".lowercase() bazı JVM'lerde
+        // "cumartesi" + U+0307 (birleşik nokta) olarak iniyordu →
+        // dayIndexOf eşleşmiyordu. foldDayToken bu tuzağı kapatır.
+        val out = TextUtil.parseSchedule(listOf("CUMARTESİ 10:00 İstatistik C-4"))
+        assertEquals(1, out.size)
+        assertEquals(5, out[0].day)   // Cumartesi
+        assertEquals("İstatistik", out[0].name)
+        assertEquals("C-4", out[0].room)
+
+        // Diğer büyük harfli Türkçe gün adları da katlamalı
+        val all = TextUtil.parseSchedule(
+            listOf(
+                "PAZARTESİ 08:00 Analiz",
+                "SALI 09:00 Cebir",
+                "ÇARŞAMBA 10:00 Geometri",
+                "PERŞEMBE 11:00 Kimya",
+                "CUMA 12:00 Fizik",
+                "PAZAR 13:00 Tarih"
+            )
+        )
+        assertEquals(6, all.size)
+        assertEquals(listOf(0, 1, 2, 3, 4, 6), all.map { it.day })
+    }
+
+    @Test
+    fun parseSchedule_kelimeIciGunAdlariEslesmez() {
+        // "pazarlama" içinde "pazar" GEÇMEZ; sınır kontrolü Türkçe
+        // karakterleri de kapsamalı (kelime sonu 'a' değil 'ı' olabilir)
+        val out = TextUtil.parseSchedule(
+            listOf("Pazarlama dersi 09:00 Salı değil", "salıncak 08:00 x")
+        )
+        // "Pazarlama ... Salı" satırında gerçek gün adı "Salı" var → eşleşir
+        // ama "pazar" (Pazarlama başındaki) GÜN sayılmaz → gün=1 (Salı)
+        assertEquals(1, out.size)
+        assertEquals(1, out[0].day)
+    }
+
+    @Test
+    fun parseSchedule_bozukSatirlarTumAktarimiDusturmez() {
+        // Taşkın uzunluk / garip satır: parse atlamalı, sağlam satır korunmalı
+        val garbage = "x".repeat(5000)
+        val out = TextUtil.parseSchedule(
+            listOf(garbage, "", "   ", "\u0000\u0001", "Pzt 08:15 Fizik")
+        )
+        assertEquals(1, out.size)
+        assertEquals(0, out[0].day)
+        assertEquals("Fizik", out[0].name)
+    }
+
+    @Test
+    fun parseSchedule_saatDisiDegerlerAtlanir() {
+        val out = TextUtil.parseSchedule(
+            listOf("Pazartesi 99:99 Bozuk Satır", "Salı 25:00 Aşırı")
+        )
+        assertTrue(out.isEmpty())
+    }
 }

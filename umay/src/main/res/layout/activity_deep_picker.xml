@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v13 (T8) — Derin Dosya Tarayıcı: tüm cihaz + SD kart -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/umay_bg"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/deep_title"
+        android:textColor="@color/umay_accent"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/deep_ready"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnScan"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+        android:gravity="center"
+        android:text="@string/deep_scan"
+        android:textColor="@color/umay_accent"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnImport"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="@string/deep_import"
+            android:textColor="@color/umay_on_accent"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- v16 (T8.1) — SAF YEDEĞİ: "Tüm dosyalara erişim" izni verilemezse bile
+         (kurumsal/MDM kilitli cihazlar) belge seçip kütüphaneye aktarabilme. -->
+    <TextView
+        android:id="@+id/btnSafPick"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_button_secondary"
+        android:gravity="center"
+        android:text="@string/deep_saf"
+        android:textColor="@color/umay_accent"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- v21.1 — KLASÖRDEN DERSLERE: hazır kaynak klasörünü (alt klasörlerle)
+         tarar, dosyaları dersin doğru rafına koyar. Elle seçim gerekmez. -->
+    <TextView
+        android:id="@+id/btnFolderImport"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_button_secondary"
+        android:gravity="center"
+        android:text="@string/folder_import"
+        android:textColor="@color/umay_orange"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- v21.3 — HAVUZ DÜZENLEYİCİ: hiçbir derse/gruba bağlı olmayan
+         kitapları isim → içerik sırasıyla doğru rafa yerleştirir. -->
+    <TextView
+        android:id="@+id/btnPoolOrganize"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_button_secondary"
+        android:gravity="center"
+        android:text="@string/pool_organize"
+        android:textColor="@color/umay_accent"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <!-- v22 (AŞAMA 5.5) — filtre/sıralama: yalnızca listeyi değiştirir,
+         dosya eklemez/silmez; seçili kimlikler (dosya yolu) korunur. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnTypeFilter"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:textColor="@color/umay_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnStatusFilter"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:textColor="@color/umay_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnSort"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:textColor="@color/umay_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnSelectAll"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/deep_select_all"
+            android:textColor="@color/umay_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnClearSel"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/deep_clear_selection"
+            android:textColor="@color/umay_danger"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/fileList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:divider="@color/umay_border"
+        android:dividerHeight="1dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp" />
+</LinearLayout>

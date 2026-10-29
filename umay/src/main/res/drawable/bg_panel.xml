@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/umay_panel" />
-    <corners android:radius="16dp" />
-    <stroke android:width="1dp" android:color="#24344F" />
-</shape>
+<!-- v16 (GÖREV 2 — TEMA ONARIMI)
+     Glassmorphism kart/panel + GERÇEK DERİNLİK:
+     • alt katman: yumuşak gölge (@color/umay_shadow) — kartlar "yüzmez", OTURUR
+     • üst katman: panel zemini (@color/umay_glass) + 1dp tema kenarlığı
+     Renkler values/ (gündüz) ve values-night/ (gece) paletlerinden gelir; -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:bottom="0dp" android:top="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/umay_shadow" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/umay_glass" />
+            <corners android:radius="16dp" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/umay_border" />
+        </shape>
+    </item>
+</layer-list>

@@ -6,6 +6,6 @@
     android:viewportHeight="24"
     android:tint="@color/umay_text">
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="@color/umay_icon"
         android:pathData="M8,5v14l11,-7z" />
 </vector>

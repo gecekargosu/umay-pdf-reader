@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v16 (GÖREV 2) — Profil kartı artık TEMAYA DUYARLI (eskiden sabit koyu
+     #1F2937/#111827 idi → açık temada siyah leke gibi duruyordu). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:bottom="0dp" android:top="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/umay_shadow" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:endColor="@color/umay_card_grad_end"
+                android:startColor="@color/umay_card_grad_start" />
+            <corners android:radius="14dp" />
+            <stroke android:width="1dp" android:color="@color/umay_border" />
+        </shape>
+    </item>
+</layer-list>

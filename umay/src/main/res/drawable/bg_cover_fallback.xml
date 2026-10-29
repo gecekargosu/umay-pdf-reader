@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — Yedek kitap kapağı: lacivert degrade + mavi kenar (tema token'lı). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:endColor="@color/umay_bg"
+        android:startColor="@color/umay_card_grad_start" />
+    <corners android:radius="6dp" />
+    <stroke android:width="1dp" android:color="@color/umay_border" />
+</shape>

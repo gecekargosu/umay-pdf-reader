@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neon green — geniş dış parıltı + çekirdek (v32: lambalar büyütüldü, ışıltı belirginleşti) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#2600E676" />
+        </shape>
+    </item>
+    <item
+        android:bottom="1.5dp"
+        android:left="1.5dp"
+        android:right="1.5dp"
+        android:top="1.5dp">
+        <shape android:shape="oval">
+            <solid android:color="#5900E676" />
+        </shape>
+    </item>
+    <item
+        android:bottom="3.5dp"
+        android:left="3.5dp"
+        android:right="3.5dp"
+        android:top="3.5dp">
+        <shape android:shape="oval">
+            <solid android:color="#FF00E676" />
+            <stroke android:width="1.2dp" android:color="#FFC8FFE0" />
+        </shape>
+    </item>
+</layer-list>

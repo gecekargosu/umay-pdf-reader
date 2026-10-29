@@ -1,3 +1,0 @@
-Umay PDF Okuyucu - test ozeti (2026-10-03 16:43)
-Komut: bash gradlew :umay:testDebugUnitTest
-tests="14" skipped="0" failures="0" errors="0"

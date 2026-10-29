@@ -1,0 +1,41 @@
+APK'YI WHATSAPP / TELEGRAM İLE GÖNDERME
+=======================================
+
+APK bir "belge" gibi gönderilir. Fotoğraf/video olarak göndermeye
+çalışma; WhatsApp onu sıkıştırır ve dosya bozulur.
+
+WHATSAPP (sen gönderirken)
+  1) Sohbeti aç → ataç simgesi → "Belge" (Document).
+  2) "Gözat" → UmayPdfReader.apk dosyasını seç → Gönder.
+  3) Dosya ~70 MB; Wi-Fi ile göndermek daha hızlı.
+
+WHATSAPP (arkadaşın alırken)
+  1) Gelen belgeye dokun → "İndir".
+  2) İndirme bitince bildirimdeki dosyaya dokun.
+  3) "Bu tür dosyaları açmak için..." derse:
+     Dosyalarım → WhatsApp → Media → WhatsApp Documents →
+     UmayPdfReader.apk
+  4) "Yükle" → uyarıda "Yine de yükle".
+
+TELEGRAM (sen gönderirken)
+  1) Sohbet → ataç → "Dosya" (File) → APK'yı seç → Gönder.
+     (Telegram APK'yı sıkıştırmaz.)
+
+TELEGRAM (arkadaşın alırken)
+  1) Dosyaya dokun → "İndir".
+  2) İndirme bitince "Aç" → Android kurulum ekranı gelir.
+  3) Telegram "APK indirmeye izin ver" derse:
+     Ayarlar → Uygulamalar → Telegram → "Bilinmeyen uygulamaları yükle"
+     → izin ver.
+
+E-POSTA / DRIVE / KABLO ile de olur
+  • Gmail 25 MB sınırına takılır → Google Drive bağlantısı kullan.
+  • Google Drive: dosyayı yükle → "Bağlantıyı kopyala" → erişimi
+    "Bağlantıya sahip olan herkes" yap → linki gönder.
+  • USB kablo: telefonu bilgisayara bağla → "Dosya aktarımı" seç →
+    APK'yı telefondaki Download klasörüne kopyala.
+
+Kontrol: dosya sağlam mı?
+  surum-bilgisi.txt içindeki SHA-256 kodu ile karşılaştırılabilir.
+  Kısa yol: kurulum "Paket ayrıştırma hatası" verirse dosya bozulmuştur;
+  tekrar gönder.

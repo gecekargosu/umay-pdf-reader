@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.10 (F2) — sohbet geçmişi (saat + geri ok) ikonu -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M13,3a9,9 0,0 0,-8.95 8H1l4,4 4,-4H5.08A7,7 0,1 1,12 19a6.98,6.98 0,0 1,-4.9 -2l-1.42,1.42A8.95,8.95 0,1 0,13 3z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12.5,8h-1.5v6l5,3 0.75,-1.23 -4.25,-2.52z" />
+</vector>

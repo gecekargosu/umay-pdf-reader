@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v14 (V5.0 §1) — Özel Tema Tasarımcısı: canlı önizleme + hazır paletler -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/umay_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/geri"
+            android:textColor="@color/umay_text_dim"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tema_studio_title"
+            android:textColor="@color/umay_text"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tema_studio_sub"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="13sp"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp" />
+
+        <!-- CANLI ÖNİZLEME -->
+        <LinearLayout
+            android:id="@+id/previewBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:id="@+id/previewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tema_preview_label"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/previewPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/previewShelf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/tema_preview_shelf"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/previewAccentBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/tema_preview_button"
+                    android:textStyle="bold"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- RENK SATIRLARI (koda bağlanır) -->
+        <TextView
+            android:id="@+id/rowBg"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="14dp"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/rowPanel"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/rowAccent"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/rowShelf"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/tema_presets"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:id="@+id/presetList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="6dp" />
+
+        <!-- v16 (GÖREV 2) — OTOMATİK MOD: özel temayı kapatır, uygulama
+             yeniden Ayarlar'daki Gece/Gündüz/Sistem seçimini izler. -->
+        <TextView
+            android:id="@+id/btnAutoTheme"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="@string/tema_auto_btn"
+            android:textColor="@color/umay_on_accent"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnResetTheme"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_button_secondary"
+            android:gravity="center"
+            android:text="@string/tema_reset"
+            android:textColor="@color/umay_text" />
+    </LinearLayout>
+</ScrollView>

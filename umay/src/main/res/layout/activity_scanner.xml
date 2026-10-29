@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/umay_bg"
+    android:background="@drawable/bg_gradient_root"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -60,6 +60,7 @@
         android:visibility="gone" />
 
     <!-- Alt aksiyonlar -->
+    <!-- v16 (YENİ GÖREV 6) — "Sayfa Ekle (+)": arka arkaya sınırsız çekim -->
     <TextView
         android:id="@+id/btnCapture"
         android:layout_width="match_parent"
@@ -67,9 +68,22 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_button_primary"
         android:gravity="center"
-        android:text="@string/tara_cek"
-        android:textColor="#04121A"
+        android:text="@string/tara_add_page"
+        android:textColor="@color/umay_on_accent"
         android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- v16 (YENİ GÖREV 6) — Galeriden ÇOKLU sayfa seçimi -->
+    <TextView
+        android:id="@+id/btnGallery"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_button_secondary"
+        android:gravity="center"
+        android:text="@string/tara_gallery"
+        android:textColor="@color/umay_accent"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     <TextView

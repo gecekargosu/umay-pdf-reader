@@ -1,0 +1,42 @@
+﻿SAMSUNG (Galaxy) — KURULUM
+==========================
+
+1) APK'yı telefona al
+   WhatsApp/Telegram'dan geldiyse önce "İndir"e bas. Dosya
+   "Dosyalarım → İndirilenler" klasörüne düşer.
+
+2) Tek seferlik izin: bu kaynaktan yüklemeye izin ver
+   Samsung'da sürüme göre iki yol var; hangisi varsa onu kullan:
+   A) Ayarlar → Güvenlik ve gizlilik → Diğer güvenlik ayarları →
+      "Bilinmeyen uygulamaları yükle" → APK'yı açtığın uygulamayı seç
+      (Chrome / Dosyalarım / WhatsApp / Telegram) → "Bu kaynağa izin ver".
+   B) Ayarlar → Uygulamalar → Özel uygulama erişimi →
+      "Bilinmeyen uygulamaları yükle" → aynı seçim.
+
+3) Otomatik Engelleme'yi kapat (One UI 6.1 ve üstü)
+   Ayarlar → Güvenlik ve gizlilik → "Otomatik engelleme" (Auto Blocker) → KAPALI.
+   Bu ayar açıkken Samsung, Play dışı APK kurulumunu tamamen engeller.
+
+4) Play Protect uyarısını geç
+   "Google Play Protect bu uygulamayı tanımıyor" derse:
+   • Ekranda "Yine de yükle" / "Ayrıntılar → Yine de yükle" seçeneğine dokun.
+   • Uyarı sürekli çıkıyorsa: Play Store → sağ üstteki profil → Play Protect →
+     dişli (Ayarlar) → "Play Protect taraması"nı geçici olarak kapat.
+     (Kurulumdan sonra tekrar açabilirsin.)
+
+5) Kur
+   Dosyalarım → İndirilenler → UmayPdfReader.apk → "Yükle" → "Aç".
+   "Uygulama yüklenmedi" derse: aynı APK'yı silip yeniden indir
+   (dosya yarım inmiş olabilir) veya 04 numaralı dosyadaki gibi
+   "belge" olarak tekrar gönder.
+
+6) İlk açılış
+   İzinleri ver: Bildirim → Tüm dosyalara erişim → Pil "Kısıtlama yok"
+   (Ayarlar → Uygulamalar → Umay → Pil → Kısıtlama yok).
+
+Sorun giderme
+  • "Paket ayrıştırma hatası": dosya bozuk inmiş → tekrar indir.
+  • "Uygulama yüklenmedi / çakışan sürüm": eski Umay varsa önce kaldır
+    (kitapların ve notların kaybolmaz; kütüphane dosyaları klasörde kalır).
+  • Kurulum ekranı hiç açılmıyor: Dosyalarım yerine "Ayarlar → Uygulamalar →
+    Umay ile aç" değil, doğrudan dosya yöneticisinden aç.

@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  v5.7 — AYARLAR EKRANI (yeniden düzenlendi).
+
+  Eski hâlde "KİŞİSEL & UYGULAMA" başlığı altında 12 farklı iş birikmişti
+  (profil, dil, tema, izin, alarm sesi, yedek, transkript, gece modu, APK,
+  sürüm, ekran, tanılama). Kullanıcı "çok karışık" dedi.
+
+  Yeni düzen — 6 anlamlı grup:
+   1) GÖRÜNÜM & KİŞİSEL   : profil, dil, tema, tema stüdyosu, raf teması, gece PDF
+   2) OKUMA & SES         : ses, hız, motor, ekolayzır, çeviri, ekran, seri
+   3) BİLDİRİM & İZİN     : izin merkezi, alarm sesi
+   4) YAPAY ZEKÂ          : sağlayıcı, anahtar, model, test, kaydet
+   5) VERİ & GÜVENLİK     : kasa, yedek, transkript, istatistik, log, tanılama
+   6) HAKKINDA & GÜNCELLEME: sürüm, APK kurulumu
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/umay_bg">
+    android:background="@drawable/bg_gradient_root">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="28dp">
 
         <!-- Üst bar -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="6dp">
 
             <ImageButton
                 android:id="@+id/btnBack"
@@ -22,7 +40,7 @@
                 android:layout_height="44dp"
                 android:layout_alignParentStart="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Geri"
+                android:contentDescription="@string/geri"
                 android:src="@drawable/ic_back" />
 
             <TextView
@@ -36,86 +54,145 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
-        <!-- Ses -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_panel"
-            android:orientation="vertical"
-            android:padding="14dp">
+        <TextView
+            style="@style/SettingsHint"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/ayarlar_alt_baslik" />
+
+        <!-- ══════════ 1. GÖRÜNÜM & KİŞİSEL ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_gorunum" />
+
+        <LinearLayout style="@style/SettingsCard">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/btnProfile"
+                style="@style/SettingsRow"
+                android:layout_marginTop="0dp"
+                android:text="@string/btn_profile" />
+
+            <TextView
+                android:id="@+id/btnLang"
+                style="@style/SettingsRow"
+                android:text="@string/lang_button" />
+
+            <TextView
+                android:id="@+id/btnTheme"
+                style="@style/SettingsRow"
+                android:text="@string/theme_mode" />
+
+            <TextView
+                android:id="@+id/btnThemeStudio"
+                style="@style/SettingsRow"
+                android:text="@string/tema_studio_title" />
+
+            <TextView
+                android:id="@+id/shelfThemeLabel"
+                style="@style/SettingsCardTitle"
+                android:layout_marginTop="14dp"
+                android:text="@string/ay_raf_temasi" />
+
+            <Spinner
+                android:id="@+id/shelfThemeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <TextView
+                style="@style/SettingsHint"
+                android:text="@string/ay_raf_temasi_aciklama" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/ay_ses_secimi"
-                android:textColor="@color/umay_text"
-                android:textStyle="bold" />
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/SettingsLabel"
+                    android:text="@string/night_pdf" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchNightPdf"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ══════════ 2. OKUMA & SES ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_okuma" />
+
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                style="@style/SettingsCardTitle"
+                android:text="@string/ay_ses_secimi" />
 
             <Spinner
                 android:id="@+id/voiceSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="4dp" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/SettingsCardTitle"
                 android:layout_marginTop="12dp"
-                android:text="@string/ay_okuma_hizi"
-                android:textColor="@color/umay_text"
-                android:textStyle="bold" />
+                android:text="@string/ay_okuma_hizi" />
 
             <Spinner
                 android:id="@+id/speedSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="6dp" />
+                android:layout_marginTop="4dp" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/ay_tts_motor"
-                android:textColor="@color/umay_text"
-                android:textStyle="bold" />
+                style="@style/SettingsCardTitle"
+                android:layout_marginTop="14dp"
+                android:text="@string/ay_tts_motor" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchEdgeVoice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:text="@string/tts_dogal"
                 android:textColor="@color/umay_text" />
 
             <TextView
+                style="@style/SettingsHint"
+                android:text="@string/tts_dogal_aciklama" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchNoBuiltin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/tts_dogal_aciklama"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
+                android:layout_marginTop="10dp"
+                android:checked="true"
+                android:text="@string/ses_yerlesik_yedek"
+                android:textColor="@color/umay_text" />
+
+            <TextView
+                style="@style/SettingsHint"
+                android:text="@string/ses_yerlesik_yedek_ipucu" />
 
             <TextView
                 android:id="@+id/btnTestVoice"
-                android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_button_secondary"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                style="@style/SettingsRow"
+                android:layout_marginTop="12dp"
                 android:text="@string/ay_tts_test"
                 android:textColor="@color/umay_accent" />
         </LinearLayout>
 
-        <!-- Ekolayzır -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_panel"
-            android:orientation="vertical"
-            android:padding="14dp">
+        <!-- Ekolayzır ayrı kart -->
+        <LinearLayout style="@style/SettingsCard">
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/settingsEqSwitch"
@@ -125,12 +202,8 @@
                 android:textColor="@color/umay_text" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/panel_ekolayzir_ipucu"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
+                style="@style/SettingsHint"
+                android:text="@string/panel_ekolayzir_ipucu" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -206,48 +279,107 @@
                     android:progressTint="@color/umay_accent"
                     android:thumbTint="@color/umay_accent" />
             </LinearLayout>
-        </LinearLayout>
-
-        <!-- Çeviri -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_panel"
-            android:orientation="vertical"
-            android:padding="14dp">
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchTranslate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:text="@string/ay_ceviri"
                 android:textColor="@color/umay_text" />
 
             <TextView
+                style="@style/SettingsHint"
+                android:text="@string/ay_ceviri_aciklama" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/ay_ceviri_aciklama"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
-        </LinearLayout>
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <!-- AI sohbet -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_panel"
-            android:orientation="vertical"
-            android:padding="14dp">
+                <TextView
+                    style="@style/SettingsLabel"
+                    android:text="@string/ekran_acik_kalsin" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchKeepScreenOn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/streakText"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/ay_api_baslik"
-                android:textColor="@color/umay_text"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textColor="@color/umay_orange"
+                android:textSize="13sp"
                 android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ══════════ 3. BİLDİRİM & İZİN ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_bildirim" />
+
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                android:id="@+id/btnPermissions"
+                style="@style/SettingsRowAccent"
+                android:layout_marginTop="0dp"
+                android:text="@string/perm_center_title" />
+
+            <TextView
+                style="@style/SettingsHint"
+                android:text="@string/sec_bildirim_ipucu" />
+
+            <TextView
+                android:id="@+id/btnAlarmSound"
+                style="@style/SettingsRow"
+                android:text="@string/alarm_sound_pick" />
+        </LinearLayout>
+
+        <!-- ══════════ 4. YAPAY ZEKÂ ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_yapayzeka" />
+
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                style="@style/SettingsCardTitle"
+                android:text="@string/ay_api_baslik" />
+
+            <TextView
+                style="@style/SettingsHint"
+                android:text="@string/ay_ai_provider" />
+
+            <Spinner
+                android:id="@+id/providerSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <EditText
+                android:id="@+id/aiBaseInput"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input"
+                android:hint="@string/ay_api_base"
+                android:inputType="textUri"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/umay_text"
+                android:textColorHint="@color/umay_text_dim"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/apiKeyInput"
@@ -276,34 +408,112 @@
                 android:textColorHint="@color/umay_text_dim" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/ay_api_key_aciklama"
-                android:textColor="@color/umay_text_dim"
-                android:textSize="12sp" />
+                style="@style/SettingsHint"
+                android:text="@string/ay_api_key_aciklama" />
 
             <TextView
                 android:id="@+id/btnTestApi"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
+                style="@style/SettingsRow"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_button_secondary"
-                android:gravity="center"
                 android:text="@string/ay_api_test"
-                android:textColor="@color/umay_accent"
-                android:textStyle="bold" />
+                android:textColor="@color/umay_accent" />
+
+            <TextView
+                android:id="@+id/btnAiGuide"
+                style="@style/SettingsRow"
+                android:text="@string/ay_api_guide" />
 
             <TextView
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_button_primary"
                 android:gravity="center"
                 android:text="@string/ay_kaydet"
-                android:textColor="#04121A"
+                android:textColor="@color/umay_on_accent"
                 android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ══════════ 5. VERİ, YEDEK & GÜVENLİK ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_veri" />
+
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                android:id="@+id/btnVault"
+                style="@style/SettingsRow"
+                android:layout_marginTop="0dp"
+                android:text="@string/kasa_baslik" />
+
+            <TextView
+                android:id="@+id/btnBackup"
+                style="@style/SettingsRow"
+                android:text="@string/backup_title" />
+
+            <TextView
+                android:id="@+id/btnTranscript"
+                style="@style/SettingsRow"
+                android:text="@string/transcript_title" />
+
+            <TextView
+                android:id="@+id/btnStats"
+                style="@style/SettingsRow"
+                android:text="@string/stats_title" />
+
+            <TextView
+                android:id="@+id/btnDiag"
+                style="@style/SettingsRowAccent"
+                android:text="@string/diag_run" />
+
+            <TextView
+                android:id="@+id/btnShareLog"
+                style="@style/SettingsRow"
+                android:text="@string/errlog_share" />
+
+            <!-- v36.1 — boşta ön hazırlık aç/kapat -->
+            <TextView
+                android:id="@+id/btnPrep"
+                style="@style/SettingsRow"
+                android:text="@string/ayar_prep" />
+
+            <!-- v36.3 — lamba sesli uyarısı aç/kapat -->
+            <TextView
+                android:id="@+id/btnLampSound"
+                style="@style/SettingsRow"
+                android:text="@string/ayar_lamp_ses" />
+        </LinearLayout>
+
+        <!-- ══════════ 6. HAKKINDA & GÜNCELLEME ══════════ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_guncelleme" />
+
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                android:id="@+id/settingsVersion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/btnInstallApk"
+                style="@style/SettingsRowAccent"
+                android:layout_marginTop="10dp"
+                android:text="@string/ay_apk_kur" />
+
+            <TextView
+                android:id="@+id/btnPickApk"
+                style="@style/SettingsRow"
+                android:text="@string/apk_pick" />
+
+            <TextView
+                style="@style/SettingsHint"
+                android:text="@string/ay_apk_ipucu" />
         </LinearLayout>
 
     </LinearLayout>

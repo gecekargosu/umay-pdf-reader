@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kitap kartı (3 raf modülünde kitap hücresi): kapak + dairesel yüzde rozeti + bağımsız grafik. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="5dp"
+    android:paddingTop="5dp"
+    android:paddingEnd="5dp"
+    android:paddingBottom="5dp">
+
+    <LinearLayout
+        android:id="@+id/bookRow"
+        android:layout_width="118dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_panel"
+        android:clipChildren="false"
+        android:orientation="vertical"
+        android:padding="7dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="152dp"
+            android:clipChildren="false"
+            android:elevation="5dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/bookCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_pdf"
+                app:shapeAppearanceOverlay="@style/shape_cover"
+                app:strokeColor="@color/umay_panel2"
+                app:strokeWidth="1dp" />
+
+            <!-- Yedek kapak (Gradient Dark + kitap adı) -->
+            <LinearLayout
+                android:id="@+id/coverFallback"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_cover_fallback"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <!-- Neumorphic kitap ikonu (ortalanmış kapak kompozisyonu) -->
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_book_neu" />
+
+                <TextView
+                    android:id="@+id/coverFallbackTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:maxLines="4"
+                    android:ellipsize="end"
+                    android:textColor="@color/umay_text"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="@string/kapak_yedek_etiket"
+                    android:textColor="@color/umay_text_dim"
+                    android:textSize="8.5sp"
+                    android:letterSpacing="0.18" />
+            </LinearLayout>
+
+            <!-- 3D kitap sırtı: kapak sol kenarında derinlik bandı -->
+            <View
+                android:layout_width="7dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_spine" />
+
+            <!-- Kapak parlama (gloss): üstten inen cam yansıması -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_cover_gloss"
+                android:alpha="0.45" />
+
+            <!-- Dairesel okuma yüzdesi rozeti -->
+            <com.umay.pdfreader.ProgressRingView
+                android:id="@+id/bookRing"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="4dp"
+                android:elevation="6dp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/bookName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/umay_text"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bookMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:singleLine="true"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

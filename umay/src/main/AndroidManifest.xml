@@ -7,31 +7,164 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Ekran kapalıyken seslendirme devam etsin -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- v34 — AR: ders ses kaydı (yalnız kullanıcı kayıt düğmesine basınca) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- SDK 36: seslendirme servisi iki tipte de tanımlı (mediaPlayback = okuma,
+         specialUse = AI özet/tek seferlik seslendirme özel kullanımı) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Ders/sınav hatırlatıcıları (ADIM 3/4) -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Documents/UmayPDF kopyası için yalnız Android 8/9 (API 29+ izinsiz çalışır) -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <!-- v11 (GÖREV 2): Eyl/Eki 2026 PDF otomatik tarama (MediaStore) -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- v16 (V5.2 ADIM F / T8.1) — "TÜM CİHAZI TARA" TAM DOSYA ERİŞİMİ.
+         Android 11+ (API 30+) ayarlarındaki "Tüm dosyalara erişim" anahtarı
+         YALNIZCA bu izin manifestte beyan edilmişse AÇILABİLİR hale gelir.
+         Beyan eksikse Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+         ekranı açılır ama anahtar GRİ/KİLİTLİ kalır → kullanıcı izni veremez
+         (14.10 tarihli "Tüm Cihazı Tara izin kilidi" hatasının kök nedeni).
+         tools:ignore="ScopedStorage": uygulama yerel belge okuyucusudur,
+         Play incelemesinde gerekçesi specialUse FGS ile birlikte açıklanır. -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+    <!-- v16 — Ana ekran APK kısayolu: Download/UmayPDF_Guncel.apk kurulumu
+         (Android 8+ için "bilinmeyen uygulama yükleme" izni) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".UmayApp"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.UmayPdf">
 
+        <!-- v16 (GÖREV 5 — ASO) — Akademik anahtar kelimeler: mağaza/görüntüleyen
+             aramaları için uygulama meta verisi (Play listesi PLAY_STORE_ASO.md
+             ile senkron); Play politikalarına uygundur (keyword stuffing yok). -->
+        <meta-data
+            android:name="umay.aso.keywords"
+            android:value="akademik pdf okuyucu, yapay zeka ders asistanı, sesli kitap okuma, ders programı, sınav takibi, tts pdf" />
+
+        <!-- v6 (Aşama 4) — AdMob App ID: Google'ın RESMİ TEST kimliği.
+             Yayına geçerken kendi AdMob panelindeki App ID ile değiştir. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+
+        <!-- v6 (Aşama 6.2) — Crashlytics otomatik gönderimi: gerçek
+             google-services.json bağlanana kadar KAPALI (CrashLog yerel
+             günlüğe yazar; gerçek proje gelince bu satırı silmek yeterli). -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- v6 (Aşama 6.3) — App Links (autoVerify): umaypdfreader.app/b/<kitapId>
+                 NOT: yayında alan adının /.well-known/assetlinks.json dosyası
+                 SHA-256 imzanı içermelidir (Google Play App Signing). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="umaypdfreader.app"
+                    android:pathPrefix="/b" />
+                <data
+                    android:scheme="https"
+                    android:host="www.umaypdfreader.app"
+                    android:pathPrefix="/b" />
+            </intent-filter>
+
+            <!-- v6 — Özel şema (yedek): umay://book/<kitapId> -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="umay"
+                    android:host="book" />
+            </intent-filter>
+
+            <!-- v11 (GÖREV 1) — VARSAYILAN BELGE OKUYUCU: dışarıdan bir
+                 PDF/DOC/DOCX/TXT/EPUB tıklandığında Umay açılsın. Dosya
+                 yöneticisi / WhatsApp / Chrome bu MIME'ları VIEW ile açar. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/pdf" />
+                <data android:mimeType="application/msword" />
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/epub+zip" />
+            </intent-filter>
+
+            <!-- v25 (C8) — PAYLAŞ MENÜSÜ: WhatsApp / Telegram / Dosyalar /
+                 Gmail eki → "Umay ile paylaş" ile belgeyi doğrudan aç.
+                 ACTION_SEND, ACTION_VIEW'dan ayrıdır; çoğu uygulama dosyayı
+                 yalnız EXTRA_STREAM ile paylaşır. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/pdf" />
+                <data android:mimeType="application/msword" />
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation" />
+                <data android:mimeType="application/vnd.ms-powerpoint" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/epub+zip" />
+            </intent-filter>
+
+            <!-- v13 (AGENT 22) — Simge uzun basma kısayolları -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- v13 (T9b) — İlk açılış tanıtımı -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v13 (T9d) — Kullanıcı profili -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v13 (T9c) — Şifreli gizli kasa (PIN + biyometrik) -->
+        <activity
+            android:name=".SecureVaultActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ReaderActivity"
@@ -55,6 +188,56 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- v12 (YENİ ÖZELLİK) — AI çalışma kartları ekranı -->
+        <activity
+            android:name=".FlashcardActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v13 (T8) — Derin dosya tarayıcı (tüm cihaz + SD kart) -->
+        <activity
+            android:name=".DeepDocumentPickerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Akademik asistan: ders detayı + haftalık program -->
+        <activity
+            android:name=".CourseDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ScheduleActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v16 (GÖREV 6) — İnteraktif sınav takvimi + not/yüzde/AGNO ekranı -->
+        <activity
+            android:name=".ExamsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v5.4 (ONARIM) — Özel tema tasarımcısı.
+             v14'te eklenmişti ama manifest'e hiç yazılmamıştı →
+             ActivityNotFoundException ile çöküyordu. -->
+        <activity
+            android:name=".ThemeStudioActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v5.4 (ONARIM) — Transkript & AGNO hesaplayıcı (aynı eksiklik). -->
+        <activity
+            android:name=".TranscriptActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v5.5 (AŞAMA 1) — Bildirim & alarm izin merkezi (HyperOS/MIUI
+             için otomatik başlatma + pil + tam alarm yönlendirmesi). -->
+        <activity
+            android:name=".PermissionCenterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Kamerayla çekilen sayfaları kamera uygulamasına verebilmek için -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -66,10 +249,56 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- v13 (T7) — Canlı sınav geri sayım bildirimi (status bar + kilit ekranı) -->
+        <service
+            android:name=".ExamCountdownService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="upcoming_exam_live_countdown_notification" />
+        </service>
+
         <service
             android:name=".ReadService"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
+            android:foregroundServiceType="mediaPlayback|specialUse">
+            <!-- specialUse alt tipi (Play incelemesi için zorunlu gerekçe):
+                 çevrimdışı PDF seslendirme + AI sayfa özeti okuma -->
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="offline_pdf_text_to_speech_reading" />
+        </service>
+
+        <!-- Ders alarmları + günlük sınav/ödev kontrolü (ADIM 3/4) -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:exported="false" />
+
+        <!-- v5.2 (ADIM C.3 / #25) — Günlük kütüphane senkron tetikleyicisi -->
+        <receiver
+            android:name=".LibrarySyncReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- v12 (YENİ ÖZELLİK) — Ana ekran widget'ı: sıradaki ders -->
+        <receiver
+            android:name=".UmayWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_info" />
+        </receiver>
     </application>
 
 </manifest>

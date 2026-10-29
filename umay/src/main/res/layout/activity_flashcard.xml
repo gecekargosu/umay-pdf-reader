@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v12 (YENİ ÖZELLİK) — AI Flashcard / Çalışma Kartı ekranı -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/umay_bg"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Üst bar: başlık + kapat -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/flashcard_title"
+            android:textColor="@color/umay_accent"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/kapat"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@color/umay_text_dim"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+    </RelativeLayout>
+
+    <!-- Yükleme -->
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="48dp"
+        android:indeterminateTint="@color/umay_accent"
+        android:visibility="gone" />
+
+    <!-- Kart grubu -->
+    <LinearLayout
+        android:id="@+id/cardGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/cardCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/questionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_panel"
+            android:padding="16dp"
+            android:textColor="@color/umay_text"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/optionA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_input"
+            android:padding="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/optionB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_input"
+            android:padding="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/optionC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_input"
+            android:padding="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/optionD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_input"
+            android:padding="14dp"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/explanationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_panel2"
+            android:padding="12dp"
+            android:textColor="@color/umay_accent"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnEditCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_button_secondary"
+            android:padding="12dp"
+            android:text="@string/flashcard_edit"
+            android:textColor="@color/umay_orange"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_primary"
+            android:padding="12dp"
+            android:text="@string/flashcard_next"
+            android:textColor="@color/umay_on_accent"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Sonuç -->
+    <LinearLayout
+        android:id="@+id/resultGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/flashcard_done"
+            android:textColor="@color/umay_accent"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/umay_text"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_button_primary"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/kapat"
+            android:textColor="@color/umay_on_accent" />
+    </LinearLayout>
+
+    <!-- Hata -->
+    <LinearLayout
+        android:id="@+id/errorGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="24dp"
+            android:textColor="@color/umay_danger"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnErrorClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_secondary"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/kapat"
+            android:textColor="@color/umay_text" />
+    </LinearLayout>
+</LinearLayout>

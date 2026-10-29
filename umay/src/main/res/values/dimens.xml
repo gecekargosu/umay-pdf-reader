@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v13 (RESPONSIVE) — Temel ölçü birimleri (standart telefon, sw360dp+) -->
+<resources>
+    <!-- Kenar boşlukları -->
+    <dimen name="page_margin">16dp</dimen>
+    <dimen name="card_margin">12dp</dimen>
+    <dimen name="card_padding">14dp</dimen>
+
+    <!-- Başlıklar -->
+    <dimen name="title_large">22sp</dimen>
+    <dimen name="title_medium">17sp</dimen>
+    <dimen name="body_text">14sp</dimen>
+    <dimen name="caption_text">12sp</dimen>
+
+    <!-- Buton / çip -->
+    <dimen name="button_height">44dp</dimen>
+    <dimen name="chip_height">34dp</dimen>
+
+    <!-- Kapak / raf -->
+    <dimen name="cover_width">96dp</dimen>
+    <dimen name="cover_height">132dp</dimen>
+
+    <!-- Widget -->
+    <dimen name="widget_padding">14dp</dimen>
+</resources>

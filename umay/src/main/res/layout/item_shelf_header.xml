@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — RAF BAŞLIĞI (çizimdeki "RAF ADI" bandı).
+     Sol turuncu şerit drawable'dan gelir; sağda kaydırma okları vardır.
+     Oklar MainActivity.wireShelfArrows() ile bağlanır. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_ahkat_raf"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingTop="7dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="7dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- v5.6 — Özel raflarda kullanıcının seçtiği renk ipucu -->
+        <View
+            android:id="@+id/shelfColorDot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginEnd="7dp"
+            android:background="@color/umay_accent"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/shelfTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:letterSpacing="0.08"
+            android:maxLines="1"
+            android:textColor="@color/umay_text"
+            android:textSize="13.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/shelfCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="10.5sp"
+            android:visibility="gone" />
+
+        <!-- v5.7 — Ders içi raflarda "bu rafa ekle" düğmesi (ana ekranda gizli) -->
+        <TextView
+            android:id="@+id/shelfAdd"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:text="＋"
+            android:textColor="@color/umay_orange"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/shelfScrollPrev"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_carousel_left" />
+
+        <ImageButton
+            android:id="@+id/shelfScrollNext"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_carousel_right" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/shelfEmptyHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/shelf_empty_hint"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="11sp"
+        android:visibility="gone" />
+</LinearLayout>

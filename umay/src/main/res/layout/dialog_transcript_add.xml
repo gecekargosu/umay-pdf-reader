@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v14 (V5.0 §6) — Transkript: ders ekleme diyaloğu (ad + AKTS + harf notu) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <EditText
+        android:id="@+id/inputCourseName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ders adı (örn. Yapay Zekâya Giriş)"
+        android:inputType="textCapWords"
+        android:textColor="@color/umay_text"
+        android:textColorHint="@color/umay_text_dim"
+        android:background="@drawable/bg_input" />
+
+    <EditText
+        android:id="@+id/inputAkts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="AKTS kredisi (örn. 6)"
+        android:inputType="numberDecimal"
+        android:textColor="@color/umay_text"
+        android:textColorHint="@color/umay_text_dim"
+        android:background="@drawable/bg_input" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Harf notu"
+        android:textColor="@color/umay_text_dim"
+        android:textSize="13sp" />
+
+    <Spinner
+        android:id="@+id/gradeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="4dp" />
+</LinearLayout>

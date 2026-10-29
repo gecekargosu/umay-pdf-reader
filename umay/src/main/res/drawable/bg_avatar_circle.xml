@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v16 (GÖREV 2) — avatar zemini temaya duyarlı -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/umay_avatar_bg" />
+    <stroke android:width="2dp" android:color="@color/umay_orange" />
+</shape>

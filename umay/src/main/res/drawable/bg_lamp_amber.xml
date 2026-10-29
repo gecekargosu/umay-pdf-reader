@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neon amber — geniş dış parıltı + çekirdek (v32: lambalar büyütüldü, ışıltı belirginleşti) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#26FFC400" />
+        </shape>
+    </item>
+    <item
+        android:bottom="1.5dp"
+        android:left="1.5dp"
+        android:right="1.5dp"
+        android:top="1.5dp">
+        <shape android:shape="oval">
+            <solid android:color="#59FFC400" />
+        </shape>
+    </item>
+    <item
+        android:bottom="3.5dp"
+        android:left="3.5dp"
+        android:right="3.5dp"
+        android:top="3.5dp">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFC400" />
+            <stroke android:width="1.2dp" android:color="#FFFFE9A8" />
+        </shape>
+    </item>
+</layer-list>

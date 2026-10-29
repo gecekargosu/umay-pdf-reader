@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v17 (ONARIM): item_shelf_header.xml bu ikonu istiyordu ama dosya yoktu
+     (derleme hatası: ic_folder not found). 3 katlı raf başlığındaki klasör
+     sembolü — açık zemin + turuncu (#FF6B00) sekme. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFF3E0"
+        android:pathData="M4,6 c0,-1.1 0.9,-2 2,-2 h4 l2,2 h6 c1.1,0 2,0.9 2,2 v10 c0,1.1 -0.9,2 -2,2 H6 c-1.1,0 -2,-0.9 -2,-2 z" />
+    <path
+        android:fillColor="#FF6B00"
+        android:pathData="M4,10 h16 v1.5 H4 z" />
+</vector>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v20 (ADIM 3): ShelfManager özel rafı — MainActivity.renderDynamicShelves()
+     tarafından programatik olarak çizilir (ekle/sil/adlandır/renk → anında). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/dynShelfHeader"
+        layout="@layout/item_shelf_header" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dynShelfList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:layout_marginTop="4dp"
+        android:nestedScrollingEnabled="false" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="2dp"
+        android:background="@color/umay_shelf_edge" />
+</LinearLayout>

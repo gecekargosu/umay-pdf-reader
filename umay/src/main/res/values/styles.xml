@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v5.7 — AYARLAR EKRANI ORTAK STİLLERİ.
+  Amaç: ayarlar ekranındaki bölüm başlıkları, satırlar ve ipuçları tek
+  yerden yönetilsin; yeni ayar eklerken 20 satır XML kopyalamayalım.
+-->
+<resources>
+
+    <!-- Bölüm başlığı: "GÖRÜNÜM & KİŞİSEL" gibi -->
+    <style name="SettingsSection">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textColor">@color/umay_accent</item>
+        <item name="android:textSize">11.5sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Bölüm kartı -->
+    <style name="SettingsCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/bg_panel</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">14dp</item>
+    </style>
+
+    <!-- Dokunulabilir ayar satırı (sol hizalı, 52dp) -->
+    <style name="SettingsRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:background">@drawable/bg_button_secondary</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:textColor">@color/umay_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Vurgulu satır (güncelleme / tanılama gibi) -->
+    <style name="SettingsRowAccent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:background">@drawable/bg_button_secondary</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:textColor">@color/umay_orange</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Küçük açıklama metni -->
+    <style name="SettingsHint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColor">@color/umay_text_dim</item>
+        <item name="android:textSize">11.5sp</item>
+    </style>
+
+    <!-- Satır içi etiket (switch / spinner yanı) -->
+    <style name="SettingsLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textColor">@color/umay_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Kart içi alt başlık -->
+    <style name="SettingsCardTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/umay_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

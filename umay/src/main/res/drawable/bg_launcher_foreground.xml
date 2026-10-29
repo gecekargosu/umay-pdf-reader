@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v14 (ADIM A tamir) — Adaptive ikon foreground: UMAY Puzzle (turkuaz + turuncu).
+     108x108 viewport; parçalar merkezdeki 66dp safe zone içinde. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- SOL puzzle parçası (Elektrik Turkuaz #00E5FF) — sağ kenarda ERKEK çıkıntısı -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M25,27 H50 V44 A8,8 0 1,1 50,60 V81 H25 Z" />
+
+    <!-- SAĞ puzzle parçası (Sıcak Turuncu #FF6B00) — sol kenarda DİŞİ çentik (tam oturur) -->
+    <path
+        android:fillColor="#FF6B00"
+        android:pathData="M58,27 H83 V81 H58 V60 A8,8 0 1,0 58,44 Z" />
+</vector>

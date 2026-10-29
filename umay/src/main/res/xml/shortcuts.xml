@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v13 (AGENT 22) — Uygulama kısayolları: simgeye uzun basınca çıkar -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="continue_reading"
+        android:enabled="true"
+        android:icon="@drawable/ic_play"
+        android:shortcutShortLabel="@string/kaldigin_yer"
+        android:shortcutLongLabel="@string/kaldigin_yer">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.umay.pdfreader"
+            android:targetClass="com.umay.pdfreader.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="schedule"
+        android:enabled="true"
+        android:icon="@drawable/ic_app"
+        android:shortcutShortLabel="@string/haftalik_program"
+        android:shortcutLongLabel="@string/haftalik_program">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.umay.pdfreader"
+            android:targetClass="com.umay.pdfreader.ScheduleActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="scan"
+        android:enabled="true"
+        android:icon="@drawable/ic_search"
+        android:shortcutShortLabel="@string/kitap_tara"
+        android:shortcutLongLabel="@string/kitap_tara">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.umay.pdfreader"
+            android:targetClass="com.umay.pdfreader.ScannerActivity" />
+    </shortcut>
+</shortcuts>

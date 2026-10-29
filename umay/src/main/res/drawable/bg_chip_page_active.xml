@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.6 — Sayfa göstergesi çipi (aktif sayfa = turuncu). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/umay_chip_active" />
+    <corners android:radius="9dp" />
+</shape>

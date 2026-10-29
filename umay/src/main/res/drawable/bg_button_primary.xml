@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/umay_accent" />
+    <!-- v5: ana buton rengi = sıcak turuncu (spec: butonlarda ANA renk) -->
+    <solid android:color="@color/umay_orange" />
     <corners android:radius="14dp" />
 </shape>
