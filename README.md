@@ -5,6 +5,14 @@ içindekileri **yapay zekâ ile açıklayan** ve kitaplığını raflara ayıran
 Android uygulaması. Türkçe arayüz, çevrimdışı çalışma, ekran kapalıyken
 okumaya devam.
 
+## Ekran Görüntüleri
+
+Telefondan alinan gercek ekranlar (surum 5.13):
+
+| Ana ekran | Okuyucu |
+|---|---|
+| ![Ana ekran](docs/screenshots/umay-pdf-reader-01.png) | ![Okuyucu](docs/screenshots/umay-pdf-reader-02.png) |
+
 ## ⬇️ İndir (APK)
 
 **Doğrudan indirme:**
