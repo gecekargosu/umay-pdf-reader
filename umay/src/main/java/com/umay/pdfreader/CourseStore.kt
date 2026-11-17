@@ -208,11 +208,14 @@ object CourseStore {
         category: String = "book"
     ): Int {
         var added = 0
-        val already = linkedBookIds(ctx, courseId)
+        // v5.17 — MÜKERRER KORUMASI: aynı kitap aynı rafa iki kez eklenmesin.
+        // `already` toplanabilir küme: aynı çağrıda kitap iki kez gelse de
+        // ikinci kez yazılmaz (eskiden yalnız DB'deki eski kayıtlar sayılıyordu).
+        val already = linkedBookIds(ctx, courseId).toMutableSet()
         safe<Unit>(ctx, "addDocs", Unit) {
             val d = db(ctx).writableDatabase
             bookIds.forEach { bookId ->
-                if (bookId in already) return@forEach
+                if (!already.add(bookId)) return@forEach
                 val cv = ContentValues().apply {
                     put("id", Academy.newId())
                     put("course_id", courseId)
