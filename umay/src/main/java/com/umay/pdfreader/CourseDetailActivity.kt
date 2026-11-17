@@ -872,6 +872,11 @@ class CourseDetailActivity : AppCompatActivity() {
         binding.courseTitle.text = c.name
         refreshShelves()
         refreshExams()
+        refreshExamPanel()
+        // v5.15 — takvim işaretleri yalnız ay değişiminde yükleniyordu; ekran
+        // ilk açıldığında hiçbir gün işaretli görünmüyordu (sınav tarihleri
+        // takvimde kayıptı). Her yenilemede işaretleri tazele.
+        refreshCalendarMarks()
     }
 
     private fun addRow(
@@ -948,6 +953,102 @@ class CourseDetailActivity : AppCompatActivity() {
             )
             // v45 — 1 haftadan az kaldıysa satır yanıp söner (kullanıcı isteği)
             if (days in 0..7) blinkView(row)
+        }
+    }
+
+    /**
+     * v5.15 — TAKVİMİN ALTINDAKİ BİLGİ PANELİ.
+     *
+     * Takvimin altı boş görünüyordu (kullanıcı isteği). Burada üç bilgi var:
+     *  1. Dersin sınav sonuçları (not + yüzde + harf) ve ders ortalaması,
+     *  2. Sıradaki sınavın türü ve tarihi,
+     *  3. Yaklaşan proje/ödev teslim tarihi.
+     * Veri yoksa panel "kayıt yok" der; çökme riski try/catch ile kapatılır.
+     */
+    private fun refreshExamPanel() {
+        try {
+            val en = LangHelper.isEnglish(this)
+            val now = System.currentTimeMillis()
+
+            binding.examResultsList.removeAllViews()
+            val grades = GradeStore.gradesOf(this, courseId)
+                .filter { it.score >= 0.0 && it.weight > 0.0 }
+            binding.examResultsEmpty.visibility =
+                if (grades.isEmpty()) View.VISIBLE else View.GONE
+
+            grades.forEach { g ->
+                val row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    setPadding(0, (3 * resources.displayMetrics.density).toInt(), 0, 0)
+                }
+                val left = TextView(this).apply {
+                    text = gradeKindLabel(g.kind) + " · %" + GradeStore.format2(g.weight)
+                    setTextColor(getColor(R.color.umay_text_dim))
+                    textSize = 11.5f
+                }
+                val right = TextView(this).apply {
+                    // v5.16 — tek bir sınavın puanına harf verilmez (36 → FF
+                    // yanılgısı); harf yalnızca ders ortalamasında gösterilir.
+                    text = GradeStore.format2(g.score) + " / 100"
+                    setTextColor(getColor(R.color.umay_text))
+                    textSize = 12f
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                }
+                row.addView(left, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+                row.addView(right, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                ))
+                binding.examResultsList.addView(row)
+            }
+
+            val avg = GradeStore.courseAverage(grades)
+            val complete = GradeStore.isComplete(grades)
+            binding.examResultsAverage.text = if (avg == null) "" else
+                getString(R.string.exam_results_average) + ": " +
+                    GradeStore.format2(avg) +
+                    if (complete) " · " + GradeStore.letterOf(avg)
+                    else " · " + getString(R.string.not_eksik)
+
+            // Sıradaki sınav: tür + tarih
+            val next = CourseStore.examsOf(this, courseId)
+                .filter { it.atMillis >= now }
+                .minByOrNull { it.atMillis }
+            binding.examNextLine.text = if (next == null) {
+                getString(R.string.exam_next) + ": " + getString(R.string.exam_none)
+            } else {
+                getString(R.string.exam_next) + ": " + next.title + " · " +
+                    typeLabel(next.type) + " · " +
+                    Academy.formatDateTime(next.atMillis, en) + " (" +
+                    Academy.countdownPhrase(Academy.daysLeft(next.atMillis, now), en) + ")"
+            }
+
+            // Yaklaşan proje/ödev teslimi
+            val hw = CourseStore.homeworkOf(this, courseId)
+                .filter { !it.done }
+                .minByOrNull { it.dueMillis }
+            binding.examHomeworkLine.text = if (hw == null) {
+                getString(R.string.exam_homework) + ": " + getString(R.string.exam_none)
+            } else {
+                getString(R.string.exam_homework) + ": " + hw.title + " · " +
+                    Academy.formatDate(hw.dueMillis, en) + " (" +
+                    Academy.countdownPhrase(Academy.daysLeft(hw.dueMillis, now), en) + ")"
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "examPanel", t)
+        }
+    }
+
+    /** Not türü etiketi (TR/EN) — GradeStore.KINDS anahtarlarıyla eşleşir. */
+    private fun gradeKindLabel(kind: String): String {
+        val en = LangHelper.isEnglish(this)
+        return when (kind) {
+            "vize" -> if (en) "Midterm" else "Vize"
+            "quiz" -> "Quiz 1"
+            "quiz2" -> "Quiz 2"
+            "final" -> "Final"
+            "butunleme" -> if (en) "Makeup" else "Bütünleme"
+            "proje" -> if (en) "Project" else "Proje"
+            else -> kind
         }
     }
 

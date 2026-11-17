@@ -383,10 +383,12 @@ class ExamsActivity : AppCompatActivity() {
 
         overview.forEach { (course, avg, ects) ->
             val row = TextView(this).apply {
-                val letter = GradeStore.letterOf(avg)
+                val complete = GradeStore.isComplete(GradeStore.gradesOf(this@ExamsActivity, course.id))
+                val letter = if (complete) GradeStore.letterOf(avg) else "—"
                 text = "${course.name}\n" +
                     "Ort: ${GradeStore.format2(avg)} · Harf: $letter · " +
-                    "${getString(R.string.akts_kisa)}: $ects"
+                    "${getString(R.string.akts_kisa)}: $ects" +
+                    if (complete) "" else " · ${getString(R.string.not_eksik)}"
                 setTextColor(getColor(R.color.umay_text))
                 textSize = 13.5f
                 setPadding(dp(12), dp(12), dp(12), dp(12))
@@ -403,7 +405,12 @@ class ExamsActivity : AppCompatActivity() {
 
     private fun refreshAgno() {
         val overview = GradeStore.overview(this)
-        val agno = GradeStore.agno(overview.map { it.second to it.third })
+        // v5.16 — yalnızca notları TAMAMLANMIŞ dersler AGNO'ya girer; vize
+        // girilmiş ama finali bekleyen ders ortalamayı yanlış düşürmesin.
+        val complete = overview.filter {
+            GradeStore.isComplete(GradeStore.gradesOf(this, it.first.id))
+        }
+        val agno = GradeStore.agno(complete.map { it.second to it.third })
         val totalEcts = overview.sumOf { it.third }
         binding.agnoText.text = getString(R.string.agno_baslik) + ": " +
             if (agno == null) "—" else GradeStore.format2(agno)

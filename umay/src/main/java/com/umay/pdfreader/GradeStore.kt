@@ -81,6 +81,18 @@ object GradeStore {
     }
 
     /**
+     * v5.16 — Notlar TAMAM mı? (ağırlık toplamı %100'e ulaştı mı)
+     *
+     * Yalnızca vize girilmişken ortalamayı 100'lük nota çevirip harf vermek
+     * yanıltıcıydı: 36 puanlık vize "FF" görünüyor, AGNO'yu da aşağı çekiyordu.
+     * Harf notu ve AGNO artık yalnızca ağırlıklar tamamlanınca hesaplanır.
+     */
+    fun isComplete(rows: List<GradeRow>): Boolean =
+        // Yalnızca PUANI GİRİLMİŞ satırlar sayılır: ağırlık tanımlı ama puanı
+        // boş (final/proje) satırlar dersi "tamamlandı" göstermemeli.
+        rows.filter { it.weight > 0.0 && it.score >= 0.0 }.sumOf { it.weight } >= 99.0
+
+    /**
      * 0..100 ortalama → harf notu.
      *
      * v44 — ÖĞRENCİNİN TRANSKRİPTİNDEKİ RESMÎ TABLO (düzeltildi):

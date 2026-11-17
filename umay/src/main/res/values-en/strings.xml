@@ -812,4 +812,34 @@
     <string name="raf_kitap_sayisi">%1$d files · %2$s</string>
     <string name="raf_sira_kaydedildi">Order saved</string>
     <string name="ders_satir_ozet">%1$d resources · %2$d exams</string>
+
+    <!-- ══ v5.15 — PROJECT COMPETITIONS ══ -->
+    <string name="yarisma_baslik">Project Competitions</string>
+    <string name="yarisma_alt_baslik">TÜBİTAK · TEKNOFEST · ASELSAN · TUSAŞ · operators</string>
+    <string name="yarisma_ipucu">Grants, competitions and startup programmes — tap a card to check the official site</string>
+    <string name="yarisma_ac">Open ↗</string>
+    <string name="yarisma_ara">Search competition, organisation or topic…</string>
+    <string name="yarisma_web">Search browser</string>
+    <string name="yarisma_bos">No competition matches your search.&#10;Try another word or use Search browser.</string>
+    <string name="yarisma_kaynak_not">Calendars are updated every year; check the official site for exact dates and rules.</string>
+    <string name="yarisma_son_tarih">Deadline</string>
+    <string name="yarisma_destek">Support/award</string>
+    <string name="yarisma_kurum">Organisation</string>
+    <string name="yarisma_kategori">Category</string>
+    <string name="yarisma_kapsam">Scope</string>
+    <string name="yarisma_detay_site">Open site</string>
+    <string name="yarisma_site_yok">Could not open the browser — copy the address and try again.</string>
+    <string name="yarisma_sayi">%1$d competitions listed</string>
+    <string name="yarisma_tumu">See all ↗</string>
+    <string name="yarisma_siralama">sorted by deadline</string>
+    <string name="yarisma_takvim_sitede">calendar on official site</string>
+    <string name="not_eksik">grades incomplete</string>
+
+    <!-- ══ v5.15 — EXAM RESULTS PANEL ══ -->
+    <string name="exam_results_title">Exam results</string>
+    <string name="exam_results_empty">No grades entered for this course yet.</string>
+    <string name="exam_results_average">Course average</string>
+    <string name="exam_next">Next exam</string>
+    <string name="exam_homework">Project/assignment due</string>
+    <string name="exam_none">none</string>
 </resources>

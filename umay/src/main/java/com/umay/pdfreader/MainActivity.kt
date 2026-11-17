@@ -3,7 +3,10 @@ package com.umay.pdfreader
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -357,6 +360,18 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 BookStore.logError(this, "btnCampus", t)
             }
         }
+
+        // v5.15 — PROJE YARIŞMALARI: TÜBİTAK / TEKNOFEST / ASELSAN / TUSAŞ …
+        binding.competitionCard.setOnClickListener {
+            try {
+                startActivity(Intent(this, CompetitionsActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "competitionCard", t)
+            }
+        }
+        // v5.16 — ana sayfa yarışma rafı (kapaklı, yatay kaydırmalı)
+        renderCompetitionShelf()
+
         // Arka plan takibi (6 saatte bir) + açılışta sessiz kontrol
         try { CampusWorker.cancel(this) } catch (_: Throwable) { }
         // v43.2 — Okul sitesi düz HTTP'yi 403 ile engelliyor; kontrol görünmez
@@ -1176,6 +1191,49 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
     }
 
     /** Ders rafını tazeler (kart yoksa satır gizlenir). */
+    /**
+     * v5.16 — PROJE YARIŞMALARI RAFI (ana sayfa).
+     * Kartın içindeki yatay listeye güncel programların kapaklarını basar;
+     * kapağa dokununca yarışmanın resmî sitesi açılır (detaylı inceleme).
+     */
+    private fun renderCompetitionShelf() {
+        try {
+            val row = binding.compHomeList
+            row.removeAllViews()
+            val d = resources.displayMetrics.density
+            CompetitionStore.sortedByDeadline().take(12).forEach { c ->
+                val card = layoutInflater.inflate(R.layout.item_competition_cover, row, false)
+                card.findViewById<TextView>(R.id.compCoverBadge).text = c.badge
+                card.findViewById<View>(R.id.compCoverArt).background = GradientDrawable(
+                    GradientDrawable.Orientation.TL_BR,
+                    intArrayOf(c.colorFrom, c.colorTo)
+                ).apply {
+                    cornerRadius = 14f * d
+                    setStroke((1.5f * d).toInt().coerceAtLeast(2), Color.argb(70, 255, 255, 255))
+                }
+                card.findViewById<TextView>(R.id.compCoverTitle).text = c.title
+                card.findViewById<TextView>(R.id.compCoverOrg).text = c.org
+                card.findViewById<TextView>(R.id.compCoverDeadline).text =
+                    getString(R.string.yarisma_son_tarih) + ": " +
+                        CompetitionStore.deadlineLabel(c)
+                            .ifBlank { getString(R.string.yarisma_takvim_sitede) }
+                card.setOnClickListener {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(c.url)))
+                    } catch (t: Throwable) {
+                        BookStore.logError(this, "competitionSite", t)
+                        Toast.makeText(
+                            this, R.string.yarisma_site_yok, Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+                row.addView(card)
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "competitionShelf", t)
+        }
+    }
+
     private fun reloadCourses() {
         // v40 — kullanıcının Dersler sayfasında belirlediği sıra ana ekrana da
         // yansır (tek doğru kaynak: CourseOrder).

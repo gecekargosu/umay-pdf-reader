@@ -201,6 +201,14 @@
             android:label="Kampüs Duyuruları"
             android:screenOrientation="portrait" />
 
+        <!-- v5.15 — Proje yarışmaları (TÜBİTAK, TEKNOFEST, savunma sanayii,
+             operatörler): arama + kapaklı liste + resmî siteye geçiş -->
+        <activity
+            android:name=".CompetitionsActivity"
+            android:exported="false"
+            android:label="@string/yarisma_baslik"
+            android:screenOrientation="portrait" />
+
         <!-- v13 (T8) — Derin dosya tarayıcı (tüm cihaz + SD kart) -->
         <activity
             android:name=".DeepDocumentPickerActivity"

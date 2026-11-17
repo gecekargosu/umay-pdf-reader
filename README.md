@@ -7,7 +7,7 @@ okumaya devam.
 
 ## Ekran Görüntüleri
 
-Telefondan alinan gercek ekranlar (surum 5.13):
+Telefondan alinan gercek ekranlar (surum 5.13; 5.16'da yeni yarisma rafi eklendi):
 
 | Ana ekran | Okuyucu |
 |---|---|
@@ -21,7 +21,7 @@ Telefondan alinan gercek ekranlar (surum 5.13):
 Telefonda bu bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
 Uyarı çıkarsa **"Yine de yükle"**.
 
-Sürüm: **5.13** (kod 30) · Android 8.0 ve üzeri · ~70 MB
+Sürüm: **5.16** (kod 33) · Android 8.0 ve üzeri · ~70 MB
 
 ## Kurulum (kısa)
 
@@ -60,7 +60,15 @@ Ayrıntılı rehberler: [`docs/kurulum/`](docs/kurulum)
 - **Yapay zekâ**: kitap içinden kaynaklı yanıt (sayfa numarasıyla), konu bazlı
   sohbet geçmişi, sayfa özeti
 - **Dersler**: program, sınav türleri (vize/final/bütünleme/quiz), yüzdeler,
-  notlar, ANO/AGNO, ders ses kayıtları ve video rafları
+  notlar, ANO/AGNO, ders ses kayıtları ve video rafları. Sınav takviminin
+  altında dersin sınav sonuçları, ders ortalaması, sıradaki sınav ve yaklaşan
+  proje/ödev teslimi görünür. Notlar tamamlanmadan harf/AGNO hesaplanmaz
+  (vize girilmiş ders yanlışlıkla FF görünmez).
+- **Proje yarışmaları**: ana sayfada kasanın üstünde kapaklı, yatay kaydırmalı
+  raf; TÜBİTAK 2209-A/B, 2242, TEKNOFEST, BiGG, KOSGEB, ASELSAN, TUSAŞ,
+  ROKETSAN, HAVELSAN, Baykar, Turkcell, Vodafone, Türk Telekom, Bilişim Vadisi
+  ve benzeri programlar. Arama + kategori çipleri; liste **son başvuru tarihine
+  göre** sıralıdır, karta dokununca detay ve resmî site açılır.
 - **Gizli kasa**: PIN + parmak izi, AES-256 şifreli resim/video/belge rafları
 - **Arka plan ön hazırlık**: şarjdayken ve boştayken kitapları okumaya hazırlar,
   sorunlu sayfaları raporlar

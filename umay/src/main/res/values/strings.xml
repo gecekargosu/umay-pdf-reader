@@ -839,4 +839,34 @@
     <string name="campus_uptodate">Yeni içerik yok — liste güncel.</string>
     <string name="campus_close">Kapat</string>
     <string name="campus_open">🏫 Kampüs Duyuruları</string>
+
+    <!-- ══ v5.15 — PROJE YARIŞMALARI ══ -->
+    <string name="yarisma_baslik">Proje Yarışmaları</string>
+    <string name="yarisma_alt_baslik">TÜBİTAK · TEKNOFEST · ASELSAN · TUSAŞ · operatörler</string>
+    <string name="yarisma_ipucu">Hibe, yarışma ve girişimcilik programları — karta dokun, resmî sitede incele</string>
+    <string name="yarisma_ac">Aç ↗</string>
+    <string name="yarisma_ara">Yarışma, kurum veya konu ara…</string>
+    <string name="yarisma_web">Tarayıcıda ara</string>
+    <string name="yarisma_bos">Aramanla eşleşen yarışma yok.&#10;Farklı bir kelime dene veya Tarayıcıda ara kullan.</string>
+    <string name="yarisma_kaynak_not">Takvimler her yıl güncellenir; kesin tarih ve şartlar için resmî siteyi kontrol et.</string>
+    <string name="yarisma_son_tarih">Son tarih</string>
+    <string name="yarisma_destek">Destek/ödül</string>
+    <string name="yarisma_kurum">Kurum</string>
+    <string name="yarisma_kategori">Kategori</string>
+    <string name="yarisma_kapsam">Kapsam</string>
+    <string name="yarisma_detay_site">Siteyi aç</string>
+    <string name="yarisma_site_yok">Tarayıcı açılamadı — site adresini kopyalayıp deneyin.</string>
+    <string name="yarisma_sayi">%1$d yarışma listeleniyor</string>
+    <string name="yarisma_tumu">Tümü ↗</string>
+    <string name="yarisma_siralama">son başvuruya göre</string>
+    <string name="yarisma_takvim_sitede">takvim resmî sitede</string>
+    <string name="not_eksik">notlar tamamlanmadı</string>
+
+    <!-- ══ v5.15 — SINAV SONUÇLARI PANELİ ══ -->
+    <string name="exam_results_title">Sınav sonuçları</string>
+    <string name="exam_results_empty">Bu derse henüz not girilmedi.</string>
+    <string name="exam_results_average">Ders ortalaması</string>
+    <string name="exam_next">Sıradaki sınav</string>
+    <string name="exam_homework">Proje/ödev teslimi</string>
+    <string name="exam_none">kayıt yok</string>
 </resources>
