@@ -1,0 +1,65 @@
+#EXTM3U
+#EXTINF:-1,GENÇ KRAL FM | MP3 · 128 kbps | Türkiye
+https://anadolu.liderhost.com.tr:10853/;
+#EXTINF:-1,KRAL TÜRK FM | MP3 · 128 kbps | Türkiye
+https://live.radyositesihazir.com/8032/stream
+#EXTINF:-1,SUPER FM 2 TURKEY | MP3 · 64 kbps | Türkiye
+https://playerservices.streamtheworld.com/api/livestream-redirect/SUPER2_SC?/
+#EXTINF:-1,Metro fm turkey | MP3 · 64 kbps | Türkiye
+https://playerservices.streamtheworld.com/api/livestream-redirect/METRO_FM_SC?
+#EXTINF:-1,JOY TÜRK FM | MP3 · 128 kbps | Türkiye
+https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_TURK_ITUNES.mp3
+#EXTINF:-1,JOY TÜRK TURKEY | MP3 · 64 kbps | Türkiye
+https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_TURK_SC?/
+#EXTINF:-1,Radyo 7 | MP3 · 128 kbps | Türkiye
+http://46.20.3.250/;stream
+#EXTINF:-1,RADYO 75 | MP3 · 128 kbps | Türkiye
+https://anadolu.liderhost.com.tr/8126/stream
+#EXTINF:-1,Virgin Radio Türkiye | MP3 · 64 kbps | Türkiye
+http://25503.live.streamtheworld.com:3690/VIRGIN_RADIO_SC
+#EXTINF:-1,Kafa Radyo | MP3 · 128 kbps | Türkiye
+https://radyofitrat.radyotvonline.net/
+#EXTINF:-1,Damar Turk FM | MP3 · 128 kbps | Istanbul
+https://live.radyositesihazir.com:10997/;
+#EXTINF:-1,Damarın Merkezi Fm | MP3 · 128 kbps | Istanbul
+http://canli.arabeskinmerkezi.com:9180/stream
+#EXTINF:-1,DamarTurk FM | MP3 · 128 kbps | Türkiye
+https://live.radyositesihazir.com:10997/stream?type=http&nocache=99881
+#EXTINF:-1,Radyo Karadeniz | MP3 · 128 kbps | Ardeşen
+https://radyomar.80.yayin.com.tr/;
+#EXTINF:-1,Radio Glamorize | MP3 · 128 kbps | Istanbul
+https://live.radioglamorize.com/stream1
+#EXTINF:-1,Mekke Fm | MP3 · 128 kbps | Web Radio
+https://radyodinle.cansuyufm.com/17175/stream;
+#EXTINF:-1,TRT FM | AAC+ · 130 kbps | Türkiye
+https://trt.radyotvonline.net/trtfm
+#EXTINF:-1,TRT Radyo 1 | AAC+ · 129 kbps | Türkiye
+https://trt.radyotvonline.net/trt1
+#EXTINF:-1,POWERTÜRK SLOW | AAC+ · 250 kbps | Türkiye
+https://listen.powerapp.com.tr/powerturkslow/mpeg/icecast.audio
+#EXTINF:-1,Süper FM | AAC+ · 64 kbps | Türkiye
+http://22343.live.streamtheworld.com:3690/SUPER_FMAAC_SC
+#EXTINF:-1,Süper FM 99.9 | AAC+ · 64 kbps | Viranşehir
+https://yayin.superfmradyo.com.tr/superfm/stream
+#EXTINF:-1,SÜPER SHOW RADYO | AAC+ · 128 kbps | Türkiye
+https://sslyayin.netyayin.net:6065/
+#EXTINF:-1,Metro FM | AAC+ · 64 kbps | Türkiye
+http://29341.live.streamtheworld.com:3690/METRO_FMAAC_SC
+#EXTINF:-1,Joy Fm | AAC+ · 64 kbps | Türkiye
+http://25443.live.streamtheworld.com:3690/JOY_FMAAC_SC
+#EXTINF:-1,Joy FM Istanbul | AAC+ · 128 kbps | Türkiye
+http://21633.live.streamtheworld.com/JOY_FM128AAC.aac
+#EXTINF:-1,Radyo Fenomen | AAC+ · 56 kbps | Türkiye
+https://live.radyofenomen.com/fenomen/128/icecast.audio
+#EXTINF:-1,Radyo Fenomen Clubbin | AAC+ · 56 kbps | Türkiye
+https://live.radyofenomen.com/fenomenclubbin/128/icecast.audio
+#EXTINF:-1,Show Radyo | AAC · 128 kbps | Türkiye
+http://showradyo.radyotvonline.net/showradyoaac/
+#EXTINF:-1,NTV Radyo | AAC+ · 139 kbps | Türkiye
+http://46.20.3.207/listen.pls
+#EXTINF:-1,Slow Turk | AAC | Türkiye
+https://radyo.duhnet.tv/ak_dtvh_slowturk
+#EXTINF:-1,Alem Fm | AAC · 128 kbps | Türkiye
+https://turkmedya.radyotvonline.net/alemfmaac
+#EXTINF:-1,Kalp FM | AAC+ · 128 kbps | Istanbul
+https://yayin.kalpfm.com:8080/

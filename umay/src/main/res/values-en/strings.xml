@@ -872,4 +872,21 @@
     <string name="prayer_card_off">Off - tap to enable</string>
     <string name="prayer_card_fmt">Next: %1$s - %2$s - %3$s</string>
     <string name="prayer_test">Send test alert</string>
+    <string name="tv_card_title">UMAY Multi TV</string>
+    <string name="tv_card_sub">305 channels · radio · 3/4-screen viewing</string>
+    <string name="weather_title">Weather</string>
+    <string name="weather_city_fmt">City: %1$s</string>
+    <string name="weather_now">NOW</string>
+    <string name="weather_forecast">5-DAY FORECAST</string>
+    <string name="weather_updated_fmt">MGM · %1$s · %2$s</string>
+    <string name="weather_refresh">Refresh</string>
+    <string name="weather_loading">Loading from MGM…</string>
+    <string name="weather_error">MGM could not be reached</string>
+    <string name="weather_stale">MGM unreachable · showing last data</string>
+    <string name="weather_rain_warn">⚠️ Rain expected today: %1$s</string>
+    <string name="weather_note">Data from the Turkish State Meteorological Service; refreshed every 30 minutes.</string>
+    <string name="weather_card_title">Weather · %1$s</string>
+    <string name="weather_card_off">Tap for 5-day forecast</string>
+    <string name="weather_card_fmt">%1$d° · %2$s · %3$d°/%4$d°</string>
+    <string name="weather_card_rain">⚠️ Rain today · %1$d°/%2$d°</string>
 </resources>

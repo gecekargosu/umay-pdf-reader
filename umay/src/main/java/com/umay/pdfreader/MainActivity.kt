@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import kotlin.math.roundToInt
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.view.View
@@ -28,6 +29,9 @@ import com.umay.pdfreader.databinding.ActivityMainBinding
  * "Kaldığın yerden devam edelim mi?" akışı.
  */
 class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
+
+    // v5.19 - MGM hava durumu: basarisiz denemede her acilista aga vurmayi onler
+    private var weatherAttemptAt = 0L
 
     private lateinit var binding: ActivityMainBinding
     /** v6 — deep link tek seferlik işlensin. */
@@ -379,6 +383,25 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             }
         }
         renderPrayerCard()
+
+        // v5.19 - HAVA DURUMU (MGM): ana sayfa penceresi
+        binding.weatherCard.setOnClickListener {
+            try {
+                startActivity(Intent(this, WeatherActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "weatherCard", t)
+            }
+        }
+        renderWeatherCard()
+
+        // v5.19 - UMAY MULTI TV: canli TV + radyo penceresi
+        binding.tvCard.setOnClickListener {
+            try {
+                startActivity(Intent(this, com.umay.pdfreader.tv.MainActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "tvCard", t)
+            }
+        }
 
         renderCompetitionShelf()
 
@@ -777,6 +800,7 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v5.18 - namaz vakitleri: plani tazele + seridi guncelle
         try { PrayerTimes.ensureScheduled(this) } catch (_: Throwable) {}
         try { renderPrayerCard() } catch (_: Throwable) {}
+        try { renderWeatherCard() } catch (_: Throwable) {}
         // v12: ana ekran widget'ını tazele (sıradaki ders bilgisi güncellensin)
         try { UmayWidgetProvider.refreshAll(this) } catch (_: Throwable) {}
         // v13 (T7): yaklaşan sınav varsa canlı geri sayım bildirimini sürdür
@@ -1210,6 +1234,49 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
      * kapağa dokununca yarışmanın resmî sitesi açılır (detaylı inceleme).
      */
     /** v5.18 - ana sayfa namaz seridi: siradaki vakit ve kalan sure. */
+    /** v5.19 - ana sayfa hava durumu penceresi (MGM, 30 dk onbellek). */
+    private fun renderWeatherCard() {
+        try {
+            val id = WeatherStore.cityId(this)
+            binding.weatherCardTitle.text = getString(R.string.weather_card_title, WeatherStore.cityName(this))
+            val cached = WeatherStore.cached(this, id)
+            paintWeatherCard(cached)
+            val now = System.currentTimeMillis()
+            if (WeatherStore.isStale(cached) && now - weatherAttemptAt > 5 * 60_000L) {
+                weatherAttemptAt = now
+                WeatherStore.fetch(this, id) { data, _ ->
+                    if (data != null) runOnUiThread { paintWeatherCard(data) }
+                }
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "renderWeatherCard", t)
+        }
+    }
+
+    private fun paintWeatherCard(d: WeatherData?) {
+        try {
+            val today = d?.days?.firstOrNull()
+            if (d == null || today == null) {
+                binding.weatherCardSub.text = getString(R.string.weather_card_off)
+                return
+            }
+            val temp = d.now?.temp?.roundToInt() ?: today.max
+            binding.weatherCardSub.text = if (WeatherStore.isRain(today.conditionCode)) {
+                getString(R.string.weather_card_rain, today.min, today.max)
+            } else {
+                getString(
+                    R.string.weather_card_fmt,
+                    temp,
+                    WeatherStore.condition(today.conditionCode),
+                    today.min,
+                    today.max
+                )
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "paintWeatherCard", t)
+        }
+    }
+
     private fun renderPrayerCard() {
         try {
             if (!PrayerTimes.isOn(this)) {

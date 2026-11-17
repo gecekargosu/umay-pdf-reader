@@ -28,6 +28,7 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <!-- v16 (V5.2 ADIM F / T8.1) — "TÜM CİHAZI TARA" TAM DOSYA ERİŞİMİ.
          Android 11+ (API 30+) ayarlarındaki "Tüm dosyalara erişim" anahtarı
          YALNIZCA bu izin manifestte beyan edilmişse AÇILABİLİR hale gelir.
@@ -52,6 +53,7 @@
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.UmayPdf">
 
         <!-- v16 (GÖREV 5 — ASO) — Akademik anahtar kelimeler: mağaza/görüntüleyen
@@ -210,6 +212,13 @@
             android:screenOrientation="portrait" />
 
         <!-- v5.18 - Namaz vakitleri: sehir, uyari araliklari, bugunun vakitleri -->
+        <!-- v5.19 - MGM hava durumu: anlik olcum + 5 gunluk tahmin -->
+        <activity
+            android:name=".WeatherActivity"
+            android:exported="false"
+            android:label="@string/weather_title"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".PrayerActivity"
             android:exported="false"
@@ -334,6 +343,60 @@
                 android:resource="@xml/appwidget_info" />
         </receiver>
         <receiver android:name=".PrayerAlertReceiver" android:exported="false" />
+
+
+        <!-- v5.19 — UMAY Multi TV: canlı TV + radyo (305 kanal, 3'lü/4'lü izleme) -->
+        <activity
+            android:name=".tv.MainActivity"
+            android:exported="false"
+            android:label="UMAY Multi TV"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:resizeableActivity="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <activity
+            android:name=".tv.PlayerActivity"
+            android:exported="false"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen" />
+
+        <activity
+            android:name=".tv.MultiActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen" />
+
+        <activity
+            android:name=".tv.RadioPlayerActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <activity
+            android:name=".tv.RadioActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <activity
+            android:name=".tv.StatusActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <activity
+            android:name=".tv.RecordingsActivity"
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <service
+            android:name=".tv.AudioService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
     </application>
 

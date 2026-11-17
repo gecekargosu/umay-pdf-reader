@@ -899,4 +899,21 @@
     <string name="prayer_card_off">Kapalı · açmak için dokun</string>
     <string name="prayer_card_fmt">Sıradaki: %1$s · %2$s · %3$s</string>
     <string name="prayer_test">Test uyarısı gönder</string>
+    <string name="tv_card_title">UMAY Multi TV</string>
+    <string name="tv_card_sub">305 kanal · radyo · 3’lü/4’lü izleme</string>
+    <string name="weather_title">Hava durumu</string>
+    <string name="weather_city_fmt">Şehir: %1$s</string>
+    <string name="weather_now">ŞİMDİ</string>
+    <string name="weather_forecast">5 GÜNLÜK TAHMİN</string>
+    <string name="weather_updated_fmt">MGM · %1$s · %2$s</string>
+    <string name="weather_refresh">Yenile</string>
+    <string name="weather_loading">MGM’den yükleniyor…</string>
+    <string name="weather_error">MGM’ye ulaşılamadı</string>
+    <string name="weather_stale">MGM’ye ulaşılamadı · son veri gösteriliyor</string>
+    <string name="weather_rain_warn">⚠️ Bugün yağış bekleniyor: %1$s</string>
+    <string name="weather_note">Veriler Meteoroloji Genel Müdürlüğü’nden alınır; 30 dakikada bir yenilenir.</string>
+    <string name="weather_card_title">Hava · %1$s</string>
+    <string name="weather_card_off">Dokun → 5 günlük tahmin</string>
+    <string name="weather_card_fmt">%1$d° · %2$s · %3$d°/%4$d°</string>
+    <string name="weather_card_rain">⚠️ Bugün yağış · %1$d°/%2$d°</string>
 </resources>
