@@ -40,11 +40,41 @@ object DocumentConverter {
 
     fun isSupported(name: String): Boolean = SUPPORTED.contains(extension(name))
 
+    /**
+     * v37 — SLAYT/SINIF SINIRI.
+     *
+     * Sunum metni tek A4'e sığdığında 60 slaytlık ders "1 sayfa" oluyordu;
+     * sayfa numarası, okunma yüzdesi ve ilerleme anlamsızlaşıyordu. Her slayt
+     * artık kendi sayfasında başlar.
+     */
+    internal const val PAGE_BREAK = "\u0000UMAY_SAYFA\u0000"
+
+    /**
+     * v38 — BELGE ÇEVRİMİ KAPATILDI.
+     *
+     * Kullanıcı isteği: DOCX/PPTX/DOC/PPT dosyaları PDF'e çevrilmesin; orijinal
+     * dosya (grafikler, renkler, şekiller) hiç değişmesin. Bu türler artık
+     * `BookStore` içinde BELGE MODUNDA saklanır. Buradaki koruma, ileride
+     * yanlışlıkla yeniden açılmasın diye var.
+     */
+    private fun ensureNotOfficeDoc(ext: String, name: String) {
+        if (ext in setOf("docx", "pptx", "doc", "ppt")) {
+            throw IllegalStateException(
+                "'$name' belge biçimi PDF'e çevrilmez (orijinal korunur)"
+            )
+        }
+    }
+
     /** Desteklenen dosyayı PDF'e çevirir; sayfa sayısını döndürür. */
     fun convert(src: File, dest: File, name: String): Int {
-        val paragraphs = paragraphs(src, name)
+        val ext = effectiveExtension(src, name)
+        ensureNotOfficeDoc(ext, name)
+        // PPTX'te her slayt yeni sayfa; diğer türlerde metin akışı korunur.
+        val paragraphs = if (ext == "pptx") pptxParagraphs(src, markSlides = true)
+        else paragraphs(src, name)
         val title = name.substringBeforeLast('.')
-        return writePdf(paragraphs, dest, title)
+        // PPTX'te ayrı başlık sayfası YOK: sayfa n = slayt n olsun.
+        return writePdf(paragraphs, dest, title, withTitlePage = ext != "pptx")
     }
 
     /**
@@ -53,13 +83,73 @@ object DocumentConverter {
      * hata yutulmaz → çağıran taraf `CrashLog.recordParse` ile loglar.
      */
     internal fun paragraphs(src: File, name: String): List<String> {
-        val ext = extension(name)
+        val ext = effectiveExtension(src, name)
         return when (ext) {
             "docx" -> docxParagraphs(src)
             "pptx" -> pptxParagraphs(src)
             "doc", "ppt" -> legacyParagraphs(src, ext)
             "epub" -> epubParagraphs(src)
             else -> textParagraphs(src)
+        }
+    }
+
+    /** ZIP tabanlı (paket) biçimler — uzantısı ne olursa olsun ZIP olmalı. */
+    private val ZIP_ONLY = setOf("docx", "pptx", "epub")
+
+    /**
+     * v37 — GERÇEK TÜR TESPİTİ (bozuk kitap salgınının kökü).
+     *
+     * Eski hata: tür YALNIZCA dosya adının uzantısına bakılarak seçiliyordu.
+     * Ad "source.pdf" gibi uzantısını yitirmiş geldiğinde (SAF/file://
+     * aktarımlarında ad okunamazsa) `else` dalı çalışıp **ZIP/PPTX baytları
+     * düz metin sanılıyordu**. Sonuç: 60 slaytlık sunum 1460 sayfalık,
+     * sesli okumada "PK ! ppt/slides/slide2.xml…" diyen bir kitaba dönüşüyordu.
+     *
+     * Artık önce İÇERİK okunur: dosya ZIP ise içindeki paket yapısına bakılır
+     * (word/document.xml → docx, ppt/slides → pptx, META-INF/container.xml →
+     * epub). ZIP ama desteklenmeyen bir paket (xlsx, rar/zip arşivi) ise bozuk
+     * kitap üretmek yerine anlaşılır hata verilir.
+     */
+    internal fun effectiveExtension(src: File, name: String): String {
+        val declared = extension(name)
+        if (UniversalParser.isZip(src)) {
+            val kind = zipKind(src)
+            if (kind != null) return kind
+            throw IllegalArgumentException(
+                "'$name' bir ZIP/paket dosyası ama DOCX/PPTX/EPUB değil " +
+                    "(ör. XLSX ya da sıkıştırılmış arşiv). Metin olarak okunamaz"
+            )
+        }
+        if (declared in ZIP_ONLY) {
+            throw IllegalArgumentException(
+                "'$name' bozuk ya da eksik paket dosyası (ZIP yapısı yok). " +
+                    "Dosyayı yeniden indirip/kaydedip tekrar deneyin"
+            )
+        }
+        return declared
+    }
+
+    /** ZIP içindeki paket türü: docx / pptx / epub / null. */
+    private fun zipKind(src: File): String? {
+        val slide = Regex("ppt/slides/slide\\d+\\.xml$")
+        return try {
+            java.util.zip.ZipInputStream(src.inputStream().buffered()).use { zip ->
+                var n = 0
+                var entry = zip.nextEntry
+                while (entry != null && n < 400) {
+                    val en = entry.name
+                    when {
+                        en == "word/document.xml" -> return "docx"
+                        en == "META-INF/container.xml" -> return "epub"
+                        slide.matches(en) -> return "pptx"
+                    }
+                    n++
+                    entry = zip.nextEntry
+                }
+                null
+            }
+        } catch (_: Throwable) {
+            null
         }
     }
 
@@ -71,7 +161,22 @@ object DocumentConverter {
         // çözümü. Eski kod yalnız UTF-8/ISO-8859-1 biliyordu → Arapça metinde
         // bozuk karakter (�) çıkıyordu; artık doğru okunur. Kod/indentasyon
         // satırları AYNI KALIR (yalnız satır sonları normalize edilir).
+        // v37 — SON KAPI: ikili bir dosya (PDF/ZIP/EXE/…) buraya düşerse
+        // çözülen metin anlamsız olur. Önce bayt düzeyinde "bu bir metin mi?"
+        // kontrolü (NUL/kontrol karakteri oranı), sonra çözülen metnin
+        // kalite kontrolü. Eskiden burada hiçbir kapı yoktu → sessizce
+        // okunamayan çöp kitap oluşuyordu.
+        if (src.length() > 0L && !UniversalParser.looksLikeText(src)) {
+            throw IllegalArgumentException(
+                "Dosya metin değil (ikili biçim) — okunabilir metin bulunamadı"
+            )
+        }
         val text = UniversalParser.decodeFile(src).text
+        if (text.isNotBlank() && TextQuality.isGarbage(text.take(6000))) {
+            throw IllegalArgumentException(
+                "Dosya metin değil (ikili biçim) — okunabilir metin bulunamadı"
+            )
+        }
         return text.replace("\r\n", "\n").replace('\r', '\n').split("\n")
     }
 
@@ -233,6 +338,10 @@ object DocumentConverter {
         var event = pull.eventType
         while (event != XmlPullParser.END_DOCUMENT) {
             when {
+                // v39 — aynı metnin Choice + Fallback kopyası iki kez okunmasın
+                event == XmlPullParser.START_TAG && pull.name == "Fallback" ->
+                    skipSubtree(pull)
+
                 event == XmlPullParser.START_TAG && pull.name == "p" ->
                     para = StringBuilder()
 
@@ -265,7 +374,7 @@ object DocumentConverter {
      * + o slayttaki tüm metin kutuları (`<a:t>`). Slaytlar doğal olarak sıralanır
      * (slide2 → slide10).
      */
-    private fun pptxParagraphs(src: File): List<String> {
+    private fun pptxParagraphs(src: File, markSlides: Boolean = false): List<String> {
         val slides = ArrayList<Pair<Int, String>>()
         java.util.zip.ZipInputStream(src.inputStream().buffered()).use { zip ->
             var entry = zip.nextEntry
@@ -282,12 +391,32 @@ object DocumentConverter {
 
         val out = mutableListOf<String>()
         slides.sortedBy { it.first }.forEach { (num, text) ->
+            if (markSlides) out += PAGE_BREAK
             out += "— Slayt $num —"
             if (text.isBlank()) out += "(bu slaytta metin yok)"
             else out += text
             out += ""
         }
         return out
+    }
+
+    /**
+     * v37 — PPTX'teki slayt sayısı (paket içindeki slideN.xml sayısı).
+     * Onarım, "sayfa sayısı slayt sayısından az" olan sunumları yeniden üretir
+     * (eski hata: 60 slayt tek sayfaya sıkışıyordu).
+     */
+    internal fun slideCount(src: File): Int = try {
+        var n = 0
+        java.util.zip.ZipInputStream(src.inputStream().buffered()).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                if (!entry.isDirectory && SLIDE_NUM.find(entry.name) != null) n++
+                entry = zip.nextEntry
+            }
+        }
+        n
+    } catch (_: Throwable) {
+        0
     }
 
     /** XML içindeki tüm `<a:t>` / `<w:t>` metinlerini tek parça olarak toplar. */
@@ -298,7 +427,12 @@ object DocumentConverter {
         val sb = StringBuilder()
         var event = pull.eventType
         while (event != XmlPullParser.END_DOCUMENT) {
-            if (event == XmlPullParser.START_TAG && pull.name == "t") {
+            // v39 — mc:AlternateContent: aynı metin hem Choice hem Fallback
+            // altında durur. İkisini okumak metni İKİ KEZ ekliyordu (sesli
+            // okuma aynı cümleyi tekrar ediyordu). Fallback atlanır.
+            if (event == XmlPullParser.START_TAG && pull.name == "Fallback") {
+                skipSubtree(pull)
+            } else if (event == XmlPullParser.START_TAG && pull.name == "t") {
                 val t = try { pull.nextText() } catch (e: Exception) { "" }
                 if (t.isNotBlank()) {
                     if (sb.isNotEmpty()) sb.append('\n')
@@ -308,6 +442,18 @@ object DocumentConverter {
             if (event != XmlPullParser.END_DOCUMENT) event = pull.next()
         }
         return sb.toString()
+    }
+
+    /** Bir XML alt ağacını (açılış etiketinden sonra) tamamen atlar. */
+    private fun skipSubtree(p: XmlPullParser) {
+        var depth = 1
+        while (depth > 0) {
+            when (p.next()) {
+                XmlPullParser.START_TAG -> depth++
+                XmlPullParser.END_TAG -> depth--
+                XmlPullParser.END_DOCUMENT -> return
+            }
+        }
     }
 
     // ── Eski ikili formatlar (.doc / .ppt) ──────────────────
@@ -384,7 +530,12 @@ object DocumentConverter {
 
     // ── PDF çizimi ────────────────────────────────────────
 
-    private fun writePdf(paragraphs: List<String>, dest: File, title: String): Int {
+    private fun writePdf(
+        paragraphs: List<String>,
+        dest: File,
+        title: String,
+        withTitlePage: Boolean = true
+    ): Int {
         PDDocument().use { doc ->
             // v17 (ONARIM — umay_error.log): Tek font Roboto, Arapça/Farsça
             // glyph'larında "No glyph for U+0643" fırlatıp İÇE AKTARMAYI
@@ -465,7 +616,7 @@ object DocumentConverter {
             newPage()
 
             // Başlık
-            if (title.isNotBlank()) {
+            if (withTitlePage && title.isNotBlank()) {
                 val cleanTitle = sanitize(title)
                 val tf = chooseFont(cleanTitle)
                 drawOne(cleanTitle, tf)
@@ -478,8 +629,18 @@ object DocumentConverter {
                 y -= leading
             }
 
+            // Sayfa başında sayfa kesme işareti gelirse boş sayfa açma.
+            var wroteAny = withTitlePage && title.isNotBlank()
             for (raw in paragraphs) {
+                if (raw == PAGE_BREAK) {
+                    if (wroteAny) {
+                        newPage()
+                        wroteAny = false
+                    }
+                    continue
+                }
                 drawLine(raw.replace("\t", "    "))
+                if (raw.isNotBlank()) wroteAny = true
             }
 
             stream?.close()

@@ -87,6 +87,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         EdgeToEdge.apply(this, binding.root)  // SDK 36 edge-to-edge
+        // v40 — ANA SAYFA SIRASI: "İlk sırada dinlenen kitap, onun altında
+        // dersler kısmı." Bu sıra artık XML'de (activity_main.xml): Derslerim
+        // bölümü "EN SON OKUNAN" kartının ALTINA taşındı. Çalışma anında
+        // view taşıma denemesi ana ekranı boş bıraktığı için kaldırıldı.
 
         // v13 (T9b) — İlk açılış tanıtımı (5 sn, "Geç" ile atlanır)
         if (!AppPrefs.getBool(this, AppPrefs.KEY_ONBOARDING_DONE, false)) {
@@ -115,6 +119,22 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             BookStore.logError(this, "playCore", t)
         }
 
+        // v39 — YERLEŞİK RAF ADI/RENGİ: "Rafları Düzenle" ile verilen ad ve
+        // renk artık ana ekrana yansır. Eski kodda başlık `shelfTitles`
+        // listesinden (sabit metin) geliyordu; kullanıcı adı değiştirse de
+        // ekranda eski ad kalıyordu. Renk de yalnız özel raflarda nokta olarak
+        // çiziliyordu; artık yerleşik raflarda da nokta olarak görünür.
+        val builtInIds = listOf(
+            "shelf_ders_kitaplari",
+            "shelf_ders_slayt_notlar",
+            "shelf_cihang_taramalari"
+        )
+        val builtInShelves = try {
+            ShelfManager.shelvesOf(this).associateBy { it.id }
+        } catch (_: Throwable) {
+            emptyMap()
+        }
+
         // 3 raf (ADIM 2) — her raf için yatay liste + başlık metni
         shelfLists.forEachIndexed { index, rv ->
             rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -129,10 +149,37 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             // Raf başlığı: layout'a <include> edilen header (shelf'in ilk
             // çocuğu) — eski kodda AYRI bir header inflate ediliyor ama hiç
             // eklenmiyordu, bu yüzden başlıklar görünmüyordu.
-            (shelfViews[index].getChildAt(0) as? android.view.View)
-                ?.findViewById<TextView>(R.id.shelfTitle)?.text = shelfTitles[index]
+            val header = shelfViews[index].getChildAt(0) as? android.view.View
+            val def = try { builtInShelves[builtInIds[index]] } catch (_: Throwable) { null }
+            header?.findViewById<TextView>(R.id.shelfTitle)?.text =
+                def?.name?.takeIf { it.isNotBlank() } ?: shelfTitles[index]
+            header?.findViewById<TextView>(R.id.shelfCount)?.apply {
+                val n = def?.bookIds?.size ?: 0
+                text = if (n > 0) n.toString() else ""
+                visibility = if (n > 0) android.view.View.VISIBLE else android.view.View.GONE
+            }
+            try {
+                header?.findViewById<android.view.View>(R.id.shelfColorDot)?.apply {
+                    setBackgroundColor(
+                        android.graphics.Color.parseColor(def?.bgColor ?: "#3B4A63")
+                    )
+                    visibility = android.view.View.VISIBLE
+                }
+            } catch (_: Throwable) {
+            }
             // v5.6 — Raf başlığındaki ‹ › okları: aynı rafı yatay kaydırır.
             shelfViews[index].getChildAt(0)?.let { wireShelfArrows(it, rv) }
+            // v40 — RAF BAŞLIĞINA DOKUN → rafın kendi sayfası açılır
+            // (kullanıcı: "raftaki tüm belgeleri görebileceğim bir sayfa
+            //  açılmalı"). Başlıktaki ＋ de aynı sayfayı açar; orada
+            // "Kaynak ekle" ile telefondan dosya seçilir.
+            val head0 = shelfViews[index].getChildAt(0)
+            val headTitle = head0?.findViewById<TextView>(R.id.shelfTitle)?.text?.toString()
+                ?: shelfTitles[index]
+            head0?.setOnClickListener { openShelfDetail(builtInIds[index], headTitle) }
+            head0?.findViewById<TextView>(R.id.shelfAdd)?.setOnClickListener {
+                openShelfDetail(builtInIds[index], headTitle)
+            }
         }
 
         // v5.6 — Ders şeridi okları (yatay kaydırma)
@@ -160,11 +207,106 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         binding.btnDiagBadge.setOnClickListener {
             DiagnosticTestManager.showLastOrRun(this)
         }
+        // v41 — LAMBALARA DOKUN: "neden yandı?" sorusunun cevabı.
+        // Yalnız sorunları ve ne yapılacağını listeler (tam rapor ayrı düğmede).
+        val lampInfo = android.view.View.OnClickListener {
+            DiagnosticTestManager.showProblems(this)
+        }
+        binding.lampRed.setOnClickListener(lampInfo)
+        binding.lampAmber.setOnClickListener(lampInfo)
+        binding.lampGreen.setOnClickListener(lampInfo)
         refreshDiagBadge()
         DiagnosticTestManager.runSilently(this) { _, _ -> refreshDiagBadge() }
         // v36.4 — yalnız hata ayıklama derlemesinde: lamba senaryolarını
         // elle doğrulamak için `am start ... --es lamp_test warn|fail`
         if (BuildConfig.DEBUG) maybeRunLampDemo(intent)
+        // v44 — hata ayıklama: klasörden toplu aktarmayı onay diyaloğu olmadan
+        // çalıştır (`--ez auto_import_pool true`). Kullanıcı akışı değişmez.
+        if (BuildConfig.DEBUG) maybeAutoImportPool(intent)
+        // v45 — YALNIZ DEBUG: 3 gün sonrasına deneme sınavı koyar / temizler
+        // (`--ez soon_exam true|clear`). Yanıp sönen uyarıyı gerçek cihazda
+        // doğrulamak için kullanılır.
+        if (BuildConfig.DEBUG) {
+            val mode = intent?.getStringExtra("soon_exam")
+            if (mode != null) {
+                try {
+                    val title = "DENEME Vize (uyari)"
+                    if (mode == "clear") {
+                        CourseStore.courses(this).forEach { c ->
+                            CourseStore.examsOf(this, c.id)
+                                .filter { it.title == title }
+                                .forEach { CourseStore.deleteExam(this, it.id) }
+                        }
+                    } else {
+                        CourseStore.courses(this).firstOrNull()?.let { c ->
+                            CourseStore.addExam(
+                                this, c.id, title,
+                                System.currentTimeMillis() + 3L * 24 * 60 * 60 * 1000,
+                                type = "Vize", weight = 40
+                            )
+                        }
+                    }
+                    reloadCourses()
+                } catch (t: Throwable) {
+                    BookStore.logError(this, "soonExam", t)
+                }
+            }
+        }
+        // v44 — YALNIZ DEBUG: deneme notlarını temizler (`--ez clear_grades true`).
+        // AKTS değerleri (gerçek 30 AKTS) korunur.
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("clear_grades", false) == true) {
+            try {
+                CourseStore.courses(this).forEach { c ->
+                    GradeStore.KINDS.forEach { k ->
+                        GradeStore.setGrade(this, c.id, k, GradeStore.NO_SCORE, 0.0)
+                    }
+                }
+                SeyirDefteri.yaz(this, "NOTLAR", "deneme notları temizlendi", "AKTS korundu")
+                Toast.makeText(this, "Deneme notları silindi", Toast.LENGTH_LONG).show()
+            } catch (t: Throwable) {
+                BookStore.logError(this, "clearGrades", t)
+            }
+        }
+        // v44 — YALNIZ DEBUG: 3. yarıyıl derslerine uydurma not + AKTS yazar,
+        // not/AGNO ekranını açar (`--ez seed_grades true`).
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("seed_grades", false) == true) {
+            try {
+                val plan = mapOf(
+                    "BLG203" to Triple(5, 88.0, 80.0), "BLG205" to Triple(6, 92.0, 90.0),
+                    "BLG207" to Triple(5, 71.0, 70.0), "MAT203" to Triple(5, 63.0, 60.0),
+                    "MAT205" to Triple(4, 55.0, 50.0), "YPZ201" to Triple(5, 47.0, 40.0)
+                )
+                CourseStore.courses(this).forEach { c ->
+                    val key = plan.keys.firstOrNull { c.name.contains(it, ignoreCase = true) }
+                    val p = key?.let { plan[it] } ?: return@forEach
+                    GradeStore.setEcts(this, c.id, p.first)
+                    // Kullanıcının gerçek dağılımı: vize %20 · quiz1 %2,5 ·
+                    // quiz2 %2,5 · final %25 · proje %50 (bütünleme %0 = pasif)
+                    GradeStore.setGrade(this, c.id, "vize", p.third, 20.0)
+                    GradeStore.setGrade(this, c.id, "quiz", 100.0, 2.5)
+                    GradeStore.setGrade(this, c.id, "quiz2", 60.0, 2.5)
+                    GradeStore.setGrade(this, c.id, "final", p.second, 25.0)
+                    GradeStore.setGrade(this, c.id, "butunleme", GradeStore.NO_SCORE, 0.0)
+                    GradeStore.setGrade(this, c.id, "proje", p.third, 50.0)
+                }
+                SeyirDefteri.yaz(this, "NOTLAR", "deneme notları yazıldı", "6 ders · AKTS + yüzde")
+                startActivity(Intent(this, ExamsActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "seedGrades", t)
+            }
+        }
+        // v44 — daha önce aktarılmış ama derse bağlanmamış kitapları klasöre
+        // göre derslere bağlar (`--ez relink_pool true`).
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("relink_pool", false) == true) {
+            FolderImporter.relinkExisting(this, java.io.File(FolderImporter.DEFAULT_DIR)) { placed, scanned ->
+                runOnUiThread {
+                    val msg = "derse bağlanan=$placed / taranan=$scanned"
+                    try { SeyirDefteri.yaz(this, "İÇE AKTARMA", "yeniden bağlama", msg) } catch (_: Throwable) {}
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                    try { reload() } catch (_: Throwable) {}
+                }
+            }
+        }
 
         // v14 (V5.0 §7) — Öğrenci profil kartına tıklayınca profil ekranı
         binding.greetingCard.setOnClickListener {
@@ -174,14 +316,26 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // ── Derslerim rafı (ADIM 2) ──
         binding.courseList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.courseList.adapter = CoursesAdapter { course ->
-            startActivity(
-                Intent(this, CourseDetailActivity::class.java).apply {
-                    putExtra(CourseDetailActivity.EXTRA_COURSE_ID, course.id)
-                }
-            )
-        }
+        binding.courseList.adapter = CoursesAdapter(
+            onClick = { course ->
+                startActivity(
+                    Intent(this, CourseDetailActivity::class.java).apply {
+                        putExtra(CourseDetailActivity.EXTRA_COURSE_ID, course.id)
+                    }
+                )
+            },
+            blink = { v, on -> setBlink(v, on) }
+        )
         binding.btnAddCourse.setOnClickListener { showAddCourseDialog() }
+        // v40 — "Derslerim"e dokun → derslerin TAM SAYFA listesi (sıralama,
+        // kaynak sayısı, yaklaşan sınav uyarısı).
+        binding.coursesLabel.setOnClickListener {
+            try {
+                startActivity(CoursesActivity.newIntent(this))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "openCourses", t)
+            }
+        }
 
         // v16 (GÖREV 4) — "Kamu Malı Kitaplık" butonu KALDIRILDI (activity_main.xml):
         // PublicDomainDialog.show() çağrısı ve listener silindi.
@@ -194,6 +348,31 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 BookStore.logError(this, "vaultCard", t)
             }
         }
+
+        // v43 — KAMPÜS DUYURULARI: okul sitesindeki yenilikler
+        binding.btnCampus.setOnClickListener {
+            try {
+                startActivity(Intent(this, CampusActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "btnCampus", t)
+            }
+        }
+        // Arka plan takibi (6 saatte bir) + açılışta sessiz kontrol
+        try { CampusWorker.cancel(this) } catch (_: Throwable) { }
+        // v43.2 — Okul sitesi düz HTTP'yi 403 ile engelliyor; kontrol görünmez
+        // WebView ile yapılır (20 dk sınırlı, açılışta sessiz).
+        try {
+            CampusFeed.checkWithWebView(this, notify = true) { fresh ->
+                if (fresh > 0) updateCampusBadge()
+            }
+        } catch (_: Throwable) { }
+        updateCampusBadge()
+
+        // v44 — Aynı dersin yinelenen kayıtları (ör. "Tubitak_2209_A" ile
+        // "Tübitak 2209-A") açılışta birleştirilir; kaynaklar kaybolmaz.
+        try {
+            if (CourseStore.mergeDuplicateCourses(this) > 0) reload()
+        } catch (_: Throwable) { }
 
         // v13 (T8) — Tüm cihazı tara (SD kart dahil)
         binding.btnDeepScan.setOnClickListener {
@@ -240,6 +419,15 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         binding.continueCover.setOnClickListener { binding.btnContinue.performClick() }
         binding.continueCard.setOnClickListener { binding.btnContinue.performClick() }
         applyNeonFrames()
+        // v41 — "şu an dinlenen" dinamik kartı (Dersler ile En son okunan arasında)
+        setupNowPlaying()
+        // v42 — SEYİR DEFTERİ: uygulama açılışı
+        try {
+            SeyirDefteri.yaz(
+                this, "UYGULAMA", "açıldı",
+                "sürüm ${BuildConfig.VERSION_NAME} (kod ${BuildConfig.VERSION_CODE})"
+            )
+        } catch (_: Throwable) { }
 
         // v24 — sıralama çipleri: yalnız Alfabetik / En son eklenen
         binding.sortAlpha.setOnClickListener { setSort("alpha") }
@@ -498,6 +686,19 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             if (state != lastLampState) {
                 val prev = lastLampState
                 lastLampState = state
+                // v43 — LAMBANIN SEBEBİ SEYİR DEFTERİNE (kullanıcı isteği:
+                // "lambalar yandığında sebepleri ayrıca log'a da yazsın")
+                try {
+                    val reasons = DiagnosticTestManager
+                        .problemsText(DiagnosticTestManager.lastReport(this))
+                        .lines().filter { it.isNotBlank() }.take(3)
+                        .joinToString(" ‖ ")
+                    SeyirDefteri.yaz(
+                        this, "LAMBA", "durum: $state",
+                        "kırmızı=$fail · sarı=$warn · yeşil=$ok" +
+                            (if (reasons.isNotBlank()) " · $reasons" else "")
+                    )
+                } catch (_: Throwable) { }
                 when {
                     // Açılışta kırmızı varsa hemen duyur (uyarı için sessiz kal:
                     // her açılışta sarı bip çalmak gürültü olur).
@@ -544,6 +745,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         } catch (t: Throwable) {
             BookStore.logError(this, "MainActivity.onResume/reload", t)
         }
+        // v41 — "şu an dinlenen" kartını tazele (kitaplık yüklendikten sonra)
+        try { refreshNowPlaying() } catch (_: Throwable) { }
+        // v43 — Kampüs rozeti (yeni duyuru sayısı)
+        try { updateCampusBadge() } catch (_: Throwable) { }
         // v12: ana ekran widget'ını tazele (sıradaki ders bilgisi güncellensin)
         try { UmayWidgetProvider.refreshAll(this) } catch (_: Throwable) {}
         // v13 (T7): yaklaşan sınav varsa canlı geri sayım bildirimini sürdür
@@ -575,6 +780,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // raf dağılımı + her açılışta yeniden aktarım). Artık keşif yalnızca
         // "Cihaz Tarama & Dokümanlar" ekranında ve YALNIZCA kullanıcının
         // seçtiği dosyalarda yapılır (DeepDocumentPicker → importSelected).
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -670,6 +879,9 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v24 — "En son okunan" çerçeve animasyonu arka planda durur (pil)
         heroHandler.removeCallbacks(heroPulse)
         heroNeon?.setAnimated(false)
+        // v41 — "şu an dinlenen" ekolayzırı da arka planda durur
+        npHandler.removeCallbacks(npAnim)
+        try { npFrame?.setAnimated(false) } catch (_: Throwable) { }
     }
 
     // ── v24 — NEON ÇERÇEVELER ────────────────────────────────
@@ -691,6 +903,159 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
      * v24 — Araçlar paneline sabit neon çerçeve; "En son okunan" kartına
      * okuma DURURKEN sabit neon, sesli okuma SÜRERKEN hareketli neon çerçeve.
      */
+    // ══ v41 — "ŞU AN DİNLENEN" DİNAMİK KART ══════════════════════
+    //
+    // Kullanıcı isteği: ana sayfada o an çalışan okumayı görebilsin,
+    // durdurabilsin, sayfa ileri/geri atabilsin; ekolayzır çalışsın ve
+    // çerçeve çalarken ışıldasın. Kart yalnız açık bir kitap varken görünür.
+    private val npHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private var npFrame: NeonFrameDrawable? = null
+    private var npTickCount = 0
+
+    private val npAnim = object : Runnable {
+        override fun run() {
+            val np = binding.npInclude
+            val bars = listOf(np.npBar1, np.npBar2, np.npBar3, np.npBar4, np.npBar5, np.npBar6, np.npBar7)
+            val playing = AppPrefs.getBool(this@MainActivity, AppPrefs.KEY_PLAYING, false)
+            if (!playing) {
+                // Duraklatıldı: çubuklar sabit ve alçak — "dinamik durum durdu"
+                bars.forEachIndexed { i, v ->
+                    v.pivotY = v.height.toFloat()
+                    v.scaleY = 0.28f + ((i * 13) % 22) / 100f
+                    v.alpha = 0.45f
+                }
+                return
+            }
+            npTickCount++
+            bars.forEachIndexed { i, v ->
+                v.pivotY = v.height.toFloat()
+                val phase = (npTickCount * 0.45f) + i * 0.9f
+                val h = 0.22f + 0.78f * Math.abs(Math.sin(phase.toDouble())).toFloat()
+                v.scaleY = h
+                v.alpha = 0.75f + 0.25f * h
+            }
+            npHandler.postDelayed(this, 150L)
+        }
+    }
+
+    /** v43 — "Kampüs" düğmesinde yeni içerik sayısı. */
+    private fun updateCampusBadge() {
+        try {
+            val n = CampusFeed.newCount(this)
+            binding.btnCampus.text = if (n > 0) {
+                getString(R.string.campus_open) + "  ·  $n yeni"
+            } else {
+                getString(R.string.campus_open)
+            }
+        } catch (_: Throwable) { }
+    }
+
+    private fun setupNowPlaying() {
+        try {
+            val np = binding.npInclude
+            // Dinamik çerçeve: çalarken yanar-döner, durunca sabit
+            try {
+                val frame = NeonFrameDrawable(16f, 2.5f, NeonFrameDrawable.DEFAULT_PALETTE, false)
+                np.npCard.background = frame
+                npFrame = frame
+            } catch (_: Throwable) { }
+
+            np.npCard.setOnClickListener { openReaderForNowPlaying() }
+            np.npPlay.setOnClickListener {
+                val playing = AppPrefs.getBool(this, AppPrefs.KEY_PLAYING, false)
+                if (playing) {
+                    readCmd(ReadService.ACTION_TOGGLE)
+                    AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, false)
+                    npHandler.postDelayed({ refreshNowPlaying() }, 250L)
+                } else {
+                    // Servis kapalıysa okuyucu ekranını otomatik oynatmayla aç;
+                    // arka planda servis başlatıp foreground kuralına takılmayalım.
+                    openReaderForNowPlaying(autoPlay = true)
+                }
+            }
+            np.npPrev.setOnClickListener { readCmd(ReadService.ACTION_PREV); npHandler.postDelayed({ refreshNowPlaying() }, 500L) }
+            np.npNext.setOnClickListener { readCmd(ReadService.ACTION_NEXT); npHandler.postDelayed({ refreshNowPlaying() }, 500L) }
+            np.npStop.setOnClickListener {
+                if (AppPrefs.getBool(this, AppPrefs.KEY_PLAYING, false)) {
+                    readCmd(ReadService.ACTION_STOP)
+                }
+                AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, false)
+                npHandler.postDelayed({ refreshNowPlaying() }, 250L)
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "setupNowPlaying", t)
+        }
+    }
+
+    /** Karttaki kitabı (yoksa son okunanı) kaldığı yerden açar. */
+    private fun openReaderForNowPlaying(autoPlay: Boolean = false) {
+        val id = AppPrefs.getString(this, AppPrefs.KEY_LAST_BOOK)
+        val book = books.firstOrNull { it.id == id } ?: return
+        val (page, sentence) = AppPrefs.loadProgress(this, book.id) ?: Pair(0, 0)
+        AppPrefs.putString(this, AppPrefs.KEY_LAST_BOOK, book.id)
+        AppPrefs.touchLastRead(this, book.id)
+        startActivity(
+            Intent(this, ReaderActivity::class.java).apply {
+                putExtra(ReaderActivity.EXTRA_BOOK_ID, book.id)
+                putExtra(ReaderActivity.EXTRA_PAGE, page)
+                putExtra(ReaderActivity.EXTRA_SENTENCE, sentence)
+                if (autoPlay) putExtra(ReaderActivity.EXTRA_AUTO_PLAY, true)
+            }
+        )
+    }
+
+    private fun readCmd(action: String) {
+        try {
+            startService(
+                Intent(this, ReadService::class.java)
+                    .putExtra(ReadService.EXTRA_ACTION, action)
+            )
+        } catch (t: Throwable) {
+            BookStore.logError(this, "readCmd/$action", t)
+        }
+    }
+
+    /** Kartı kitaplık/progress durumuna göre tazeler. */
+    private fun refreshNowPlaying() {
+        try {
+            val np = binding.npInclude
+            val lastId = AppPrefs.getString(this, AppPrefs.KEY_LAST_BOOK)
+            val book = books.firstOrNull { it.id == lastId }
+                ?: books.firstOrNull { AppPrefs.lastRead(this, it.id) > 0L }
+            if (book == null) {
+                np.npCard.visibility = View.GONE
+                return
+            }
+            val playing = AppPrefs.getBool(this, AppPrefs.KEY_PLAYING, false)
+            val (page, _) = AppPrefs.loadProgress(this, book.id) ?: Pair(0, 0)
+            np.npCard.visibility = View.VISIBLE
+            np.npTitle.text = book.title
+            np.npMeta.text = getString(R.string.np_meta, page + 1, book.pageCount) + " · " +
+                getString(
+                    when {
+                        playing -> R.string.np_playing
+                        page > 0 -> R.string.np_paused
+                        else -> R.string.np_ready
+                    }
+                )
+            np.npPlay.setImageResource(if (playing) R.drawable.ic_pause else R.drawable.ic_play)
+            np.npCoverFallback.text = if (book.title.length > 24) book.title.take(24) + "…" else book.title
+            np.npCover.tag = book.id
+            np.npCover.setImageResource(R.drawable.ic_pdf)
+            loadCover(book.id) { bmp ->
+                if (np.npCover.tag == book.id && bmp != null) {
+                    np.npCover.setImageBitmap(bmp)
+                    np.npCoverFallback.text = ""
+                }
+            }
+            try { npFrame?.setAnimated(playing) } catch (_: Throwable) { }
+            npHandler.removeCallbacks(npAnim)
+            npHandler.post(npAnim)
+        } catch (t: Throwable) {
+            BookStore.logError(this, "refreshNowPlaying", t)
+        }
+    }
+
     private fun applyNeonFrames() {
         try {
             val toolsColors = intArrayOf(
@@ -812,7 +1177,14 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
 
     /** Ders rafını tazeler (kart yoksa satır gizlenir). */
     private fun reloadCourses() {
-        val items = CourseStore.courses(this)
+        // v40 — kullanıcının Dersler sayfasında belirlediği sıra ana ekrana da
+        // yansır (tek doğru kaynak: CourseOrder).
+        val items = try {
+            CourseOrder.apply(this, CourseStore.courses(this))
+        } catch (t: Throwable) {
+            BookStore.logError(this, "reloadCourses/order", t)
+            CourseStore.courses(this)
+        }
         binding.courseList.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
         binding.coursesEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
         (binding.courseList.adapter as? CoursesAdapter)?.submit(items)
@@ -926,14 +1298,14 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         }
         val lists = listOf(dersKitaplari, dersSlaytlar, cihangTaramalari)
         val libraryEmpty = all.isEmpty()
-        // v5.6 — Boş yerleşik raflar ekranı kaplamaz. Raflar yalnız hiçbirinde
-        // kitap yokken (yapı görünsün diye) boş hâliyle gösterilir.
-        val anyContent = lists.any { it.isNotEmpty() }
+        // v41 — BOŞ RAF GİZLENMEZ (kullanıcı: "ben silmeden bazı raflar
+        // kendiliğinden kayboldu"). Kök neden: buradaki eski kural, herhangi
+        // bir rafta kitap varsa DİĞER boş rafları gizliyordu. Artık üç yerleşik
+        // raf her zaman görünür; boşsa "Bu raf boş" ipucu ve ＋ düğmesi olur.
         shelfLists.forEachIndexed { index, rv ->
             (rv.adapter as? BooksAdapter)?.submit(lists[index])
             tintShelf(shelfViews[index], index)
-            val show = !libraryEmpty && (lists[index].isNotEmpty() || !anyContent)
-            shelfViews[index].visibility = if (show) View.VISIBLE else View.GONE
+            shelfViews[index].visibility = View.VISIBLE
             // Boş raf ipucu: başlık görünür kalsın, "Bu raf boş" yazısı açılır
             val hint = shelfViews[index].findViewById<TextView>(R.id.shelfEmptyHint)
             hint?.visibility = if (lists[index].isEmpty()) View.VISIBLE else View.GONE
@@ -949,6 +1321,59 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v20 (ADIM 3): Kullanıcının ShelfManager'dan eklediği ÖZEL raflar da
         // her applyFilter/reload çağrısında ANINDA yeniden çizilir.
         renderDynamicShelves(all, libraryEmpty)
+        // v41 — Rafların ana sayfadaki sırası kullanıcının "Raflarım"
+        // listesindeki sırasına göre uygulanır (▲▼).
+        applyShelfBlockOrder()
+    }
+
+    /**
+     * v41 — RAF SIRASI (ana sayfa).
+     *
+     * Üç yerleşik raf sabit XML bloklarıdır; özel raflar tek bir kapsayıcıda
+     * çizilir. Kullanıcı "Raflarım" ekranında ▲▼ ile sırayı değiştirdiğinde
+     * aynı sıra burada blok görünümlerini yeniden dizerek uygulanır.
+     * Favoriler bloğu en üstte kalır (özel raf değil).
+     */
+    private fun applyShelfBlockOrder() {
+        try {
+            val parent = binding.shelfDynamicWrap.parent as? android.view.ViewGroup ?: return
+            val blocks = linkedMapOf(
+                "shelf_ders_kitaplari" to binding.shelfDersKitaplari,
+                "shelf_ders_slayt_notlar" to binding.shelfDersSlaytNotlar,
+                "shelf_cihang_taramalari" to binding.shelfCihangTaramalari
+            )
+            val shelves = try { ShelfManager.shelvesOf(this) } catch (_: Throwable) { emptyList() }
+            // v42 — kullanıcının sildiği yerleşik rafın bloğu gizlenir (geri gelmez)
+            blocks.forEach { (id, v) ->
+                v.visibility = if (shelves.any { it.id == id }) View.VISIBLE else View.GONE
+            }
+            if (shelves.isEmpty()) {
+                binding.shelfDynamicWrap.visibility = View.GONE
+                return
+            }
+            val seq = ArrayList<android.view.View>(4)
+            var customPlaced = false
+            for (s in shelves) {
+                val b = blocks[s.id]
+                if (b != null) {
+                    if (b !in seq && b.visibility == View.VISIBLE) seq.add(b)
+                } else if (!customPlaced) {
+                    seq.add(binding.shelfDynamicWrap)
+                    customPlaced = true
+                }
+            }
+            if (!customPlaced) seq.add(binding.shelfDynamicWrap)
+            // Yeniden diz: önce çıkar, sonra hedef konuma ekle
+            seq.forEach { parent.removeView(it) }
+            var idx = parent.indexOfChild(binding.emptyText)
+            if (idx < 0) idx = parent.childCount
+            seq.forEach { v ->
+                parent.addView(v, idx)
+                idx++
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "applyShelfBlockOrder", t)
+        }
     }
 
     /**
@@ -984,8 +1409,17 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 onLongClick = { book -> showBookActions(book) },
                 loadCover = { id, cb -> loadCover(id, cb) },
                 accent = shelfNeonColor(3)
-            ).also { it.submit(ShelfManager.sortForShelf(this, books)) }
+            ).also { it.submit(ShelfManager.shelfBooks(this, ShelfManager.SHELF_FAVORITES, all)) }
             binding.shelfFavorites.getChildAt(0)?.let { wireShelfArrows(it, rv) }
+            // v40 — başlığa dokun → favoriler rafının sayfası
+            binding.shelfFavorites.getChildAt(0)?.apply {
+                setOnClickListener {
+                    openShelfDetail(ShelfManager.SHELF_FAVORITES, getString(R.string.favorilerim))
+                }
+                findViewById<TextView>(R.id.shelfAdd)?.setOnClickListener {
+                    openShelfDetail(ShelfManager.SHELF_FAVORITES, getString(R.string.favorilerim))
+                }
+            }
             tintShelf(binding.shelfFavorites, 3)
             binding.shelfFavorites.visibility = View.VISIBLE
         } catch (t: Throwable) {
@@ -1019,10 +1453,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             }
             val byId = all.associateBy { it.id }
             custom.forEachIndexed { sIdx, shelf ->
-                val booksOfShelf = shelf.bookIds.mapNotNull { byId[it] }
-                // v5.6 — İçi boş özel raf ana ekranı kaplamaz ("Bu raf boş"
-                // bantları üst üste biniyordu); yönetim: Rafları Düzenle.
-                if (booksOfShelf.isEmpty()) return@forEachIndexed
+                // v40 — Boş raf ARTIK GİZLENMEZ (kullanıcı: "rafta bir şey
+                // yoksa raf saklanmamalı görünebilmeli, oraya da ekleyebilmeliyiz").
+                // Başlıktaki ＋ ve raf sayfası kaynak eklemeyi sunar.
+                val booksOfShelf = ShelfManager.shelfBooks(this, shelf.id, all)
                 val block = layoutInflater
                     .inflate(R.layout.item_dynamic_shelf, container, false)
                 tintShelf(block, 4 + sIdx)
@@ -1052,9 +1486,14 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                     onLongClick = { book -> showBookActions(book) },
                     loadCover = { id, cb -> loadCover(id, cb) },
                     accent = shelfNeonColor(4 + sIdx)
-                ).also { it.submit(ShelfManager.sortForShelf(this, booksOfShelf)) }
+                ).also { it.submit(booksOfShelf) }
                 // v5.6 — özel rafın başlığındaki ‹ › okları
                 wireShelfArrows(header, rv)
+                // v40 — raf başlığı → raf sayfası (kapak + sıralama + ekleme)
+                header.setOnClickListener { openShelfDetail(shelf.id, shelf.name) }
+                header.findViewById<TextView>(R.id.shelfAdd)?.setOnClickListener {
+                    openShelfDetail(shelf.id, shelf.name)
+                }
                 container.addView(block)
             }
             container.visibility = View.VISIBLE
@@ -1461,7 +1900,60 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             .show()
     }
 
+    /**
+     * v44 — YALNIZ DEBUG: `Download/UmayKaynak` klasörünü sessizce aktarır.
+     * Amaç: hazırlanan kaynak klasörlerini (ör. TÜBİTAK 2209-A, ders proje
+     * yönergeleri) telefonda tek komutla kütüphaneye/derslere almak.
+     */
+    private fun maybeAutoImportPool(i: android.content.Intent?) {
+        if (i?.getBooleanExtra("auto_import_pool", false) != true) return
+        val dir = java.io.File(FolderImporter.DEFAULT_DIR)
+        if (!dir.isDirectory) {
+            Toast.makeText(this, "Klasör yok: ${dir.absolutePath}", Toast.LENGTH_LONG).show()
+            return
+        }
+        val dlg = android.app.ProgressDialog(this).apply {
+            setMessage("İçe aktarılıyor…")
+            setCancelable(false)
+            show()
+        }
+        try {
+            FolderImporter.run(this, dir, { name, done, total ->
+                runOnUiThread { try { dlg.setMessage("$done/$total\n$name") } catch (_: Throwable) {} }
+            }) { rep ->
+                runOnUiThread {
+                    try { dlg.dismiss() } catch (_: Throwable) {}
+                    val msg = "eklenen=${rep.imported} · zaten var=${rep.existing} · " +
+                        "hata=${rep.failed} · eşleşmeyen=${rep.unmatched.size}"
+                    try { SeyirDefteri.yaz(this, "İÇE AKTARMA", "toplu aktarma", msg) } catch (_: Throwable) {}
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+                    try { reload() } catch (_: Throwable) {}
+                }
+            }
+        } catch (t: Throwable) {
+            try { dlg.dismiss() } catch (_: Throwable) {}
+            BookStore.logError(this, "autoImportPool", t)
+        }
+    }
+
+    /** v40 — Raf detay sayfası (kapaklar, dosya bilgisi, sıralama, kaynak ekle). */
+    private fun openShelfDetail(shelfId: String, shelfName: String) {
+        try {
+            startActivity(ShelfDetailActivity.newIntent(this, shelfId, shelfName))
+        } catch (t: Throwable) {
+            BookStore.logError(this, "openShelfDetail", t)
+        }
+    }
+
     private fun openReader(bookId: String, page: Int, sentence: Int) {
+        // v42 — SEYİR DEFTERİ: hangi kitap, hangi sayfadan açıldı
+        try {
+            val b = books.firstOrNull { it.id == bookId }
+            SeyirDefteri.yaz(
+                this, "OKUMA", "kitap açıldı",
+                "${b?.title ?: bookId} · sayfa ${page + 1}/${b?.pageCount ?: 0}"
+            )
+        } catch (_: Throwable) { }
         AppPrefs.putString(this, AppPrefs.KEY_LAST_BOOK, bookId)
         AppPrefs.touchLastRead(this, bookId)   // "Son okunan" sıralaması için
         startActivity(
@@ -1481,6 +1973,14 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 BookStore.deleteBook(this, book.id)
                 // v5.5: favori listesinde asılı kalmasın
                 FavoritesStore.onBookDeleted(this, book.id)
+                // v42 — SEYİR DEFTERİ: "sildim ama silinmedi" durumu da görünsün
+                try {
+                    val gone = BookStore.loadBooks(this).none { it.id == book.id }
+                    SeyirDefteri.dogrula(
+                        this, "KÜTÜPHANE", "kitap silindi",
+                        ok = gone, ayrinti = "${book.title} (${book.pageCount} sayfa)"
+                    )
+                } catch (_: Throwable) { }
                 reload()
                 // v6 — onay bildirimi (Aşama 3): liste anında güncellenir + Snackbar
                 try {
@@ -1551,9 +2051,36 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
 
     // ── Liste ────────────────────────────────────────────────
 
+    /**
+     * v45 — YANIP SÖNEN UYARI (Handler ile; animasyon ölçeği 0 olan cihazlarda da
+     * çalışır — lamba dersinde öğrenilen ders).
+     */
+    private val blinkHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val blinking = java.util.WeakHashMap<android.view.View, Runnable>()
+
+    private fun setBlink(v: android.view.View, on: Boolean) {
+        try {
+            blinking.remove(v)?.let { blinkHandler.removeCallbacks(it) }
+            if (!on) {
+                v.alpha = 1f
+                return
+            }
+            val run = object : Runnable {
+                override fun run() {
+                    v.alpha = if (v.alpha < 0.85f) 1f else 0.35f
+                    blinkHandler.postDelayed(this, 620L)
+                }
+            }
+            blinking[v] = run
+            blinkHandler.post(run)
+        } catch (_: Throwable) { }
+    }
+
     /** Ders kartı rafı (ADIM 2): isim + istatistik + sıradaki ders bilgisi. */
     class CoursesAdapter(
-        val onClick: (Course) -> Unit
+        val onClick: (Course) -> Unit,
+        /** v45 — yaklaşan sınav uyarısı yanıp sönsün (lamba dersindeki Handler deseni). */
+        private val blink: (TextView, Boolean) -> Unit = { _, _ -> }
     ) : RecyclerView.Adapter<CoursesAdapter.VH>() {
 
         private var items: List<Course> = emptyList()
@@ -1573,6 +2100,39 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             VH(LayoutInflater.from(parent.context).inflate(R.layout.item_course, parent, false))
 
         override fun getItemCount() = items.size
+
+        /**
+         * v45 — En yakın sınav/ödev (7 gün içinde) → (etiket, gün).
+         * Ders kartında yanıp sönen uyarı metni için kullanılır.
+         */
+        private fun nearestDeadline(
+            ctx: android.content.Context,
+            courseId: String,
+            now: Long
+        ): Pair<String, Int>? {
+            var label: String? = null
+            var days = Int.MAX_VALUE
+            try {
+                CourseStore.examsOf(ctx, courseId).forEach { e ->
+                    val d = Academy.daysLeft(e.atMillis, now)
+                    if (d in 0..7 && d < days) {
+                        days = d
+                        label = e.type.ifBlank { ctx.getString(R.string.sinavlar_baslik) }
+                    }
+                }
+                CourseStore.homeworkOf(ctx, courseId).forEach { h ->
+                    if (h.done) return@forEach
+                    val d = Academy.daysLeft(h.dueMillis, now)
+                    if (d in 0..7 && d < days) {
+                        days = d
+                        label = ctx.getString(R.string.ders_odev_kisa)
+                    }
+                }
+            } catch (_: Throwable) {
+            }
+            val l = label ?: return null
+            return l to days
+        }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val course = items[position]
@@ -1600,8 +2160,17 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 .filter { it.courseId == course.id }
                 .map { it to Academy.nextOccurrence(it.day, it.minuteOfDay, now) }
                 .minByOrNull { it.second }
-            if (next != null) {
+            // v45 — YAKLAŞAN SINAV/PROJE: 1 haftadan az kaldıysa uyarı
+            // metni yanıp söner (kullanıcı isteği: "sınavın var yazısı yanıp sönsün").
+            val soon = nearestDeadline(ctx, course.id, now)
+            if (soon != null) {
                 holder.next.visibility = View.VISIBLE
+                holder.next.setTextColor(androidx.core.content.ContextCompat.getColor(ctx, R.color.umay_orange))
+                holder.next.text = ctx.getString(R.string.ders_uyari_yaklasan, soon.first, soon.second)
+                blink(holder.next, true)
+            } else if (next != null) {
+                holder.next.visibility = View.VISIBLE
+                holder.next.setTextColor(androidx.core.content.ContextCompat.getColor(ctx, R.color.umay_accent))
                 holder.next.text = ctx.getString(
                     R.string.sonraki_ders,
                     // (v16) Adaptör iç içe sınıftır (`inner` değil) → dış Activity
@@ -1609,8 +2178,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                     Academy.dayName(next.first.day, LangHelper.isEnglish(ctx)),
                     Academy.formatClock(next.first.minuteOfDay)
                 )
+                blink(holder.next, false)
             } else {
                 holder.next.visibility = View.GONE
+                blink(holder.next, false)
             }
 
             holder.itemView.setOnClickListener { onClick(course) }

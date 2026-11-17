@@ -74,6 +74,23 @@ object FavoritesStore {
     /** Sıralamayı kullanıcının verdiği sıraya göre kaydeder. */
     fun reorder(ctx: Context, orderedIds: List<String>) = save(ctx, orderedIds)
 
+    /**
+     * v41 — SİLİNMİŞ KİTAP KAYITLARINI TEMİZLE.
+     * Kitap silinince favori kimliği düşürülüyordu ama eski kayıtlarda
+     * (ör. kitaplık sıfırlanmadan önce) "hayalet" kimlik kalabiliyor ve
+     * tanılama "1 geçersiz" uyarısı üretiyordu.
+     * @return temizlenen kayıt sayısı
+     */
+    fun prune(ctx: Context?, validIds: Collection<String>): Int {
+        if (ctx == null) return 0
+        val list = ids(ctx)
+        val before = list.size
+        list.removeAll { it !in validIds }
+        val removed = before - list.size
+        if (removed > 0) save(ctx, list)
+        return removed
+    }
+
     /** Kitap silindiğinde favori listesinden de düşür. */
     fun onBookDeleted(ctx: Context, bookId: String) = remove(ctx, bookId)
 }

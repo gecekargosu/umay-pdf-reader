@@ -24,7 +24,17 @@ object PrepAudit {
         ARABIC("Arapça ağırlıklı sayfa")
     }
 
-    data class Issue(val page: Int, val kind: Kind, val note: String)
+    /**
+     * v41 — `bookId` eklendi: kayıt dosyasında kitap kimliği zaten yazılıyordu
+     * ama okunurken atılıyordu, bu yüzden tanılama "hangi kitapta sorun var?"
+     * sorusunu cevaplayamıyordu. Artık lamba/uyarı kitabı adıyla söylenebilir.
+     */
+    data class Issue(
+        val page: Int,
+        val kind: Kind,
+        val note: String,
+        val bookId: String = ""
+    )
 
     data class Report(
         val bookId: String,

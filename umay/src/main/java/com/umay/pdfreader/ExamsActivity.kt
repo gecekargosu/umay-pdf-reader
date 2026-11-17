@@ -491,7 +491,9 @@ class ExamsActivity : AppCompatActivity() {
     private fun kindLabel(kind: String): String = getString(
         when (kind) {
             "quiz" -> R.string.not_turu_quiz
+            "quiz2" -> R.string.not_turu_quiz2
             "final" -> R.string.not_turu_final
+            "butunleme" -> R.string.not_turu_butunleme
             "proje" -> R.string.not_turu_proje
             else -> R.string.not_turu_vize
         }

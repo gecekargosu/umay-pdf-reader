@@ -212,6 +212,9 @@
     <string name="ders_sil_soru">Bu ders ve tüm kayıtları (kaynaklar, ödevler, sınavlar, program satırları) silinsin mi? Kitaplar silinmez.</string>
     <string name="ders_istatistik">%1$d kaynak • %2$d ödev • %3$d sınav</string>
     <string name="sonraki_ders">Sıradaki: %1$s %2$s</string>
+    <!-- v45 — 1 haftadan az kalan sınav/ödev: ders kartında yanıp söner -->
+    <string name="ders_uyari_yaklasan">⏰ %1$s: %2$d gün</string>
+    <string name="ders_odev_kisa">Ödev</string>
     <string name="kaynaklar">Ders Kaynakları</string>
     <string name="kaynak_ekle">＋ Kaynak Ekle</string>
     <string name="kaynak_bos">Bu derse henüz kaynak eklenmedi. Kütüphanedeki kitapları seç.</string>
@@ -264,8 +267,10 @@
     <string name="sinav_sil">Sınavı sil</string>
     <string name="ders_yok_uyari">Önce Derslerim bölümünden bir ders ekle.</string>
     <string name="not_turu_vize">Vize</string>
-    <string name="not_turu_quiz">Quiz</string>
+    <string name="not_turu_quiz">Quiz 1</string>
+    <string name="not_turu_quiz2">Quiz 2</string>
     <string name="not_turu_final">Final</string>
+    <string name="not_turu_butunleme">Bütünleme</string>
     <string name="not_turu_proje">Proje</string>
     <!-- v16 (GÖREV 5) — Excel tarzı matris tablo (günler × saatler) -->
     <string name="program_tablo">⬜ Tablo Görünümü (Excel Tarzı)</string>
@@ -730,7 +735,10 @@
     <string name="sec_gorunum">GÖRÜNÜM &amp; KİŞİSEL</string>
     <string name="sec_yapayzeka">YAPAY ZEKÂ</string>
     <string name="sec_kisisel">KİŞİSEL &amp; UYGULAMA</string>
-    <string name="sec_veri">VERİ, YEDEK &amp; GÜVENLİK</string>
+    <string name="sec_veri">VERİLERİM</string>
+    <!-- v45 — Ayarlar düzeni: güvenlik ve bakım/teşhis ayrı başlıklara taşındı -->
+    <string name="sec_guvenlik">GÜVENLİK</string>
+    <string name="sec_bakim">BAKIM VE TEŞHİS</string>
     <string name="ekran_acik_kalsin">Ekran açık kalsın (okurken kapanmasın)</string>
     <string name="ay_apk_kuruluyor">%1$s kurulum ekranına hazırlanıyor…</string>
     <string name="ay_surum">Sürüm %1$s</string>
@@ -748,6 +756,87 @@
     <string name="ayar_prep_acildi">Ön hazırlık açıldı (şarjda + cihaz boşta)</string>
     <string name="ayar_prep_kapandi">Ön hazırlık kapatıldı</string>
     <string name="ayar_lamp_ses">Lamba uyarı sesi</string>
+
+    <!-- v36.9 — bozuk belge onarımı -->
+    <string name="onar_satir">Bozuk belgeleri onar (orijinal klasörden)</string>
+    <string name="onar_baslik">Bozuk belgeleri onar</string>
+    <string name="onar_aciklama">Bazı DOCX/PPTX kitapları eski bir sürümde yanlış çevrildiği için sesli okumada anlamsız şeyler söylüyor. Bu işlem, orijinal dosyaları bulup o kitapları SİLMEDEN yeniden üretir (okuma yüzdesi ve ders bağı korunur).\n\nTaranacak klasörler:\n%1$s</string>
+    <string name="onar_basla">Onar</string>
+    <string name="onar_klasor_yok">Orijinal belge klasörü bulunamadı. Dosyaları telefonun Download/UmayKaynak klasörüne kopyalayıp tekrar dene.</string>
+    <string name="onar_calisiyor">Belgeler onarılıyor…</string>
+    <string name="onar_bitti">Onarım bitti</string>
+    <string name="onar_sonuc">%1$s</string>
+    <!-- v5.14 — sınav geri sayımı bildirimi (kapatılabilir) -->
+    <string name="ayar_sinav_sayaci">Sınav geri sayımı</string>
+    <string name="ayar_sinav_sayaci_acik">Sınav sayacı: AÇIK — sessiz bildirim</string>
+    <string name="ayar_sinav_sayaci_kapali">Sınav sayacı: KAPALI</string>
+    <string name="ayar_sinav_sayaci_acildi">Sınav geri sayımı açıldı</string>
+    <string name="ayar_sinav_sayaci_kapandi">Sınav geri sayımı kapatıldı</string>
     <string name="ayar_lamp_ses_acik">Lamba sesi: AÇIK — sarı/kırmızıda bip</string>
     <string name="ayar_lamp_ses_kapali">Lamba sesi: KAPALI</string>
+
+    <!-- v37 — DOCX/PPTX kitaplarını kaldır + orijinalinden yeniden yükle -->
+    <string name="reload_satir">Belgeleri sıfırdan yükle (DOCX/PPTX)</string>
+    <string name="reload_baslik">Belgeleri sıfırdan yükle</string>
+    <string name="reload_aciklama">Kütüphanedeki DOCX/PPTX/DOC/PPT kitapları KALDIRILIR ve orijinal klasörden yeniden aktarılır. PDF\'ler ve diğer kitaplar korunur.\n\nKaldırılacak belge: %1$d\nKlasör: %2$s\n\nBu belgelerin okuma konumu sıfırlanır; ders bağlantıları yeniden kurulur.</string>
+    <string name="reload_klasor_yok">Orijinal belge klasörü bulunamadı. Dosyaları telefonun Download/UmayKaynak klasörüne kopyalayıp tekrar dene.</string>
+    <string name="reload_basla">Yükle</string>
+    <string name="reload_calisiyor">Belgeler yeniden yükleniyor…</string>
+    <string name="reload_bitti">Yeniden yükleme bitti</string>
+    <string name="reload_sonuc">%1$s</string>
+    <string name="diag_doc_convert">Belge dönüşümü</string>
+    <string name="reload_tumu">Tümü (Kur\'an hariç)</string>
+    <string name="reload_tumu_baslik">Kütüphaneyi sıfırla ve klasörden yükle</string>
+    <string name="reload_tumu_aciklama">Kur\'an dışındaki TÜM kitaplar (PDF dâhil) KALDIRILIR ve klasörden yeniden aktarılır.\n\nMevcut kitap: %1$d\nKlasör: %2$s\n\nNot: DOCX/PPTX dosyaları ARTIK PDF\'e çevrilmez; orijinali saklanır. Slayt/doküman uygulama içinde kendi metni ve resimleriyle görüntülenir; tam birebir görünüm için "Orijinali aç" kullanılır.</string>
+    <string name="doc_metin_uyari">%1$s metne dönüştürüldü: grafik/şekil korunmaz. Tam görünüm için PDF yükleyin.</string>
+    <string name="doc_sayfa_bos">(bu sayfada metin yok)</string>
+    <string name="doc_harici_ac">Orijinali aç</string>
+    <string name="doc_harici_yok">Cihazda bu belgeyi açabilecek uygulama bulunamadı (PowerPoint / Google Slides / WPS).</string>
+    <string name="dedup_satir">Mükerrer kitapları temizle (birebir aynı dosya)</string>
+    <string name="dedup_baslik">Mükerrer temizliği</string>
+    <string name="dedup_aciklama">Yalnızca İÇERİĞİ BİREBİR AYNI olan dosyalar kopya sayılır (SHA-256). Aynı adlı ama farklı sayfalı dosyalara dokunulmaz. Her gruptan en eski kayıt korunur; kopyalar silinir (okuma konumu, ders bağı ve raf kaydı da temizlenir).</string>
+    <string name="dedup_temiz">Mükerrer kopya yok.</string>
+    <string name="raf_onar_satir">Rafları onar (boş rafları yeniden doldur)</string>
+    <string name="raf_onar_bitti">Raflar onarıldı: %1$d raf · %2$d kitap yerleştirildi</string>
+    <string name="raf_onar_bos">Raflarda onarılacak bir şey yok.</string>
+    <string name="doc_gorsel">Görsel</string>
+    <string name="doc_metin">Metin</string>
+    <string name="doc_gorsel_yok">Bu biçim için görsel önizleme yok (yalnız eski DOC/PPT). Orijinali açabilirsin.</string>
+
+    <!-- v40 — RAF DETAY SAYFASI -->
+    <string name="raf_kaynak_ekle">＋ Kaynak ekle</string>
+    <string name="raf_bos">Bu rafta henüz dosya yok</string>
+    <string name="raf_bos_ipucu">“Kaynak ekle” ile telefondan dosya seçebilirsin.</string>
+    <string name="raftan_kaldir">Raftan kaldır</string>
+    <string name="dosya_ekle">Dosya ekle</string>
+    <string name="dosya_bilgisi">Dosya bilgisi</string>
+    <string name="yukari_tasi">Yukarı taşı</string>
+    <string name="asagi_tasi">Aşağı taşı</string>
+    <string name="raf_kitap_sayisi">%1$d dosya · %2$s</string>
+    <string name="raf_sira_kaydedildi">Sıra kaydedildi</string>
+    <string name="ders_satir_ozet">%1$d kaynak · %2$d sınav</string>
+    <!-- v41 — ana sayfa "şu an dinlenen" kartı -->
+    <string name="np_tap_hint">Sayfayı görmek için dokun</string>
+    <string name="np_meta">Sayfa %1$d / %2$d</string>
+    <string name="np_playing">şu an okunuyor</string>
+    <string name="np_paused">duraklatıldı</string>
+    <string name="np_ready">dinlemeye hazır</string>
+
+    <!-- v42 — Seyir Defteri (otomatik günlük) -->
+    <string name="seyir_defteri">Seyir Defteri (program günlüğü)</string>
+    <string name="seyir_bos">Henüz kayıt yok. Programı kullandıkça buraya yazılır.</string>
+    <string name="seyir_temizle">Defteri temizle</string>
+    <string name="seyir_kopyala">Kopyala</string>
+    <string name="seyir_kapandi">Seyir Defteri temizlendi</string>
+
+    <!-- v43 — Kampüs duyuruları -->
+    <string name="campus_title">🏫 Kampüs Duyuruları</string>
+    <string name="campus_refresh">Yenile</string>
+    <string name="campus_hint">Okul sitesindeki son duyuru ve haberler — siteye gitmeden.</string>
+    <string name="campus_loading">İnternetten kontrol ediliyor…</string>
+    <string name="campus_new">%1$d yeni içerik bulundu</string>
+    <string name="campus_empty">Henüz kayıt yok. İnternete bağlıyken "Yenile"ye bas.</string>
+    <string name="campus_uptodate">Yeni içerik yok — liste güncel.</string>
+    <string name="campus_close">Kapat</string>
+    <string name="campus_open">🏫 Kampüs Duyuruları</string>
 </resources>

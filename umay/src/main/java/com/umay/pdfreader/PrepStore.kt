@@ -65,7 +65,8 @@ object PrepStore {
                     PrepAudit.Issue(
                         page = o.optInt("page", 0),
                         kind = kind,
-                        note = o.optString("note", "")
+                        note = o.optString("note", ""),
+                        bookId = o.optString("book", "")
                     )
                 )
             }
@@ -147,6 +148,29 @@ object PrepStore {
             ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
                 .putString(KEY_SIGS, all.toString()).apply()
         } catch (_: Throwable) {
+        }
+    }
+
+    /**
+     * v44 — KİTAP SİLİNDİ: o kitabın "okunamaz sayfa" kayıtları da düşsün.
+     *
+     * Kullanıcı 40+ belgeyi silmesine rağmen tanılamada "silinmiş kitap: 3
+     * sayfa" satırları kalıyor, sarı lamba boşuna yanıyordu.
+     */
+    fun forgetBook(ctx: Context, bookId: String) {
+        try {
+            val f = issuesFile(ctx)
+            if (!f.exists() || f.length() == 0L) return
+            val arr = try { JSONArray(f.readText()) } catch (_: Throwable) { return }
+            val kept = JSONArray()
+            for (i in 0 until arr.length()) {
+                val o = arr.optJSONObject(i) ?: continue
+                if (o.optString("book") == bookId) continue
+                kept.put(o)
+            }
+            if (kept.length() != arr.length()) atomicWrite(f, kept.toString())
+        } catch (t: Throwable) {
+            BookStore.logError(ctx, "PrepStore.forgetBook", t)
         }
     }
 

@@ -87,7 +87,11 @@ object TextUtil {
         val textOnly = if (pageText.contains('\n')) {
             pageText.lines().filterNot { looksLikeCodeLine(it) }.joinToString("\n")
         } else pageText
-        val cleaned = normalizeArabic(textOnly)
+        // v40 — SATIR SONUNDA BÖLÜNEN KELİME (kullanıcı bildirimi):
+        // "proje gel-" + "iştiriyorlar" iki kelime gibi okunuyordu. Birleştirme
+        // cümle parçalamadan ÖNCE yapılmalı; sonra yapılırsa parça ikiye
+        // bölünmüş hâliyle kalır.
+        val cleaned = dehyphenate(normalizeArabic(textOnly))
             .replace(Regex("[ \\t]+"), " ")
             .replace(Regex("\\n{2,}"), "\n")
             .trim()
@@ -182,6 +186,20 @@ object TextUtil {
         s.lowercase(trLocale)
             .replace("ı", "i").replace("ş", "s").replace("ğ", "g")
             .replace("ç", "c").replace("ö", "o").replace("ü", "u")
+
+    /**
+     * v44 — EŞLEŞTİRME ANAHTARI.
+     *
+     * Gerçek olay: klasör `Tubitak_2209_A`, ders `Tübitak 2209-A`. Alt çizgi ve
+     * tire yüzünden isim eşleşmedi → 59 dosya kütüphaneye girdi ama derse
+     * bağlanmadı (TÜBİTAK rafı boş göründü). Noktalama/alt çizgi/tire boşluğa
+     * çevrilir: `tubitak 2209 a` == `tubitak 2209 a`.
+     */
+    fun matchKey(s: String): String =
+        normalize(s)
+            .replace(Regex("[^a-z0-9 ]"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
 
     /** Küçük Türkçe-İngilizce stopword listesi. */
     private val stop = setOf(
@@ -303,6 +321,65 @@ object TextUtil {
     /** Boşluk kümelerini tek boşluğa indirger (eşleştirme anahtarı). */
     fun collapseWs(s: String): String = s.replace(Regex("\\s+"), " ").trim()
 
+    /** Tire benzeri karakterler: düz tire + Unicode tire/işaretleri. */
+    private fun isHyphenChar(c: Char): Boolean =
+        c == '-' || c == '\u2010' || c == '\u2011' ||
+            // v44 — PDF'ler satır sonunda sık sık uzun tire kullanır (— / –)
+            c == '\u2012' || c == '\u2013' || c == '\u2014' || c == '\u2212'
+
+    /**
+     * v40 — SATIR SONU TİRE BİRLEŞTİRME (kullanıcı bildirimi, P0).
+     *
+     * PDF'te bir kelime satır sonunda bölünüyor:
+     * ```
+     * Freebuff ve Cengiz proje gel-
+     * iştiriyorlar
+     * ```
+     * TTS bunu iki ayrı kelime gibi okuyup araya duraklama koyuyor, cümle
+     * anlaşılmaz hâle geliyordu. Burada YALNIZCA şu kalıp birleştirilir:
+     *   harf + tire + (boşluk/satır sonu) + KÜÇÜK harf
+     * Böylece gerçek tireli ifadeler korunur:
+     *  • `yapay-zeka`  (tireden sonra boşluk yok)
+     *  • `2020-2024`   (tireden sonra rakam var)
+     *  • `Türk-Alman`  (tireden sonra büyük harf var)
+     * Ayrıca görünmez yumuşak tire (U+00AD) her yerde silinir.
+     *
+     * Ekrandaki metin DEĞİŞMEZ — yalnız seslendirilen metin ve karaoke
+     * eşleştirmesi bu normalleştirmeyi kullanır.
+     */
+    fun dehyphenate(text: String): String {
+        if (text.isEmpty()) return text
+        if (text.indexOf('\u00AD') < 0 && text.none { isHyphenChar(it) }) return text
+        val sb = StringBuilder(text.length)
+        var i = 0
+        val n = text.length
+        while (i < n) {
+            val c = text[i]
+            if (c == '\u00AD') { i++; continue }   // görünmez tire: tamamen at
+            if (isHyphenChar(c)) {
+                // Geriye bak: "gel-" gibi bitişik mi, "gel -" gibi arada boşluk var mı?
+                var b = sb.length - 1
+                var sawSpace = false
+                while (b >= 0 && sb[b].isWhitespace()) { b--; sawSpace = true }
+                val prevIsLetter = b >= 0 && sb[b].isLetter()
+                // İleriye bak: araya boşluk/satır sonu girmiş mi?
+                var j = i + 1
+                var gap = false
+                while (j < n && text[j].isWhitespace()) { j++; gap = true }
+                // Bölünmüş kelime: harf + tire + (boşluk/satır sonu) + KÜÇÜK harf
+                // ("2020-2024", "yapay-zeka", "Türk-Alman" korunur)
+                if (prevIsLetter && (gap || sawSpace) && j < n && text[j].isLowerCase()) {
+                    sb.setLength(b + 1)   // aradaki boşluklar da atılır → kelime birleşir
+                    i = j
+                    continue
+                }
+            }
+            sb.append(c)
+            i++
+        }
+        return sb.toString()
+    }
+
     /**
      * Seslendirilen parça (chunk) hangi satırların üzerinden geçiyor?
      * Karaoke vurgusu için: dönen değer [lineTexts] içindeki 0 tabanlı
@@ -310,18 +387,40 @@ object TextUtil {
      * kutular eksik olabilir → eşleşme yoksa boş liste (vurgusuz devam).
      */
     fun matchingLines(chunk: String, lineTexts: List<String>): List<Int> {
-        val target = collapseWs(chunk)
+        // v40 — seslendirilen parça artık satır sonu tirelerinden arındırılmış
+        // olabilir ("geliştiriyorlar"); satırlarda ise "gel-" + "iştiriyorlar"
+        // duruyor. İki taraf da aynı normalleştirmeden geçmezse karaoke
+        // vurgusu o parçada kayboluyordu.
+        val target = dehyphenate(collapseWs(chunk))
         if (target.isEmpty() || lineTexts.isEmpty()) return emptyList()
 
-        // Satırları tek boşlukla birleştir; her satırın aralığını tut
-        val joined = StringBuilder()
-        val starts = IntArray(lineTexts.size)
-        val ends = IntArray(lineTexts.size)
-        lineTexts.forEachIndexed { i, raw ->
-            if (joined.isNotEmpty()) joined.append(' ')
-            starts[i] = joined.length
-            joined.append(collapseWs(raw))
-            ends[i] = joined.length
+        // Satır metinlerini birleştir ve tire birleştirmesini SATIR SINIRINI
+        // KORUYARAK uygula; böylece her karakterin hangi satıra ait olduğunu
+        // bilmeye devam ederiz.
+        val raw = StringBuilder()
+        val rawOwner = ArrayList<Int>(lineTexts.sumOf { it.length + 1 })
+        // Satırlar TEK BOŞLUKLA birleştirilir (eski davranış): cümle iki satıra
+        // yayıldığında da eşleşsin. Satır sonunda kalan tire ("gel- ")
+        // aşağıdaki döngüde birleştirilir; sahibi (owner) korunur.
+        lineTexts.forEachIndexed { i, s ->
+            if (raw.isNotEmpty()) { raw.append(' '); rawOwner.add(i) }
+            val t = collapseWs(s)
+            for (ch in t) { raw.append(ch); rawOwner.add(i) }
+        }
+        val joined = StringBuilder(raw.length)
+        val owner = ArrayList<Int>(raw.length)
+        var k = 0
+        while (k < raw.length) {
+            val c = raw[k]
+            if (c == '\u00AD') { k++; continue }
+            if (isHyphenChar(c) && joined.isNotEmpty() && joined.last().isLetter()) {
+                var j = k + 1
+                while (j < raw.length && (raw[j] == ' ' || raw[j] == '\n' || raw[j] == '\t')) j++
+                if (j > k + 1 && j < raw.length && raw[j].isLowerCase()) { k = j; continue }
+            }
+            joined.append(c)
+            owner.add(rawOwner[k])
+            k++
         }
         val hay = joined.toString()
 
@@ -332,11 +431,10 @@ object TextUtil {
         }
         if (at < 0) return emptyList()
 
-        val end = at + target.length
+        val end = (at + target.length).coerceAtMost(owner.size)
         val hit = mutableSetOf<Int>()
-        for (i in lineTexts.indices) {
-            // [starts[i], ends[i]) aralığı [at, end) ile kesişiyorsa
-            if (starts[i] < end && ends[i] > at) hit.add(i)
+        for (p in at until end) {
+            if (p in owner.indices) hit.add(owner[p])
         }
         return hit.toList().sorted()
     }
@@ -776,9 +874,12 @@ object TextUtil {
      */
     fun forSpeech(raw: String): String {
         if (raw.isEmpty()) return raw
+        // v40 — satır sonunda bölünmüş kelime ("gel-" + "iştiriyorlar")
+        // her ses yolunda birleştirilir; yalnız speechChunks'a bırakmak
+        // AI özet/çeviri gibi diğer yolları açıkta bırakıyordu.
         // v16 (YENİ GÖREV 7): önce formül sanitizasyonu (LaTeX → düz metin),
         // ardından karakter süzgeci SpeechSafe dahil edilmiş hâlde devam eder.
-        var s = sanitizeText(raw)
+        var s = sanitizeText(dehyphenate(raw))
 
         // HTML/XML etiketleri tamamen çık (matematikte < harfle başlamaz:
         // "n<10" gibi ifadelere dokunmaz)

@@ -217,6 +217,8 @@
     <string name="ders_sil_soru">Delete this course and all its records (resources, homework, exams, schedule rows)? Books are not deleted.</string>
     <string name="ders_istatistik">%1$d resources • %2$d homework • %3$d exams</string>
     <string name="sonraki_ders">Next: %1$s %2$s</string>
+    <string name="ders_uyari_yaklasan">⏰ %1$s: %2$d days</string>
+    <string name="ders_odev_kisa">Assignment</string>
     <string name="kaynaklar">Course Resources</string>
     <string name="kaynak_ekle">＋ Add Resource</string>
     <string name="kaynak_bos">No resources added to this course yet. Pick books from your library.</string>
@@ -269,8 +271,10 @@
     <string name="sinav_sil">Delete exam</string>
     <string name="ders_yok_uyari">First add a course from the \"My Courses\" section.</string>
     <string name="not_turu_vize">Midterm</string>
-    <string name="not_turu_quiz">Quiz</string>
+    <string name="not_turu_quiz">Quiz 1</string>
+    <string name="not_turu_quiz2">Quiz 2</string>
     <string name="not_turu_final">Final</string>
+    <string name="not_turu_butunleme">Resit</string>
     <string name="not_turu_proje">Project</string>
     <!-- v16 (GÖREV 5) — Excel-style matrix grid (days × hours) -->
     <string name="program_tablo">⬜ Grid View (Excel style)</string>
@@ -719,7 +723,9 @@
     <string name="sec_gorunum">APPEARANCE &amp; PROFILE</string>
     <string name="sec_yapayzeka">ARTIFICIAL INTELLIGENCE</string>
     <string name="sec_kisisel">PERSONAL &amp; APP</string>
-    <string name="sec_veri">DATA, BACKUP &amp; SECURITY</string>
+    <string name="sec_veri">MY DATA</string>
+    <string name="sec_guvenlik">SECURITY</string>
+    <string name="sec_bakim">MAINTENANCE &amp; DIAGNOSTICS</string>
     <string name="ekran_acik_kalsin">Keep screen on while reading</string>
     <string name="ay_apk_kuruluyor">Preparing %1$s for install…</string>
     <string name="ay_surum">Version %1$s</string>
@@ -747,6 +753,63 @@
     <string name="ayar_prep_acildi">Preparation on (charging + idle only)</string>
     <string name="ayar_prep_kapandi">Preparation turned off</string>
     <string name="ayar_lamp_ses">Lamp alert sound</string>
+
+    <!-- v36.9 — broken document repair -->
+    <string name="onar_satir">Repair broken documents (from originals folder)</string>
+    <string name="onar_baslik">Repair broken documents</string>
+    <string name="onar_aciklama">Some DOCX/PPTX books were converted incorrectly by an older version, so read-aloud says nonsense. This rebuilds them from the original files WITHOUT deleting the books (reading progress and course links are kept).\n\nFolders scanned:\n%1$s</string>
+    <string name="onar_basla">Repair</string>
+    <string name="onar_klasor_yok">Original documents folder not found. Copy the files to Download/UmayKaynak and try again.</string>
+    <string name="onar_calisiyor">Repairing documents…</string>
+    <string name="onar_bitti">Repair finished</string>
+    <string name="onar_sonuc">%1$s</string>
+    <!-- v5.14 — exam countdown notification (can be turned off) -->
+    <string name="ayar_sinav_sayaci">Exam countdown</string>
+    <string name="ayar_sinav_sayaci_acik">Exam countdown: ON — silent notification</string>
+    <string name="ayar_sinav_sayaci_kapali">Exam countdown: OFF</string>
+    <string name="ayar_sinav_sayaci_acildi">Exam countdown turned on</string>
+    <string name="ayar_sinav_sayaci_kapandi">Exam countdown turned off</string>
     <string name="ayar_lamp_ses_acik">Lamp sound: ON — beep on amber/red</string>
     <string name="ayar_lamp_ses_kapali">Lamp sound: OFF</string>
+
+    <!-- v37 — reload DOCX/PPTX books from the original folder -->
+    <string name="reload_satir">Reload documents from scratch (DOCX/PPTX)</string>
+    <string name="reload_baslik">Reload documents</string>
+    <string name="reload_aciklama">DOCX/PPTX/DOC/PPT books in the library are REMOVED and imported again from the original folder. PDFs and other books are kept.\n\nBooks to remove: %1$d\nFolder: %2$s\n\nReading positions for these documents are reset; course links are rebuilt.</string>
+    <string name="reload_klasor_yok">Original documents folder not found. Copy the files to Download/UmayKaynak and try again.</string>
+    <string name="reload_basla">Reload</string>
+    <string name="reload_calisiyor">Reloading documents…</string>
+    <string name="reload_bitti">Reload finished</string>
+    <string name="reload_sonuc">%1$s</string>
+    <string name="diag_doc_convert">Document conversion</string>
+    <string name="reload_tumu">All (except Quran)</string>
+    <string name="reload_tumu_baslik">Reset library and load from folder</string>
+    <string name="reload_tumu_aciklama">ALL books except the Quran (including PDFs) are REMOVED and imported again from the folder.\n\nCurrent books: %1$d\nFolder: %2$s\n\nNote: DOCX/PPTX files are read as TEXT only; graphics/shapes are not preserved. If the folder has a PDF version of the document, use that.</string>
+    <string name="doc_metin_uyari">%1$s was converted to text: graphics/shapes are not preserved. Load a PDF for the full view.</string>
+    <string name="doc_sayfa_bos">(no text on this page)</string>
+    <string name="doc_harici_ac">Open original</string>
+    <string name="doc_harici_yok">No app found to open this document (PowerPoint / Google Slides / WPS).</string>
+    <string name="dedup_satir">Remove duplicate books (identical file)</string>
+    <string name="dedup_baslik">Duplicate cleanup</string>
+    <string name="dedup_aciklama">Only files with byte-identical content count as duplicates (SHA-256). Files with the same name but different pages are untouched. The oldest record in each group is kept; copies are deleted (reading position, course link and shelf entry are cleaned too).</string>
+    <string name="dedup_temiz">No duplicate copies.</string>
+    <string name="raf_onar_satir">Repair shelves (refill empty shelves)</string>
+    <string name="raf_onar_bitti">Shelves repaired: %1$d shelves · %2$d books placed</string>
+    <string name="raf_onar_bos">Nothing to repair on the shelves.</string>
+    <string name="doc_gorsel">Visual</string>
+    <string name="doc_metin">Text</string>
+    <string name="doc_gorsel_yok">No visual preview for this format (legacy DOC/PPT only). You can open the original.</string>
+
+    <!-- v40 — SHELF DETAIL PAGE -->
+    <string name="raf_kaynak_ekle">＋ Add source</string>
+    <string name="raf_bos">No files on this shelf yet</string>
+    <string name="raf_bos_ipucu">Use "Add source" to pick a file from your phone.</string>
+    <string name="raftan_kaldir">Remove from shelf</string>
+    <string name="dosya_ekle">Add file</string>
+    <string name="dosya_bilgisi">File info</string>
+    <string name="yukari_tasi">Move up</string>
+    <string name="asagi_tasi">Move down</string>
+    <string name="raf_kitap_sayisi">%1$d files · %2$s</string>
+    <string name="raf_sira_kaydedildi">Order saved</string>
+    <string name="ders_satir_ozet">%1$d resources · %2$d exams</string>
 </resources>

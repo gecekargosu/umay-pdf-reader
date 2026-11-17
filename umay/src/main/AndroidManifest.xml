@@ -194,6 +194,13 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- v43 — Kampüs duyuruları (okul sitesi akışı, uygulama içi görünüm) -->
+        <activity
+            android:name=".CampusActivity"
+            android:exported="false"
+            android:label="Kampüs Duyuruları"
+            android:screenOrientation="portrait" />
+
         <!-- v13 (T8) — Derin dosya tarayıcı (tüm cihaz + SD kart) -->
         <activity
             android:name=".DeepDocumentPickerActivity"
@@ -203,6 +210,18 @@
         <!-- Akademik asistan: ders detayı + haftalık program -->
         <activity
             android:name=".CourseDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v40 — Raf detay sayfası (rafa dokununca açılır) -->
+        <activity
+            android:name=".ShelfDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- v40 — Dersler tam sayfa listesi -->
+        <activity
+            android:name=".CoursesActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

@@ -60,6 +60,15 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
 
     private var renderedPage = -1
 
+    /** v38 — DOCX/PPTX/DOC/PPT: PDF'e çevrilmeden, metin olarak okunan belge. */
+    private var docMode = false
+    private var docExternalBtn: android.widget.TextView? = null
+
+    /** v39 — belge görsel görünümü (dosya değişmeden, WebView + resimler). */
+    private var docToggleBtn: android.widget.TextView? = null
+    private var docPreview: java.io.File? = null
+    private var docVisual = false
+
     private val speeds = listOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
     private var speedIdx = 2
     private val voiceModes = arrayOf("auto", "female", "male")
@@ -172,6 +181,9 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
         }
         AppPrefs.touchLastRead(this, bookId)   // kütüphane "Son okunan" sıralaması için
 
+        // v38 — DOCX/PPTX/DOC/PPT: PDF'e çevrilmemiş, orijinali saklanan belge
+        docMode = try { BookStore.isDocumentBook(this, bookId) } catch (_: Throwable) { false }
+
         openRenderer()
         initControls()
         setupSheet()
@@ -233,6 +245,8 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
     override fun onDestroy() {
         // v34 — ekran kapanırken kayıt açık kalmasın (dosya bozulmasın)
         try { if (recorder != null) stopRecording(false) } catch (_: Throwable) { }
+        // v39 — belge görünümü WebView'i serbest bırak
+        try { binding.docWeb.loadUrl("about:blank"); binding.docWeb.destroy() } catch (_: Throwable) { }
         aiScope.cancel()
         stopKaraoke()
         if (bound) {
@@ -252,6 +266,17 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
     // ── PDF görüntüleme ──────────────────────────────────────
 
     private fun openRenderer() {
+        // v38 — BELGE MODU: PDF yok. Metin gösterilir, dosya değiştirilmez.
+        if (docMode) {
+            runCatching {
+                binding.pageImage.visibility = android.view.View.GONE
+                binding.docScroll.visibility = android.view.View.VISIBLE
+                showDocExternalButton()
+            }
+            renderPage(displayedPage.coerceAtLeast(0))
+            loadDocPreview()
+            return
+        }
         try {
             val src = BookStore.sourceFile(this, bookId)
             rendererPfd = android.os.ParcelFileDescriptor.open(
@@ -263,7 +288,125 @@ class ReaderActivity : AppCompatActivity(), ReadService.Listener, ExtractionBus.
         }
     }
 
+    /**
+     * v38 — "Harici uygulamada aç": orijinal DOCX/PPTX/DOC/PPT dosyası
+     * cihazdaki PowerPoint/Slides/WPS gibi bir uygulamada **birebir** açılır.
+     * Dosya kopyalanmaz, değiştirilmez; yalnızca okuma izni verilir.
+     */
+    /**
+     * Belge düğmeleri artık SAYFANIN ÜZERİNDE değil, açılır kontrol panelinin
+     * içinde (v39). Sayfa tam görünür kalır.
+     */
+    private fun showDocExternalButton() {
+        if (docExternalBtn != null) return
+        runCatching {
+            binding.docButtonRow.visibility = android.view.View.VISIBLE
+            binding.docViewToggle.setOnClickListener { toggleDocView() }
+            binding.docOpenExternal.setOnClickListener { openDocExternally() }
+            docToggleBtn = binding.docViewToggle
+            docExternalBtn = binding.docOpenExternal
+        }
+    }
+
+    /**
+     * v39 — belgeyi uygulama içinde, ORİJİNAL dosyadan görsel olarak gösterir.
+     * Dosya kopyalanmaz/değiştirilmez; paket içeriği okunup HTML'e dökülür.
+     * Tamamen çevrimdışı çalışır (sunucu yok, internet yok).
+     */
+    private fun loadDocPreview() {
+        if (docPreview != null) {
+            showDocVisual(true)
+            return
+        }
+        val src = BookStore.sourceDoc(this, bookId) ?: return
+        val name = bookTitle ?: src.name
+        Thread {
+            val f = try { OfficePreview.build(this, src, name) } catch (_: Throwable) { null }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                if (f == null) {
+                    android.widget.Toast.makeText(
+                        this, R.string.doc_gorsel_yok, android.widget.Toast.LENGTH_LONG
+                    ).show()
+                    return@runOnUiThread
+                }
+                docPreview = f
+                runCatching {
+                    binding.docWeb.settings.apply {
+                        javaScriptEnabled = false
+                        allowFileAccess = true
+                        allowContentAccess = true
+                        loadWithOverviewMode = true
+                        useWideViewPort = true
+                        builtInZoomControls = true
+                        displayZoomControls = false
+                    }
+                    binding.docWeb.loadUrl("file://" + f.absolutePath)
+                }
+                showDocVisual(true)
+            }
+        }.also { it.name = "umay-doc-preview" }.start()
+    }
+
+    /** Görsel ⇄ metin görünümü. */
+    private fun showDocVisual(on: Boolean) {
+        if (!docMode) return
+        docVisual = on
+        runCatching {
+            binding.docWeb.visibility = if (on) android.view.View.VISIBLE else android.view.View.GONE
+            binding.docScroll.visibility = if (on) android.view.View.GONE else android.view.View.VISIBLE
+            binding.docViewToggle.text = getString(if (on) R.string.doc_metin else R.string.doc_gorsel)
+        }
+    }
+
+    private fun toggleDocView() {
+        if (docPreview == null) {
+            loadDocPreview()
+            return
+        }
+        showDocVisual(!docVisual)
+    }
+
+    private fun openDocExternally() {
+        try {
+            val f = BookStore.sourceDoc(this, bookId) ?: return
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                this, "$packageName.fileprovider", f
+            )
+            val mime = when (f.extension.lowercase()) {
+                "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                "pptx" -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                "doc" -> "application/msword"
+                "ppt" -> "application/vnd.ms-powerpoint"
+                else -> "*/*"
+            }
+            val i = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mime)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(i, getString(R.string.doc_harici_ac)))
+        } catch (t: Throwable) {
+            android.widget.Toast.makeText(this, R.string.doc_harici_yok, android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun renderPage(index: Int) {
+        // v38 — belge modunda sayfa metni gösterilir (PDF render yok).
+        if (docMode) {
+            renderedPage = index
+            val text = try {
+                BookStore.pageFile(this, bookId, index).readText()
+            } catch (_: Throwable) {
+                ""
+            }
+            runCatching {
+                binding.docScroll.visibility = android.view.View.VISIBLE
+                binding.docText.text = if (text.isBlank()) getString(R.string.doc_sayfa_bos) else text
+                binding.docScroll.scrollTo(0, 0)
+                binding.pageImage.visibility = android.view.View.GONE
+            }
+            return
+        }
         val r = renderer ?: return
         if (index == renderedPage && baseBitmap != null) return
         renderedPage = index

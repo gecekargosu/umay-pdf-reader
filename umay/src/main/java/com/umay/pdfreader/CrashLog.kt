@@ -231,10 +231,17 @@ object CrashLog {
     }
 }
 
-/** Sürüm bilgisi (tek kaynak: BuildConfig yerine basit sabit). */
+/**
+ * Sürüm bilgisi.
+ *
+ * v5.14 — DÜZELTME: burada elle yazılmış sabitler vardı ("5.3"/21) ve
+ * build.gradle.kts ile senkronu TUTMADI. İki somut sonucu oluyordu:
+ *  • günlüğe yanlış sürüm yazılıyordu (5.14 çalışırken "v=5.3"),
+ *  • AppPrefs.reviewShownFor(version) anahtarı "5.3"te donduğu için
+ *    uygulama içi değerlendirme istemi bir daha HİÇ çıkmıyordu.
+ * Artık tek kaynak BuildConfig:
+ */
 object BuildInfo {
-    // v22 senkronu: build.gradle.kts versionName/versionCode ile HİZALI olmalı
-    // (v21 turunda gradle 5.2/20'ye geçmişti ama burası 5.1/19'da kalmıştı).
-    const val versionName = "5.3"
-    const val versionCode = 21
+    val versionName: String = BuildConfig.VERSION_NAME
+    val versionCode: Int = BuildConfig.VERSION_CODE
 }

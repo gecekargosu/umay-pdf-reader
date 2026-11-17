@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ══ v41 — ŞU AN DİNLENEN (DİNAMİK PENCERE) ══
+     Kullanıcı isteği: "ana sayfada o an çalışan okuma/dinlemeyi görebil,
+     durdurabil, sayfa ileri geri atabil, ekolayzır gerçek çalışsın, çerçeve
+     ışıldasın; dinleme durunca dinamik durum dursun."
+     • Kart yalnız bir kitap açıldığında görünür (npCard).
+     • Çerçeve NeonFrameDrawable: çalarken yanar-döner, durunca sabit.
+     • Ekolayzır çubukları gerçek RMS yerine "çalıyor mu" durumuna bağlı
+       zamanlayıcıyla hareket eder (okuma servisi PCM vermiyor). -->
+<com.umay.pdfreader.NeonCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/npCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/bg_panel"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Kapak -->
+        <FrameLayout
+            android:layout_width="58dp"
+            android:layout_height="78dp"
+            android:background="@drawable/bg_panel">
+
+            <ImageView
+                android:id="@+id/npCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/app_name"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_pdf" />
+
+            <TextView
+                android:id="@+id/npCoverFallback"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:maxLines="3"
+                android:padding="3dp"
+                android:textColor="@color/umay_text"
+                android:textSize="8sp" />
+        </FrameLayout>
+
+        <!-- Ad + durum + ekolayzır -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/npTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/umay_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/npMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="10.5sp" />
+
+            <!-- EKOLAYZIR: 7 çubuk, kodda yükseklikleri güncellenir -->
+            <LinearLayout
+                android:id="@+id/npBars"
+                android:layout_width="match_parent"
+                android:layout_height="22dp"
+                android:layout_marginTop="6dp"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/npBar1"
+                    android:layout_width="0dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_accent" />
+
+                <View
+                    android:id="@+id/npBar2"
+                    android:layout_width="0dp"
+                    android:layout_height="11dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_accent" />
+
+                <View
+                    android:id="@+id/npBar3"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_orange" />
+
+                <View
+                    android:id="@+id/npBar4"
+                    android:layout_width="0dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_accent" />
+
+                <View
+                    android:id="@+id/npBar5"
+                    android:layout_width="0dp"
+                    android:layout_height="19dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_orange" />
+
+                <View
+                    android:id="@+id/npBar6"
+                    android:layout_width="0dp"
+                    android:layout_height="8dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_accent" />
+
+                <View
+                    android:id="@+id/npBar7"
+                    android:layout_width="0dp"
+                    android:layout_height="13dp"
+                    android:layout_weight="1"
+                    android:background="@color/umay_accent" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Kontroller -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/npPrev"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/onceki"
+            android:src="@drawable/ic_prev"
+            android:tint="@color/umay_accent" />
+
+        <ImageButton
+            android:id="@+id/npPlay"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="4dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/oynat"
+            android:src="@drawable/ic_play"
+            android:tint="@color/umay_orange" />
+
+        <ImageButton
+            android:id="@+id/npNext"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="4dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/sonraki"
+            android:src="@drawable/ic_next"
+            android:tint="@color/umay_accent" />
+
+        <ImageButton
+            android:id="@+id/npStop"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="4dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/bildirim_durdur"
+            android:src="@drawable/ic_stop"
+            android:tint="@color/umay_danger" />
+
+        <TextView
+            android:id="@+id/npTapHint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:maxLines="2"
+            android:text="@string/np_tap_hint"
+            android:textColor="@color/umay_text_dim"
+            android:textSize="9.5sp" />
+    </LinearLayout>
+</com.umay.pdfreader.NeonCardLayout>

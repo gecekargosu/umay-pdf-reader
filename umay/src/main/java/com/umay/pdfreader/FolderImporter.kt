@@ -219,6 +219,52 @@ object FolderImporter {
         }, "umay-pool-organize").apply { isDaemon = true }.start()
     }
 
+    /**
+     * v44 — ZATEN AKTARILMIŞ KİTAPLARI DERSLERE BAĞLAR.
+     *
+     * Klasör yeniden taranır; kitaplıkta aynı adlı ve henüz hiçbir derse bağlı
+     * olmayan kitap, dosyanın bulunduğu klasöre göre doğru derse eklenir.
+     * Dosya KOPYALANMAZ, kitap SİLİNMEZ — yalnız bağ kurulur.
+     */
+    fun relinkExisting(
+        ctx: Context,
+        root: File,
+        onDone: (placed: Int, scanned: Int) -> Unit
+    ) {
+        Thread({
+            var placed = 0
+            var scanned = 0
+            try {
+                val linked = CourseStore.allLinkedBookIds(ctx).toMutableSet()
+                val byTitle = BookStore.loadBooks(ctx)
+                    .associateBy { TextUtil.matchKey(it.title.substringBeforeLast('.')) }
+                collect(root).forEach { file ->
+                    scanned++
+                    try {
+                        val key = TextUtil.matchKey(file.nameWithoutExtension)
+                        val book = byTitle[key]
+                        if (book != null && book.id !in linked) {
+                            val courses = CourseStore.courses(ctx)
+                            val course = matchByName(file, root, courses)
+                            if (course != null) {
+                                CourseStore.addDocs(
+                                    ctx, course.id, listOf(book.id), categoryOf(book.title)
+                                )
+                                linked.add(book.id)
+                                placed++
+                            }
+                        }
+                    } catch (t: Throwable) {
+                        BookStore.logError(ctx, "relink/${file.name}", t)
+                    }
+                }
+            } catch (t: Throwable) {
+                BookStore.logError(ctx, "relinkExisting", t)
+            }
+            onDone(placed, scanned)
+        }, "umay-relink").apply { isDaemon = true }.start()
+    }
+
     // ── İsim eşleştirme ────────────────────────────────────────
 
     private fun matchByName(file: File, root: File, courses: List<Course>): Course? {
@@ -237,10 +283,11 @@ object FolderImporter {
         var best: Course? = null
         var bestScore = 0
         for (c in courses) {
-            val target = TextUtil.normalize(c.name)
+            // v44 — alt çizgi/tire/noktalama eşleştirmeyi bozmasın
+            val target = TextUtil.matchKey(c.name)
             val tokens = target.split(" ").filter { it.length >= 4 && it !in STOP }
             for (cand in candidates) {
-                val src = TextUtil.normalize(cand)
+                val src = TextUtil.matchKey(cand)
                 if (src.isBlank()) continue
                 var score = if (src.contains(target) || target.contains(src)) 12 else {
                     val words = src.split(" ")
@@ -274,7 +321,7 @@ object FolderImporter {
 
     private fun findOrCreateGroup(ctx: Context, name: String): Course? {
         val courses = try { CourseStore.courses(ctx) } catch (_: Throwable) { emptyList() }
-        courses.firstOrNull { TextUtil.normalize(it.name) == TextUtil.normalize(name) }?.let { return it }
+        courses.firstOrNull { TextUtil.matchKey(it.name) == TextUtil.matchKey(name) }?.let { return it }
         return try { CourseStore.addCourse(ctx, name) } catch (_: Throwable) { null }
     }
 

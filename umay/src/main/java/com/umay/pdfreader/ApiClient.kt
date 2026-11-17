@@ -49,17 +49,19 @@ object ApiClient {
      *  v11: 2.0/1.5 serisi yeni anahtarlarla 404 veriyor (API'den kaldırıldı);
      *  gemini-3.8-flash birinci sırada — canlı test edildi ✓. */
     private val FALLBACK_MODELS = listOf(
-        // v5.4 (ONARIM 2) — 28 Eki 2026 canlı ölçüm (gömülü anahtarla):
-        //   gemini-3.5-flash          → 200, ~2.5 sn   ✓ EN HIZLI
-        //   gemini-flash-lite-latest  → 200, ~15 sn    ✓
-        //   gemini-3.8-flash / 3.7 / gemini-flash-latest → 503 (aşırı yük)
-        //   gemini-2.5-flash, 2.0-flash → 404 (yeni kullanıcılara kapalı)
-        // Sıralama "çalıştığı ölçülmüş" modellerden "son çare"ye doğrudur.
-        "gemini-3.5-flash",
+        // v42 — 31 Eki 2026 CANLI ÖLÇÜM (gömülü anahtarla, gerçek HTTP):
+        //   gemini-flash-lite-latest  → 200, 619 ms   ✓ ÇALIŞIYOR (tek çalışan)
+        //   gemini-3.5-flash          → 429 kota dolu
+        //   gemini-flash-latest       → 429 kota dolu
+        //   gemini-2.5-flash / 2.5-flash-lite → 404 (yeni kullanıcıya kapalı)
+        //   gemini-3.8-flash / 3.7    → böyle bir model YOK (uydurma isimdi)
+        // Eski liste "gemini-3.5-flash"ı başa koyuyordu; o model 429 döndürdüğü
+        // için uygulama 40+ adayı sırayla deniyor ve 20 sn'de zaman aşımına
+        // uğruyordu → tanılamada "Gemini API yanıt vermedi" uyarısı (sarı lamba).
         "gemini-flash-lite-latest",
-        "gemini-3.8-flash",
         "gemini-flash-latest",
-        "gemini-2.5-flash-lite"
+        "gemini-3-flash-preview",
+        "gemini-3.5-flash"
     )
 
     /** Sunucudan bir kez keşfedilen kullanılabilir modeller (boşsa keşfedilemedi). */
@@ -216,7 +218,10 @@ object ApiClient {
         // yanlıştı (model yoğunken de "internet yok" deniyordu). Artık sıradaki
         // model denenir; iki ardışık ağ hatası olursa ağ hatası bildirilir.
         var ioFails = 0
-        for (model in candidates.distinct()) {
+        var quotaHit = false
+        // v42 — EN FAZLA 6 ADAY: 46 modeli sırayla denemek 20 sn'lik tanılama
+        // süresini doldurup "yanıt gelmedi" diyordu. İlk 6 yeterli.
+        for (model in candidates.distinct().take(6)) {
             try {
                 return geminiCall(key, model, system, question, history)
             } catch (e: ApiFatal) {
@@ -232,7 +237,15 @@ object ApiClient {
                 if (ioFails >= 2) throw ApiFatal(lastError!!.message ?: "Ağ hatası")
             } catch (e: Exception) {
                 lastError = e
+                if (e.message?.contains("limit", ignoreCase = true) == true) quotaHit = true
             }
+        }
+        // v42 — kullanıcıya "yanıt gelmedi" yerine gerçek sebep söylenir
+        if (quotaHit) {
+            throw ApiFatal(
+                "Ücretsiz AI kotası doldu (429). Yarın sıfırlanır; " +
+                    "Ayarlar → Yapay zekâ'dan başka bir ücretsiz anahtar girebilirsin."
+            )
         }
         throw lastError ?: ApiFatal("Yanıt alınamadı. Tekrar dene.")
     }
@@ -262,9 +275,11 @@ object ApiClient {
         } catch (_: Exception) {
             emptyList()
         }
-        // Hızlı/ucuz flash modeller önce, "lite" en sonda
-        val ordered = names.filter { it.contains("flash") && !it.contains("lite") } +
-            names.filter { it.contains("flash") && it.contains("lite") } +
+        // v42 — SIRA DÜZELTİLDİ: lite modeller ayrı kotaya sahip ve bu
+        // anahtarda tek çalışan onlar; eski sıralama lite'ı EN SONA atıyor,
+        // önündeki 40+ model 429/404 dönerken 20 sn zaman aşımına giriyordu.
+        val ordered = names.filter { it.contains("flash") && it.contains("lite") } +
+            names.filter { it.contains("flash") && !it.contains("lite") } +
             names.filter { !it.contains("flash") }
         if (ordered.isNotEmpty()) {
             discoveredModels = ordered

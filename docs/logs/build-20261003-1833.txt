@@ -1,0 +1,109 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.aapt2FromMavenOverride=/opt/android-sdk/build-tools/34.0.0/aapt2' is experimental.
+
+> Task :umay:preBuild UP-TO-DATE
+> Task :umay:preDebugBuild UP-TO-DATE
+> Task :umay:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :umay:generateDebugResValues UP-TO-DATE
+> Task :umay:generateDebugResources UP-TO-DATE
+> Task :umay:mergeDebugResources
+> Task :umay:packageDebugResources
+> Task :umay:parseDebugLocalResources
+> Task :umay:checkDebugAarMetadata
+> Task :umay:dataBindingGenBaseClassesDebug
+> Task :umay:mapDebugSourceSetPaths
+> Task :umay:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :umay:extractDeepLinksDebug UP-TO-DATE
+> Task :umay:processDebugMainManifest
+> Task :umay:processDebugManifest UP-TO-DATE
+> Task :umay:processDebugManifestForPackage UP-TO-DATE
+> Task :umay:javaPreCompileDebug UP-TO-DATE
+> Task :umay:preDebugUnitTestBuild UP-TO-DATE
+> Task :umay:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :umay:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :umay:mergeDebugShaders UP-TO-DATE
+> Task :umay:compileDebugShaders NO-SOURCE
+> Task :umay:generateDebugAssets UP-TO-DATE
+> Task :umay:mergeDebugAssets UP-TO-DATE
+> Task :umay:compressDebugAssets UP-TO-DATE
+> Task :umay:desugarDebugFileDependencies UP-TO-DATE
+> Task :umay:mergeDebugJniLibFolders UP-TO-DATE
+> Task :umay:checkDebugDuplicateClasses
+> Task :umay:mergeDebugNativeLibs UP-TO-DATE
+> Task :umay:processDebugResources
+> Task :umay:mergeExtDexDebug
+> Task :umay:mergeLibDexDebug UP-TO-DATE
+> Task :umay:stripDebugDebugSymbols UP-TO-DATE
+> Task :umay:validateSigningDebug UP-TO-DATE
+> Task :umay:writeDebugAppMetadata UP-TO-DATE
+> Task :umay:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :umay:compileDebugKotlin
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:138:37 Unresolved reference: title
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:174:61 Too many arguments for public open fun createFromByteArray(p0: PDDocument!, p1: ByteArray!, p2: String!): PDImageXObject! defined in com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:243:24 None of the following functions can be called with the arguments supplied: 
+public open fun createBitmap(p0: Bitmap, p1: Int, p2: Int, p3: Int, p4: Int, p5: Matrix?, p6: Boolean): Bitmap defined in android.graphics.Bitmap
+public open fun createBitmap(p0: DisplayMetrics, p1: IntArray, p2: Int, p3: Int, p4: Int, p5: Int, p6: Bitmap.Config): Bitmap defined in android.graphics.Bitmap
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/BookStore.kt:244:25 Unresolved reference: it
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:141:21 Unresolved reference: setFont
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:142:21 Unresolved reference: newLineAtOffset
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:143:21 Unresolved reference: showText
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:144:21 Unresolved reference: endText
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:154:21 Unresolved reference: setFont
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:155:21 Unresolved reference: newLineAtOffset
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:156:21 Unresolved reference: showText
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:157:21 Unresolved reference: endText
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:161:25 Unresolved reference: addStroke
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/DocumentConverter.kt:170:39 None of the following functions can be called with the arguments supplied: 
+public inline fun CharSequence.replace(regex: Regex, noinline transform: (MatchResult) -> CharSequence): String defined in kotlin.text
+public inline fun CharSequence.replace(regex: Regex, replacement: String): String defined in kotlin.text
+public fun String.replace(oldChar: Char, newChar: Char, ignoreCase: Boolean = ...): String defined in kotlin.text
+public fun String.replace(oldValue: String, newValue: String, ignoreCase: Boolean = ...): String defined in kotlin.text
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:124:77 Expecting '"'
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:124:77 Expecting ','
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:129:14 Expecting ','
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:130:29 Expecting ')'
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:124:21 None of the following functions can be called with the arguments supplied: 
+internal constructor Regex(nativePattern: Pattern) defined in kotlin.text.Regex
+public constructor Regex(pattern: String) defined in kotlin.text.Regex
+public constructor Regex(pattern: String, options: Set<RegexOption>) defined in kotlin.text.Regex
+public constructor Regex(pattern: String, option: RegexOption) defined in kotlin.text.Regex
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:125:13 'if' must have both main and 'else' branches if used as an expression
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:125:17 Unresolved reference: m
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:126:30 Unresolved reference: m
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:127:28 Overload resolution ambiguity: 
+public operator fun CharSequence.contains(char: Char, ignoreCase: Boolean = ...): Boolean defined in kotlin.text
+public operator fun CharSequence.contains(other: CharSequence, ignoreCase: Boolean = ...): Boolean defined in kotlin.text
+public inline operator fun CharSequence.contains(regex: Regex): Boolean defined in kotlin.text
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:128:17 'if' must have both main and 'else' branches if used as an expression
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:128:28 Overload resolution ambiguity: 
+public operator fun CharSequence.contains(char: Char, ignoreCase: Boolean = ...): Boolean defined in kotlin.text
+public operator fun CharSequence.contains(other: CharSequence, ignoreCase: Boolean = ...): Boolean defined in kotlin.text
+public inline operator fun CharSequence.contains(regex: Regex): Boolean defined in kotlin.text
+e: file:///mnt/sdcard/FreebuffProject/JarvisMobile/umay/src/main/java/com/umay/pdfreader/TtsManager.kt:195:28 'if' must have both main and 'else' branches if used as an expression
+
+> Task :umay:compileDebugKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':umay:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 8m 19s
+30 actionable tasks: 11 executed, 19 up-to-date

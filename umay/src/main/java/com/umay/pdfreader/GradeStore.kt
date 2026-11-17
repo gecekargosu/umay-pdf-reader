@@ -26,8 +26,15 @@ import kotlin.math.roundToInt
  */
 object GradeStore {
 
-    /** Desteklenen not türleri (sıra UI'da da kullanılır). */
-    val KINDS = listOf("vize", "quiz", "final", "proje")
+    /**
+     * Desteklenen not türleri (sıra UI'da da kullanılır).
+     *
+     * v45 — Öğrencinin derslerinde quiz'ler ayrı ayrı ve bütünleme var
+     * (ör. vize %20 · quiz1 %2,5 · quiz2 %2,5 · final %25 · proje %50 ·
+     * bütünleme %25). "quiz" eski kayıtların anahtarıdır → **Quiz 1** olarak
+     * görünür, böylece daha önce girilmiş notlar kaybolmaz.
+     */
+    val KINDS = listOf("vize", "quiz", "quiz2", "final", "butunleme", "proje")
 
     /**
      * DB'de "PUAN HENÜZ GİRİLMEDİ" işareti (-1).
@@ -37,13 +44,19 @@ object GradeStore {
 
     /** Varsayılan yüzdeler — kullanıcı her dersi için değiştirebilir. */
     val DEFAULT_WEIGHTS = mapOf(
-        "vize" to 30.0, "quiz" to 10.0, "final" to 50.0, "proje" to 10.0
+        "vize" to 30.0, "quiz" to 5.0, "quiz2" to 5.0,
+        "final" to 50.0,
+        // Bütünleme yalnız dersten kalınca kullanılır → varsayılan yüzde 0
+        "butunleme" to 0.0,
+        "proje" to 10.0
     )
 
     /** Harf notu → 4.00 sistemindeki puan. */
     private val LETTER_POINTS = mapOf(
         "AA" to 4.0, "BA" to 3.5, "BB" to 3.0, "CB" to 2.5,
-        "CC" to 2.0, "DC" to 1.5, "DD" to 1.0, "FF" to 0.0
+        "CC" to 2.0, "DC" to 1.5, "DD" to 1.0,
+        // v44 — Rumeli Üniversitesi transkriptindeki resmî tablo: FD = 0,5
+        "FD" to 0.5, "FF" to 0.0
     )
 
     /** Tek not satırı (saf model). */
@@ -67,17 +80,26 @@ object GradeStore {
         return weighted / totalWeight
     }
 
-    /** 0..100 ortalama → harf notu (Türk üniversite sistemi). */
+    /**
+     * 0..100 ortalama → harf notu.
+     *
+     * v44 — ÖĞRENCİNİN TRANSKRİPTİNDEKİ RESMÎ TABLO (düzeltildi):
+     * AA 90-100 · BA 85-89 · BB 75-84 · CB 65-74 · CC 60-64 ·
+     * DC 55-59 · DD 50-54 · FD 45-49 · FF 00-44
+     * (Eski kod BB'yi 80'den, CC'yi 70'ten başlatıyordu → not yanlış harfe
+     * düşüyor, AGNO hatalı çıkıyordu.)
+     */
     fun letterOf(average: Double?): String {
         val a = average ?: return "—"
         return when {
             a >= 90 -> "AA"
             a >= 85 -> "BA"
-            a >= 80 -> "BB"
-            a >= 75 -> "CB"
-            a >= 70 -> "CC"
-            a >= 60 -> "DC"
+            a >= 75 -> "BB"
+            a >= 65 -> "CB"
+            a >= 60 -> "CC"
+            a >= 55 -> "DC"
             a >= 50 -> "DD"
+            a >= 45 -> "FD"
             else -> "FF"
         }
     }
@@ -174,7 +196,9 @@ object GradeStore {
             put("id", "$courseId-$kind")
             put("course_id", courseId)
             put("kind", kind)
-            put("score", score?.let { clampPercent(it) } ?: NO_SCORE)
+            // v45 — NO_SCORE (-1) "puan girilmedi" demektir; 0'a kırpılırsa
+            // ekranda "0" görünüp girilmiş not gibi duruyordu.
+            put("score", score?.let { if (it < 0.0) NO_SCORE else clampPercent(it) } ?: NO_SCORE)
             put("weight", clampPercent(weight))
         }
         d.insertWithOnConflict(

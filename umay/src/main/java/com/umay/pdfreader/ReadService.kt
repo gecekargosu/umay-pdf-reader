@@ -527,6 +527,13 @@ class ReadService : Service() {
         playing = true
         playRetry = 0
         AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, true)
+        // v42 — SEYİR DEFTERİ: sesli okuma başladı
+        try {
+            SeyirDefteri.yaz(
+                this, "SESLİ OKUMA", "başladı",
+                "${(bookTitle ?: "").ifBlank { bookId ?: "?" }} · sayfa ${currentPage + 1}"
+            )
+        } catch (_: Throwable) { }
         requestAudioFocus()   // v8: ses odağını al (başka uygulama çalıyorsa bile)
         acquireWakeLock()
         startAsForeground()
@@ -599,6 +606,24 @@ class ReadService : Service() {
         }
         playing = false
         AppPrefs.putBool(this, AppPrefs.KEY_PLAYING, false)
+        // v45 — SEYİR DEFTERİ: duraklatıldı.
+        // Gerçek günlük kaydı "? · sayfa 1" diyordu: başlık o an boş olabiliyor
+        // (servis, ekran kapandıktan sonra duraklatıldığında). Kitap adı
+        // kitaplıktan bulunur, bulunamazsa kimlik yazılır.
+        try {
+            val title = bookTitle?.takeIf { it.isNotBlank() }
+                ?: bookId?.let { id ->
+                    try {
+                        BookStore.loadBooks(this).firstOrNull { it.id == id }?.title
+                    } catch (_: Throwable) {
+                        null
+                    }
+                }
+            SeyirDefteri.yaz(
+                this, "SESLİ OKUMA", "duraklatıldı",
+                "${title ?: bookId ?: "?"} · sayfa ${currentPage + 1}"
+            )
+        } catch (_: Throwable) { }
         stopStatsTick()   // v12: istatistik sayacını durdur
         abandonAudioFocus()   // v8: odak bırakılsın (müzik vb. geri gelebilsin)
         speakJob?.cancel()

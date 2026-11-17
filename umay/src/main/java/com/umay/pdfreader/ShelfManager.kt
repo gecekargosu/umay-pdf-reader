@@ -140,8 +140,13 @@ object ShelfManager {
         try {
             val shelves = shelvesOf(context)
             val have = shelves.map { it.id }.toSet()
+            // v42 — KULLANICININ SİLDİĞİ YERLEŞİK RAF GERİ GELMEZ.
+            // Kullanıcı: "sildiğim raflar daha önce geri gelmişti". Sebep:
+            // ensureBuiltIns her açılışta eksik yerleşik rafları geri ekliyordu.
+            // Artık silinenler "mezar taşı" (hidden_builtins) listesine yazılır.
+            val hidden = hiddenBuiltIns(context)
             val missing = defaultShelfLayout().filter {
-                it.id in AUTO_SHELF_IDS && it.id !in have
+                it.id in AUTO_SHELF_IDS && it.id !in have && it.id !in hidden
             }
             if (missing.isEmpty()) return
             // Yerleşik raflar başta, kullanıcı rafları sonda (sıra korunur).
@@ -166,6 +171,11 @@ object ShelfManager {
         val shelves = shelvesOf(context)
         shelves.add(Shelf(id, name, mutableListOf(), bgColor))
         save(context, shelves)
+        SeyirDefteri.dogrula(
+            context, "RAF", "yeni raf",
+            ok = shelvesOf(context).any { it.id == id },
+            ayrinti = "\"$name\" ($id)"
+        )
         return id
     }
 
@@ -177,26 +187,86 @@ object ShelfManager {
             if (idx < 0) return false
             shelves[idx] = shelves[idx].copy(name = newName)
             save(context, shelves)
-            true
+            val ok = shelvesOf(context).any { it.id == shelfId && it.name == newName }
+            SeyirDefteri.dogrula(context, "RAF", "raf adı değişti", ok, "\"$newName\"")
+            ok
         } catch (t: Throwable) {
             log(context, "renameShelf", t)
             false
         }
     }
 
-    /** Rafı siler — raftaki kitaplar SILINMEZ, yalnız raf kalkar (kalıcı). */
+    /**
+     * Rafı siler — raftaki kitaplar SILINMEZ, yalnız raf kalkar (kalıcı).
+     *
+     * v42 — YERLEŞİK RAFLAR DA SİLİNEBİLİR. Silinen yerleşik raf
+     * `hidden_builtins` listesine yazılır ve **bir daha geri gelmez**
+     * (ensureBuiltIns bu listeyi atlar). İstenirse Raflarım →
+     * "Gizlenen yerleşik rafları geri getir" ile döner.
+     *
+     * Her silme Seyir Defteri'ne yazılır; işlem sonrası liste **yeniden
+     * okunarak** gerçekten silindiği doğrulanır ("sil dedim silinmedi").
+     */
     fun deleteShelf(context: android.content.Context, shelfId: String): Boolean {
         return try {
-            if (shelfId in AUTO_SHELF_IDS) return false   // yerleşik raflar silinemez
+            val name = shelvesOf(context).firstOrNull { it.id == shelfId }?.name ?: shelfId
             val shelves = shelvesOf(context)
             val before = shelves.size
             shelves.removeAll { it.id == shelfId }
-            if (shelves.size == before) return false
-            save(context, shelves)
-            true
+            val removedFromList = shelves.size != before
+            if (removedFromList) save(context, shelves)
+            if (shelfId in AUTO_SHELF_IDS) hideBuiltIn(context, shelfId)
+            // GERÇEK DOĞRULAMA: bellekteki değişiklik değil, diskten okunan sonuç
+            val stillThere = shelvesOf(context).any { it.id == shelfId }
+            SeyirDefteri.dogrula(
+                context, "RAF", "raf silindi",
+                ok = !stillThere,
+                ayrinti = "\"$name\" ($shelfId)" + if (!removedFromList) " · listede yoktu" else ""
+            )
+            !stillThere
         } catch (t: Throwable) {
             log(context, "deleteShelf", t)
+            SeyirDefteri.yaz(context, "RAF", "raf silinemedi", "$shelfId · ${t.message}")
             false
+        }
+    }
+
+    // ── v42 — SİLİNEN YERLEŞİK RAFIN "MEZAR TAŞI"SI ─────────────
+
+    private const val KEY_HIDDEN = "hidden_builtins"
+
+    fun hiddenBuiltIns(context: android.content.Context): MutableSet<String> = try {
+        val raw = context.getSharedPreferences(PREFS, 0).getString(KEY_HIDDEN, null)
+        if (raw.isNullOrBlank()) mutableSetOf()
+        else mutableSetOf(*raw.split(',').filter { it.isNotBlank() }.toTypedArray())
+    } catch (_: Throwable) {
+        mutableSetOf()
+    }
+
+    private fun hideBuiltIn(context: android.content.Context, shelfId: String) {
+        try {
+            val set = hiddenBuiltIns(context).apply { add(shelfId) }
+            context.getSharedPreferences(PREFS, 0).edit()
+                .putString(KEY_HIDDEN, set.joinToString(",")).apply()
+        } catch (t: Throwable) {
+            log(context, "hideBuiltIn", t)
+        }
+    }
+
+    /** Silinen yerleşik rafları geri getirir (Raflarım menüsünden). */
+    fun restoreBuiltIns(context: android.content.Context): Int {
+        return try {
+            val hidden = hiddenBuiltIns(context)
+            if (hidden.isEmpty()) return 0
+            val n = hidden.size
+            context.getSharedPreferences(PREFS, 0).edit()
+                .remove(KEY_HIDDEN).apply()
+            ensureBuiltIns(context)
+            SeyirDefteri.yaz(context, "RAF", "yerleşik raflar geri getirildi", "$n raf")
+            n
+        } catch (t: Throwable) {
+            log(context, "restoreBuiltIns", t)
+            0
         }
     }
 
@@ -320,6 +390,11 @@ object ShelfManager {
             if (bookId !in target.bookIds) {
                 target.bookIds.add(bookId)
                 save(context, shelves)
+                SeyirDefteri.dogrula(
+                    context, "RAF", "kitap rafa eklendi",
+                    ok = shelvesOf(context).any { it.id == shelfId && bookId in it.bookIds },
+                    ayrinti = "raf=$shelfId · kitap=$bookId"
+                )
             }
         } catch (t: Throwable) {
             log(context, "addBookToShelf", t)
@@ -334,6 +409,11 @@ object ShelfManager {
             if (target != null) {
                 target.bookIds.removeAll { it == bookId }
                 save(context, shelves)
+                SeyirDefteri.dogrula(
+                    context, "RAF", "kitap raftan çıkarıldı",
+                    ok = shelvesOf(context).none { it.id == shelfId && bookId in it.bookIds },
+                    ayrinti = "raf=$shelfId · kitap=$bookId"
+                )
             }
         } catch (t: Throwable) {
             log(context, "removeBookFromShelf", t)
@@ -469,12 +549,24 @@ object ShelfManager {
         ensureDefaults(activity)
         val shelves = shelvesOf(activity)
         if (shelves.isEmpty()) shelves.addAll(defaultShelfLayout())
+        val hidden = hiddenBuiltIns(activity)
         val labels = mutableListOf("＋ Yeni Raf Ekle")
         shelves.forEach { labels.add("${it.name}  (${it.bookIds.size} kitap)  [${it.bgColor}] ") }
+        // v42 — silinen yerleşik raflar geri getirilebilsin (yoksa hiç görünmez)
+        val restoreIdx = if (hidden.isNotEmpty()) {
+            labels.add("↺ Gizlenen yerleşik rafları geri getir (${hidden.size})")
+            labels.size - 1
+        } else -1
 
         AlertDialog.Builder(activity)
             .setTitle("Raflarım")
             .setItems(labels.toTypedArray()) { _, which ->
+                if (which == restoreIdx) {
+                    val n = restoreBuiltIns(activity)
+                    Toast.makeText(activity, "$n yerleşik raf geri getirildi", Toast.LENGTH_SHORT).show()
+                    refresh()
+                    return@setItems
+                }
                 when (which) {
                     0 -> promptName(activity, "Yeni Raf", "Raf adı (örn. Ders Hazırlık)") { name ->
                         if (name.isBlank()) return@promptName
@@ -490,10 +582,40 @@ object ShelfManager {
             .show()
     }
 
+    /**
+     * v41 — RAF SIRASI.
+     * Liste sırası kalıcıdır (save). Ana sayfa bu sırayı kullanır.
+     * @return taşındıysa true
+     */
+    fun moveShelf(context: android.content.Context, shelfId: String, delta: Int): Boolean {
+        return try {
+            val list = shelvesOf(context)
+            val i = list.indexOfFirst { it.id == shelfId }
+            if (i < 0) return false
+            val j = i + delta
+            if (j !in list.indices) return false
+            val moved = list.removeAt(i)
+            list.add(j, moved)
+            save(context, list)
+            val ok = shelvesOf(context).indexOfFirst { it.id == shelfId } == j
+            SeyirDefteri.dogrula(
+                context, "RAF", "raf sırası değişti", ok,
+                "\"${moved.name}\" $i → $j"
+            )
+            ok
+        } catch (t: Throwable) {
+            log(context, "moveShelf", t)
+            false
+        }
+    }
+
     private fun showShelfActions(activity: Activity, shelf: Shelf, onDone: () -> Unit) {
         val acts = arrayOf(
             "Kitapları yönet",
             "📚 Bu rafa taşı…",       // v20.1: tek dokunuşla kitap getir
+            "＋ Telefondan dosya ekle…",  // v41: kütüphanede yoksa doğrudan seç
+            "▲ Rafı yukarı taşı",
+            "▼ Rafı aşağı taşı",
             "Yeniden adlandır",
             "Renk değiştir",
             "Raftan sil"
@@ -504,35 +626,59 @@ object ShelfManager {
                 when (i) {
                     0 -> showBookPicker(activity, shelf, onDone)
                     1 -> showMovePicker(activity, shelf, onDone)
-                    2 -> promptName(activity, "Rafı yeniden adlandır", shelf.name) { name ->
+                    2 -> {
+                        // Rafın kendi sayfası: "Kaynak ekle" telefondan çoklu
+                        // seçim yapar, dosya kütüphaneye alınır ve rafa bağlanır.
+                        activity.startActivity(
+                            ShelfDetailActivity.newIntent(activity, shelf.id, shelf.name)
+                        )
+                        onDone()
+                    }
+                    3 -> {
+                        if (moveShelf(activity, shelf.id, -1)) {
+                            Toast.makeText(activity, "Raf yukarı taşındı", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(activity, "Daha yukarı taşınamaz", Toast.LENGTH_SHORT).show()
+                        }
+                        onDone()
+                        showManageDialog(activity, onDone)
+                    }
+                    4 -> {
+                        if (moveShelf(activity, shelf.id, +1)) {
+                            Toast.makeText(activity, "Raf aşağı taşındı", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(activity, "Daha aşağı taşınamaz", Toast.LENGTH_SHORT).show()
+                        }
+                        onDone()
+                        showManageDialog(activity, onDone)
+                    }
+                    5 -> promptName(activity, "Rafı yeniden adlandır", shelf.name) { name ->
                         if (name.isBlank()) return@promptName
                         // v20 (ADIM 2): açık API
                         renameShelf(activity, shelf.id, name)
                         onDone()
                         showManageDialog(activity, onDone)
                     }
-                    3 -> promptColor(activity, shelf) { color ->
+                    6 -> promptColor(activity, shelf) { color ->
                         if (color.isBlank()) return@promptColor
                         editShelfBgColor(activity, shelf.id, color)
                         Toast.makeText(activity, "Renk değiştirildi", Toast.LENGTH_SHORT).show()
                         onDone()
                         showManageDialog(activity, onDone)
                     }
-                    4 -> AlertDialog.Builder(activity)
+                    7 -> AlertDialog.Builder(activity)
                         .setTitle("Raftan sil")
                         .setMessage("\"${shelf.name}\" silinsin mi? (Kitaplar silinmez)")
                         .setPositiveButton("Sil") { _, _ ->
-                            // v20 (ADIM 2): açık API + yerleşik raf koruması
-                            if (shelf.id in AUTO_SHELF_IDS) {
-                                Toast.makeText(
-                                    activity,
-                                    "Yerleşik raf silinemez — yalnız yeniden adlandırılabilir",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else {
-                                deleteShelf(activity, shelf.id)
-                                Toast.makeText(activity, "\"${shelf.name}\" silindi", Toast.LENGTH_SHORT).show()
-                            }
+                            // v42 — YERLEŞİK RAFLAR DA SİLİNİR; silinen yerleşik raf
+                            // "gizlenen" listesine yazılır ve bir daha geri gelmez.
+                            val ok = deleteShelf(activity, shelf.id)
+                            Toast.makeText(
+                                activity,
+                                if (ok) "\"${shelf.name}\" silindi"
+                                else "Silinemedi — Seyir Defteri'ne yazıldı",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             onDone()
                             showManageDialog(activity, onDone)
                         }
@@ -628,5 +774,139 @@ object ShelfManager {
             }
             .setNegativeButton("Vazgeç", null)
             .show()
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // v40 — RAF DETAY SAYFASI: İÇERİK + ELLE SIRALAMA
+    //
+    // Kullanıcı rafa dokununca rafın kendi sayfası açılır. Buradaki sıra
+    // ELLE belirlenir ve kalıcıdır (umay_shelf_order).
+    //  • Özel rafta sıra ayrıca shelf.bookIds'e de yazılır (tek doğru kaynak).
+    //  • Yerleşik raflarda (Ders Kitapları vb.) bookIds boş olduğu için sıra
+    //    yalnız order anahtarında tutulur; içerik otomatik sınıflandırmayla
+    //    üretilir → yeni kitap eklendiğinde raf kendiliğinden güncel kalır.
+    // ═══════════════════════════════════════════════════════════════
+
+    /** Sanal raf: favoriler (ShelfManager'da kayıtlı bir raf değildir). */
+    const val SHELF_FAVORITES = "shelf_favorites"
+
+    private const val PREFS_ORDER = "umay_shelf_order"
+
+    private fun orderKey(shelfId: String) = "order_$shelfId"
+
+    /** Kullanıcının elle belirlediği sıra (boş = varsayılan sıralama). */
+    fun manualOrder(context: Context?, shelfId: String): List<String> {
+        if (context == null) return emptyList()
+        return try {
+            val raw = context.getSharedPreferences(PREFS_ORDER, 0)
+                .getString(orderKey(shelfId), null) ?: return emptyList()
+            val arr = JSONArray(raw)
+            val out = ArrayList<String>(arr.length())
+            for (i in 0 until arr.length()) out.add(arr.getString(i))
+            out
+        } catch (t: Throwable) {
+            log(context, "manualOrder", t)
+            emptyList()
+        }
+    }
+
+    /** Elle sırayı kaydeder (kalıcı). Özel rafta bookIds de aynı sıraya çekilir. */
+    fun setManualOrder(context: Context, shelfId: String, ids: List<String>) {
+        try {
+            val arr = JSONArray()
+            ids.forEach { arr.put(it) }
+            context.getSharedPreferences(PREFS_ORDER, 0).edit()
+                .putString(orderKey(shelfId), arr.toString()).apply()
+            if (shelfId !in AUTO_SHELF_IDS && shelfId != SHELF_FAVORITES) {
+                val shelves = shelvesOf(context)
+                val target = shelves.firstOrNull { it.id == shelfId } ?: return
+                val keep = target.bookIds.filter { it !in ids }
+                target.bookIds.clear()
+                target.bookIds.addAll(ids)
+                target.bookIds.addAll(keep)   // listede olmayanlar kaybolmaz
+                save(context, shelves)
+            }
+        } catch (t: Throwable) {
+            log(context, "setManualOrder", t)
+        }
+    }
+
+    /** Elle sırayı uygular; sırada olmayan kitaplar SONA eklenir (kaybolmaz). */
+    fun orderBooks(context: Context?, shelfId: String, list: List<Book>): List<Book> {
+        if (list.size < 2) return list
+        val order = manualOrder(context, shelfId)
+        if (order.isEmpty()) return list
+        val pos = HashMap<String, Int>(order.size * 2)
+        order.forEachIndexed { i, id -> if (!pos.containsKey(id)) pos[id] = i }
+        return list.sortedBy { pos[it.id] ?: Int.MAX_VALUE }
+    }
+
+    /** Bir rafın göstereceği kitaplar: favoriler / yerleşik / özel raf. */
+    fun shelfBooks(context: Context, shelfId: String, all: List<Book>): List<Book> {
+        val base: List<Book> = when {
+            shelfId == SHELF_FAVORITES -> {
+                val byId = all.associateBy { it.id }
+                FavoritesStore.ids(context).mapNotNull { byId[it] }
+            }
+            shelfId in AUTO_SHELF_IDS -> autoClassify(context, shelfId, all)
+            else -> {
+                val byId = all.associateBy { it.id }
+                val ids = shelvesOf(context).firstOrNull { it.id == shelfId }?.bookIds
+                    ?: emptyList()
+                ids.mapNotNull { byId[it] }
+            }
+        }
+        return orderBooks(context, shelfId, base)
+    }
+
+    /**
+     * Yerleşik rafların içeriği — ana ekrandaki sınıflandırmanın BİREBİR
+     * aynısı (MainActivity.fillShelves). Raf detay sayfası ile ana ekran
+     * farklı kitap göstermesin diye ayrı tutuldu.
+     */
+    private fun autoClassify(context: Context, shelfId: String, all: List<Book>): List<Book> {
+        val assigned = try {
+            val map = HashMap<String, MutableSet<String>>()
+            shelvesOf(context).forEach { shelf ->
+                shelf.bookIds.forEach { id ->
+                    map.getOrPut(id) { mutableSetOf() }.add(shelf.id)
+                }
+            }
+            map
+        } catch (t: Throwable) {
+            log(context, "autoClassify/assigned", t)
+            emptyMap<String, Set<String>>()
+        }
+        val out = ArrayList<Book>(all.size)
+        for (book in all) {
+            val mine = assigned[book.id]
+            if (mine != null) {
+                if (shelfId in mine) out.add(book)
+                continue
+            }
+            val src = book.title.lowercase()
+            val auto = when {
+                src.endsWith(".pptx") || src.endsWith(".ppt") || src.endsWith(".odp") ->
+                    "shelf_ders_slayt_notlar"
+                src.endsWith(".pdf") || src.endsWith(".epub") -> "shelf_ders_kitaplari"
+                else -> "shelf_cihang_taramalari"
+            }
+            if (auto == shelfId) out.add(book)
+        }
+        // v21 — derslere bağlı kaynaklar "Ders Kitapları" rafında da görünür
+        if (shelfId == "shelf_ders_kitaplari") {
+            try {
+                val linked = CourseStore.allLinkedBookIds(context)
+                if (linked.isNotEmpty()) {
+                    val shown = out.map { it.id }.toHashSet()
+                    for (book in all) {
+                        if (book.id in linked && shown.add(book.id)) out.add(book)
+                    }
+                }
+            } catch (t: Throwable) {
+                log(context, "autoClassify/linked", t)
+            }
+        }
+        return out
     }
 }

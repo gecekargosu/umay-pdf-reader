@@ -73,11 +73,19 @@ class UmayApp : Application() {
         try {
             Thread {
                 try {
-                    LibraryDb.get(this).readableDatabase?.close()
+                    // v5.14 — DÜZELTME: buradaki .close() KALDIRILDI.
+                    // SQLiteOpenHelper'ın önbelleğe aldığı PAYLAŞILAN bağlantıyı
+                    // kapatıyordu. Tam o sırada BootReceiver → Reminder →
+                    // CourseStore.slotsOf sorgu atınca "attempt to re-open an
+                    // already-closed object" hatası oluşuyordu. Isıtmanın amacı
+                    // şemayı kurmak; bağlantıyı açık tutmak Android'de normaldir.
+                    LibraryDb.get(this).readableDatabase
                     Log.d("UmayApp", "LibraryDb ısıtma/self-heal OK")
                     // v5.4 (ONARIM 3): iki sütunlu sayfalarda eski metinler
                     // karışıktı → bir kez yeniden çıkarılır (arka planda).
                     try { BookStore.migratePageTextV2(this) } catch (_: Throwable) {}
+                    // v39 — slaytlı belgelerde sayfa = slayt (metin yeniden bölünür)
+                    try { BookStore.migrateDocPagesV39(this) } catch (_: Throwable) {}
                     // v21.2 — file:// ile eklenen kitapların "source.pdf"
                     // kalan adlarını gerçek dosya adıyla değiştir (bir kez).
                     try { BookStore.repairGenericTitles(this) } catch (_: Throwable) {}
@@ -88,6 +96,13 @@ class UmayApp : Application() {
                     // v5.5 (ONARIM 10): mevcut kitapları derslere bir kez bağla
                     // (ders kartlarındaki "0 kaynak" sorunu — H12.6)
                     try { CourseStore.backfillAutoLink(this) } catch (_: Throwable) {}
+                    // v38 — RAF ONARIMI: kütüphane sıfırlanınca boşalan rafları
+                    // ders bağlarından + dosya adlarından yeniden doldur.
+                    // v39 — her açılışta (ucuz, idempotent): silinen kitap
+                    // kimliklerini temizler, BOŞ kalmış rafları ders/uzantıya
+                    // göre yeniden doldurur. Kullanıcı düzenine dokunmaz.
+                    try { ShelfRepair.runOnStart(this) } catch (_: Throwable) {}
+                    try { OfficePreview.cleanup(this) } catch (_: Throwable) {}
                 } catch (t: Throwable) {
                     // Açılışta asla fırlatılmaz; kitaplık JSON yedeğine düşer
                     Log.e("UmayApp", "LibraryDb ısıtma başarısız (yedek devrede)", t)

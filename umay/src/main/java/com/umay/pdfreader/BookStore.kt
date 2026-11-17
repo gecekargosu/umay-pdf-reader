@@ -70,6 +70,82 @@ object BookStore {
 
     fun sourceFile(ctx: Context, id: String) = File(bookDir(ctx, id), "source.pdf")
 
+    /**
+     * v38 — BELGE KİTAPLARI (DOCX/PPTX/DOC/PPT).
+     *
+     * Bu biçimler ARTIK PDF'e ÇEVRİLMEZ (kullanıcı isteği: dosya değişmesin,
+     * grafikler kaybolmasın). Orijinal dosya `source.<uzantı>` olarak saklanır;
+     * okuma için metin sayfaları ayrıca çıkarılır. Görüntüleme uygulama içi
+     * belge görünümünde veya cihazdaki başka bir uygulamada yapılır.
+     */
+    val DOC_EXTS = setOf("docx", "pptx", "doc", "ppt")
+
+    /** Kitabın orijinal belge dosyası (yoksa null = PDF kitap). */
+    fun sourceDoc(ctx: Context, id: String): File? {
+        val dir = bookDir(ctx, id)
+        for (e in DOC_EXTS) {
+            val f = File(dir, "source.$e")
+            if (f.exists() && f.length() > 0L) return f
+        }
+        return null
+    }
+
+    /** Belge modunda mı (PDF değil)? */
+    fun isDocumentBook(ctx: Context, id: String): Boolean = sourceDoc(ctx, id) != null
+
+    /**
+     * v39 — BELGE SAYFALARINI YENİDEN BÖL (bir kez).
+     *
+     * Slaytlı belgelerde 1400 karakter sınırı yüzünden 37 slaytlık sunum
+     * "2 sayfa"ya sıkışıyordu. Artık her slayt kendi sayfasında başlıyor;
+     * bu göç mevcut belge kitaplarının metnini orijinalinden yeniden böler.
+     * Orijinal dosya DEĞİŞMEZ, yalnızca metin sayfaları yeniden yazılır.
+     */
+    fun migrateDocPagesV39(ctx: Context) {
+        val key = "doc_pages_v39"
+        if (AppPrefs.getBool(ctx, key, false)) return
+        try {
+            loadBooks(ctx).forEach { b ->
+                val src = sourceDoc(ctx, b.id) ?: return@forEach
+                val pages = try {
+                    TextPager.paginate(DocumentConverter.paragraphs(src, src.name))
+                } catch (t: Throwable) {
+                    logError(ctx, "migrateDocPagesV39:${b.id}", t)
+                    return@forEach
+                }
+                if (pages.isEmpty()) return@forEach
+                for (i in 0 until b.pageCount) pageFile(ctx, b.id, i).delete()
+                pages.forEachIndexed { i, t -> pageFile(ctx, b.id, i).writeText(t) }
+                if (pages.size != b.pageCount) updatePageCount(ctx, b.id, pages.size)
+            }
+            AppPrefs.putBool(ctx, key, true)
+        } catch (t: Throwable) {
+            logError(ctx, "migrateDocPagesV39", t)
+        }
+    }
+
+    /**
+     * v39 — İçe aktarılan kitabı doğru YERLEŞİK rafa koyar.
+     *
+     * Kök neden: yalnız "Cihang Tarama" akışı raf atıyordu; normal aktarımda
+     * kitap hiçbir rafa girmiyor, kütüphane sıfırlanıp yeniden yüklenince
+     * raflar boş kalıyordu. Slaytlar slayt rafına, taramalar tarama rafına,
+     * diğerleri Ders Kitapları rafına düşer. Ders kodu varsa
+     * `CourseStore.autoLinkByTitle` zaten kendi ders rafına da ekler.
+     */
+    private fun placeOnShelf(ctx: Context, book: Book) {
+        try {
+            val shelf = when (ShelfRepair.categoryOf(book.title)) {
+                "slide" -> "shelf_ders_slayt_notlar"
+                "scan" -> "shelf_cihang_taramalari"
+                else -> "shelf_ders_kitaplari"
+            }
+            ShelfManager.addBookToShelf(ctx, book.id, shelf)
+        } catch (t: Throwable) {
+            logError(ctx, "placeOnShelf:${book.id}", t)
+        }
+    }
+
     private fun indexFile(ctx: Context) = File(booksDir(ctx), "books.json")
 
     // ── Kütüphane ──────────────────────────────────────────────
@@ -142,6 +218,24 @@ object BookStore {
         }
     }
 
+    /**
+     * v36.9 — ONARIM: yeniden üretilen PDF'in sayfa sayısı değişmişse kaydı
+     * güncelle (kitap id'si ve okuma geçmişi korunur).
+     */
+    fun updatePageCount(ctx: Context, id: String, pageCount: Int) {
+        if (pageCount <= 0) return
+        try {
+            val list = loadBooks(ctx).toMutableList()
+            val i = list.indexOfFirst { it.id == id }
+            if (i < 0) return
+            if (list[i].pageCount == pageCount) return
+            list[i] = list[i].copy(pageCount = pageCount)
+            saveBooks(ctx, list)
+        } catch (t: Throwable) {
+            logError(ctx, "updatePageCount:$id", t)
+        }
+    }
+
     /** Kitaplığı kaydeder: SQLite ana kayıt, `books.json` yedek aynası. */
     private fun saveBooks(ctx: Context, books: List<Book>) {
         cache = books
@@ -198,6 +292,27 @@ object BookStore {
     private fun sourceIndexFile(ctx: Context) = File(booksDir(ctx), "sources.json")
 
     /** Dosyanın kararlı kaynak kimliği (yol/belge kimliği + boyut). */
+    /**
+     * v42 — KİTAP ADINI DEĞİŞTİR (kopya eklerken "farklı ad ver" için).
+     * Dosya adı değişmez; yalnız kütüphane kaydı (görünen ad) güncellenir.
+     */
+    fun renameBook(ctx: Context, id: String, newTitle: String): Boolean {
+        return try {
+            val name = newTitle.trim()
+            if (name.isBlank()) return false
+            val list = loadBooks(ctx).toMutableList()
+            val i = list.indexOfFirst { it.id == id }
+            if (i < 0) return false
+            list[i] = list[i].copy(title = name)
+            saveBooks(ctx, list)
+            SeyirDefteri.yaz(ctx, "KÜTÜPHANE", "kitap adı değişti", "$id → $name")
+            true
+        } catch (t: Throwable) {
+            logError(ctx, "renameBook", t)
+            false
+        }
+    }
+
     fun sourceKeyOf(ctx: Context, uri: Uri): String? {
         val path0 = uri.path
         if (uri.scheme == "file") {
@@ -318,6 +433,39 @@ object BookStore {
                     dest.outputStream().use { output -> input.copyTo(output) }
                 } ?: throw IllegalStateException("Dosya açılamadı")
 
+                // ── v38: BELGE MODU — ÇEVRİM YOK ─────────────────────────
+                // DOCX/PPTX/DOC/PPT olduğu gibi saklanır. Grafik/şekil/renk
+                // korunur; yalnızca sesli okuma için METİN sayfaları çıkarılır.
+                val ext0 = DocumentConverter.effectiveExtension(dest, name)
+                if (ext0 in DOC_EXTS) {
+                    val original = File(dir, "source.$ext0")
+                    if (!dest.renameTo(original)) {
+                        dest.copyTo(original, overwrite = true)
+                        dest.delete()
+                    }
+                    val paragraphs = try {
+                        DocumentConverter.paragraphs(original, name)
+                    } catch (t: Throwable) {
+                        CrashLog.recordParse(ctx, "importDoc.parse", name, t)
+                        original.delete()
+                        throw IllegalArgumentException(
+                            "'$name' okunamadı (${t.message ?: t.javaClass.simpleName}).", t
+                        )
+                    }
+                    val pages = TextPager.paginate(paragraphs)
+                    pages.forEachIndexed { i, text -> pageFile(ctx, id, i).writeText(text) }
+                    val docBook = Book(id, name, pages.size, System.currentTimeMillis())
+                    val docBooks = loadBooks(ctx).toMutableList()
+                    docBooks.add(docBook)
+                    saveBooks(ctx, docBooks)
+                    if (srcKey != null) rememberSourceKey(ctx, srcKey, id)
+                    try { CourseStore.autoLinkByTitle(ctx, docBook) } catch (_: Throwable) {}
+                    placeOnShelf(ctx, docBook)
+                    CrashLog.notePublic(ctx, "importDoc", "$name → ${pages.size} sayfa (orijinal korundu)")
+                    onDone(Result.success(docBook))
+                    return@execute
+                }
+
                 // v17 (EVRENSEL PARSER — GÖREV 1): uzantıya GÜVENME, magic
                 // byte'a bak (UniversalParser). Böylece:
                 //  • "kitap.pdf" ama aslında metin olan dosya → PDF'e çevrilir
@@ -361,6 +509,10 @@ object BookStore {
                         )
                     }
                     val converted = File(dir, "converted.pdf")
+                    // v36.9 — KALİTE KAPISI: dönüşüm "başarılı" görünse de metin
+                    // ZIP baytlarından ibaret olabilir (eski sürüm hatası). Böyle
+                    // bir kitap kütüphaneye HİÇ eklenmesin: okunamayan, sesli
+                    // okumada anlamsız şeyler söyleyen kayıt oluşmasın.
                     val n = try {
                         DocumentConverter.convert(dest, converted, name)
                     } catch (t: Throwable) {
@@ -371,6 +523,18 @@ object BookStore {
                         throw IllegalArgumentException(
                             "'$name' okunamadı (${t.message ?: t.javaClass.simpleName}). " +
                                 "Detay: Ayarlar → Hata Günlüğü (umay_error.log)", t
+                        )
+                    }
+                    if (n > 0 && BookRepair.probeGarbage(converted)) {
+                        converted.delete()
+                        dest.delete()
+                        CrashLog.recordParse(
+                            ctx, "importPdf.garbage", name,
+                            IllegalArgumentException("dönüşüm metni çöp üretti")
+                        )
+                        throw IllegalArgumentException(
+                            "'$name' metne çevrilemedi (dönüşüm bozuk çıktı). " +
+                                "Dosyayı farklı bir biçimde (ör. PDF) kaydedip yeniden deneyin."
                         )
                     }
                     dest.delete()
@@ -396,6 +560,28 @@ object BookStore {
                 books.add(book)
                 saveBooks(ctx, books)
 
+                // v37 — GRAFİK UYARISI: DOCX/PPTX yalnızca METNE çevrilir;
+                // şekil/grafik/tablo düzeni korunmaz. Kullanıcı bunu bilmeli,
+                // aksi hâlde "hocanın slaytıyla aynı değil" sürprizi oluyor.
+                if (convertedDoc &&
+                    DocumentConverter.extension(name) in setOf("docx", "pptx", "doc", "ppt")
+                ) {
+                    try {
+                        CrashLog.notePublic(ctx, "importPdf", "$name metne çevrildi (grafik yok)")
+                        android.os.Handler(android.os.Looper.getMainLooper()).post {
+                            try {
+                                android.widget.Toast.makeText(
+                                    ctx,
+                                    ctx.getString(R.string.doc_metin_uyari, name),
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            } catch (_: Throwable) {
+                            }
+                        }
+                    } catch (_: Throwable) {
+                    }
+                }
+
                 // v21: kaynak kimliğini kaydet (sonraki taramalarda tekilleştirme)
                 if (srcKey != null) rememberSourceKey(ctx, srcKey, id)
 
@@ -406,6 +592,7 @@ object BookStore {
                 // otomatik bağla ("BLG205 Slayt3.pptx" → BLG205 dersi).
                 // Kod yoksa hiçbir şey yapılmaz; hata içe aktarmayı durdurmaz.
                 try { CourseStore.autoLinkByTitle(ctx, book) } catch (_: Throwable) {}
+                placeOnShelf(ctx, book)
 
                 // Dönüştürmeden oluşan PDF'in (TXT/DOCX/MD/CSV) kamuya açık
                 // kopyası: Documents/UmayPDF (ADIM 1). Hata içe aktarmayı
@@ -777,6 +964,10 @@ object BookStore {
         if (AppPrefs.getString(ctx, AppPrefs.KEY_LAST_BOOK) == id) {
             AppPrefs.putString(ctx, AppPrefs.KEY_LAST_BOOK, "")
         }
+        // v44 — "okunamaz sayfa" kayıtları da bu kitapla birlikte gitsin
+        // (yoksa tanılama "silinmiş kitap" diye sarı lamba yakar)
+        try { PrepStore.forgetBook(ctx, id) } catch (_: Throwable) {}
+        try { PrepStore.forgetSignature(ctx, id) } catch (_: Throwable) {}
         // v6 (Aşama 3) — ders kaynaklarındaki asılı bağlantıları da temizle
         try { CourseStore.unlinkBook(ctx, id) } catch (_: Throwable) {}
         // v20 (ADIM 2): kitap raftaysa raf listelerinde asılı kalmasın —

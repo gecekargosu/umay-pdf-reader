@@ -229,7 +229,8 @@
                     android:visibility="gone" />
             </FrameLayout>
 
-            <!-- 3. DERSLER — v25: bölümün TAMAMI tek neon çerçeve içinde -->
+
+            <!-- 4. DERSLER — v40: kahraman kartın HEMEN ALTINDA (kullanıcı isteği) -->
             <com.umay.pdfreader.NeonCardLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -319,7 +320,12 @@
 
             </com.umay.pdfreader.NeonCardLayout>
 
-            <!-- 4. EN SON OKUNAN (kahraman kart) -->
+            <!-- 4. ŞU AN DİNLENEN — v41: yalnız bir kitap açıkken görünür -->
+            <include
+                android:id="@+id/npInclude"
+                layout="@layout/view_now_playing" />
+
+            <!-- 3. EN SON OKUNAN (kahraman kart) — v40: artık Derslerim'den ÖNCE -->
             <LinearLayout
                 android:id="@+id/heroWrap"
                 android:layout_width="match_parent"
@@ -900,6 +906,19 @@
                     android:textSize="12.5sp"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- v43 — Kampüs duyuruları (okul sitesi akışı) -->
+            <TextView
+                android:id="@+id/btnCampus"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:text="@string/campus_open"
+                android:textColor="@color/umay_accent"
+                android:textSize="12.5sp"
+                android:textStyle="bold" />
 
 
             <!-- v5.7 — GİZLİ KASA: ana sayfanın en altında, kilitli alan -->

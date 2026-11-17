@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_gradient_root">
+
+    <!-- Üst bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_alignParentStart="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Geri"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:id="@+id/bookTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/btnBack"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:layout_toStartOf="@id/btnDelete"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/btnDelete"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_toStartOf="@id/btnSearch"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/kitap_sil"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/umay_danger" />
+
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_toStartOf="@id/pageIndicator"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/ic_ara_hint"
+            android:src="@drawable/ic_search"
+            app:tint="@color/umay_text_dim" />            <TextView
+                android:id="@+id/pageIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/umay_accent"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Sayfa görüntüsü -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/umay_frame">
+
+        <ImageView
+            android:id="@+id/pageImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="Sayfa"
+            android:scaleType="matrix" />            <!-- v21 (DENETİM BUG-005): Çıkarma/OCR durumu artık sayfanın
+                 ORTASINDA boyutu değişen bir balon DEĞİL, altta sabit genişlikli
+                 tek satırlık bir banttır. Eski kodda her sayfa ilerlemesinde
+                 balon boyutu değişiyor, merkezde "titriyor / kayıyor" görünüyordu. -->
+            <TextView
+                android:id="@+id/pageStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_panel"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingTop="7dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="7dp"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12.5sp"
+                android:visibility="gone" />
+
+        <!-- v13 (T9e) — Yüzen "Dinle / AI Özet" rozeti (görüntüleme modu dahil) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/floatSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="✨ AI Özet"
+                android:textColor="@color/umay_accent"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/floatPomodoro"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/pomodoro_start"
+                android:textColor="@color/umay_orange"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/floatListen"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_button_primary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="🔊 Dinle"
+                android:textColor="@color/umay_on_accent"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Kontrol paneli -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_panel"
+        android:padding="12dp">
+
+        <!-- Sayfa atlama -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sayfa"
+                android:textColor="@color/umay_text_dim" />
+
+            <EditText
+                android:id="@+id/pageInput"
+                android:layout_width="70dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_input"
+                android:gravity="center"
+                android:imeOptions="actionGo"
+                android:inputType="number"
+                android:maxLength="5"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColor="@color/umay_text"
+                android:textColorHint="@color/umay_text_dim"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/btnGoPage"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/sayfaya_git"
+                android:textColor="@color/umay_accent"
+                android:textStyle="bold" />
+
+            <SeekBar
+                android:id="@+id/pageSeek"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:progressTint="@color/umay_accent"
+                android:thumbTint="@color/umay_accent" />
+        </LinearLayout>
+
+        <!-- Sayfa atlama sonrası: tam oradan okumaya başla -->
+        <TextView
+            android:id="@+id/btnReadHere"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_button_primary"
+            android:gravity="center"
+            android:text="@string/buradan_oku"
+            android:textColor="@color/umay_on_accent"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Oynatma tuşları -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnPrev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/onceki"
+                android:src="@drawable/ic_prev" />
+
+            <ImageButton
+                android:id="@+id/btnPlayPause"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_button_primary"
+                android:contentDescription="@string/oynat"
+                android:padding="16dp"
+                android:src="@drawable/ic_play"
+                app:tint="@color/umay_on_accent" />
+
+            <ImageButton
+                android:id="@+id/btnNext"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/sonraki"
+                android:src="@drawable/ic_next" />
+
+            <!-- Hız: yavaşlat / hızlandır (0.5x – 2.0x) -->
+            <TextView
+                android:id="@+id/btnSpeedDown"
+                android:layout_width="34dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_button_secondary"
+                android:contentDescription="@string/yavaslat"
+                android:gravity="center"
+                android:text="−"
+                android:textColor="@color/umay_accent"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="1.0x"
+                android:textColor="@color/umay_accent"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnSpeedUp"
+                android:layout_width="34dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/bg_button_secondary"
+                android:contentDescription="@string/hizlandir"
+                android:gravity="center"
+                android:text="＋"
+                android:textColor="@color/umay_accent"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- v5.12 — Arapça sayfa OCR modu (meal / tefsir).
+                 Hız grubunun sağındaki boşlukta, her zaman görünür. -->
+            <TextView
+                android:id="@+id/btnOcr"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="@string/arapca_ocr_kisa"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Alt satır: uyku, çeviri, sohbet -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnSleep"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/kapali"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btnTranslate"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ceviri_kisa"
+                android:textColor="@color/umay_text_dim"
+                android:textSize="13sp" />
+
+            <!-- Ses (kadın/erkek) -->
+            <TextView
+                android:id="@+id/btnVoice"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ses_otomatik"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+
+            <!-- Yapay zekâ sayfa özeti panelini aç/kapat (ADIM 3) -->
+            <TextView
+                android:id="@+id/btnSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ozet_kisa"
+                android:textColor="@color/umay_orange"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnEq"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/ekolayzir_ac"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+
+            <!-- v12 (YENİ ÖZELLİK) — AI çalışma kartları -->
+            <TextView
+                android:id="@+id/btnCards"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/flashcard_open"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+
+            <!-- v12 (YENİ ÖZELLİK) — Yer imi / sayfa notu -->
+            <TextView
+                android:id="@+id/btnBookmark"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/bookmark_open"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btnChat"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_secondary"
+                android:gravity="center"
+                android:text="@string/sohbet"
+                android:textColor="@color/umay_accent"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Ses dalgalanması (ADIM 3): okurken hareketli, duraklatınca düz çizgi -->
+        <com.umay.pdfreader.WaveformView
+            android:id="@+id/waveform"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/ses_dalgasi" />
+
+        <!-- Yapay zekâ sayfa özeti paneli (ADIM 3) -->
+        <LinearLayout
+            android:id="@+id/summaryCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="@string/ozet"
+                    android:textColor="@color/umay_orange"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />                    <TextView
+                        android:id="@+id/btnSummaryEdit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:layout_toStartOf="@id/btnSummaryClose"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:text="@string/summary_edit"
+                        android:textColor="@color/umay_orange"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/btnSummaryClose"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/ozet_kapat"
+                    android:textColor="@color/umay_text_dim"
+                    android:textSize="13sp" />
+            </RelativeLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="132dp"
+                android:layout_marginTop="4dp"
+                android:fadeScrollbars="false">
+
+                <TextView
+                    android:id="@+id/summaryText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/ozet_aliniyor"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+            </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnSummaryListen"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_primary"
+                    android:gravity="center"
+                    android:text="@string/ozet_dinle"
+                    android:textColor="@color/umay_on_accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnSummaryChat"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/sohbet"
+                    android:textColor="@color/umay_accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- v12 (YENİ ÖZELLİK) — Özeti dışa aktar + alıntı kartı -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnSummaryExport"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/export_summary"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/btnSummaryQuote"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/quote_share"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- v5 (ADIM D): Özet sesi kontrolü — Duraklat/Devam + Durdur -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:id="@+id/summaryControls">
+
+                <TextView
+                    android:id="@+id/btnSummaryPause"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/ozet_duraklat"
+                    android:textColor="@color/umay_orange"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnSummaryStop"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:gravity="center"
+                    android:text="@string/ozet_durdur"
+                    android:textColor="@color/umay_text"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Okunan metin önizleme -->
+        <TextView
+            android:id="@+id/sentencePreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:padding="10dp"
+            android:textColor="@color/umay_text"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

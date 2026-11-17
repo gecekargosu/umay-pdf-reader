@@ -141,6 +141,38 @@ class SettingsActivity : AppCompatActivity() {
         }
         paintLampSoundRow()
 
+        // v5.14 — SINAV GERİ SAYIMI: bildirimi tamamen kapatma anahtarı.
+        // Eski sürümde kapatma yoktu; bildirim dakikada bir tazelenip HIGH
+        // kanalda olduğu için sürekli ekrana düşüyordu.
+        binding.btnExamCountdown.setOnClickListener {
+            val on = ExamCountdownService.enabled(this)
+            AppPrefs.putBool(this, AppPrefs.KEY_EXAM_COUNTDOWN, !on)
+            if (!on) ExamCountdownService.refresh(this) else ExamCountdownService.stop(this)
+            paintExamCountdownRow()
+            Toast.makeText(
+                this,
+                getString(
+                    if (!on) R.string.ayar_sinav_sayaci_acildi
+                    else R.string.ayar_sinav_sayaci_kapandi
+                ),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        paintExamCountdownRow()
+
+        // v42 — SEYİR DEFTERİ: programın kendi tuttuğu, kullanıcıya açık günlük
+        binding.btnSeyirDefteri.setOnClickListener { showSeyirDefteri() }
+
+        // v36.9 — BOZUK BELGELERİ ONAR: eski sürümde yanlış çevrilmiş
+        // DOCX/PPTX kitaplarını orijinal dosyadan yeniden üretir (silmeden).
+        binding.btnRepairBooks.setOnClickListener { confirmRepairBooks() }
+        // v37 — DOCX/PPTX belgelerini kaldır + orijinalinden yeniden yükle
+        binding.btnReloadDocs.setOnClickListener { confirmReloadDocs() }
+        // v39 — boş kalmış rafları yeniden doldur (veri silmez)
+        binding.btnRepairShelves.setOnClickListener { repairShelves() }
+        // v39 — birebir aynı dosyaların kopyalarını sil
+        binding.btnDedup.setOnClickListener { confirmDedup() }
+
         // v17 (GÖREV 2) — Hata günlüğü paylaşımı: umay_error.log'u
         // FileProvider ile gönder (WhatsApp/E-posta/Drive) veya olmazsa
         // panoya kopyala — kullanıcı ajanı anında bilgilendirebilsin.
@@ -541,7 +573,291 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * v36.9 — BOZUK BELGE ONARIMI (arayüz tarafı).
+     *
+     * Orijinal dosyalar telefonun içinde tutulmuyor (dönüştürülmüş PDF
+     * saklanıyor), bu yüzden onarım kullanıcının belgelerini koyduğu
+     * klasörlerden yapılır. Kitap SİLİNMEZ; yalnız kaynak PDF yenilenir.
+     */
+    private fun confirmRepairBooks() {
+        val roots = listOf(
+            java.io.File(FolderImporter.DEFAULT_DIR),
+            java.io.File("/sdcard/Download/3.DONEM"),
+            java.io.File("/sdcard/3.DONEM"),
+            java.io.File("/sdcard/3.DÖNEM")
+        ).filter { it.isDirectory && it.canRead() }
+        if (roots.isEmpty()) {
+            Toast.makeText(this, R.string.onar_klasor_yok, Toast.LENGTH_LONG).show()
+            return
+        }
+        val listText = roots.joinToString("\n") { "• " + it.absolutePath }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.onar_baslik)
+            .setMessage(getString(R.string.onar_aciklama, listText))
+            .setPositiveButton(R.string.onar_basla) { _, _ -> runRepair(roots) }
+            .setNegativeButton(R.string.iptal, null)
+            .show()
+    }
+
+    private fun runRepair(roots: List<java.io.File>) {
+        val dlg = android.app.ProgressDialog(this).apply {
+            setMessage(getString(R.string.onar_calisiyor))
+            setCancelable(false)
+            show()
+        }
+        Thread {
+            val total = BookRepair.Report()
+            try {
+                roots.forEach { root ->
+                    val rep = BookRepair.runFolder(this, root) { name, done, all ->
+                        runOnUiThread {
+                            runCatching { dlg.setMessage("$name  ($done/$all)") }
+                        }
+                    }
+                    total.checked += rep.checked
+                    total.repaired += rep.repaired
+                    total.alreadyOk += rep.alreadyOk
+                    total.noSource += rep.noSource
+                    total.failed += rep.failed
+                    total.details.addAll(rep.details)
+                }
+            } catch (t: Throwable) {
+                BookStore.logError(this, "repairBooks", t)
+            }
+            runOnUiThread {
+                runCatching { dlg.dismiss() }
+                val msg = BookRepair.summary(total) +
+                    if (total.details.isEmpty()) "" else "\n\n" +
+                        total.details.take(10).joinToString("\n")
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.onar_bitti)
+                    .setMessage(msg)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+        }.start()
+    }
+
+    /**
+     * v37 — BELGELERİ SIFIRDAN YÜKLE (sağlama).
+     *
+     * Kütüphanedeki DOCX/PPTX kitapları kaldırılır ve orijinal klasörden
+     * yeniden aktarılır. Amaç: eski sürümde bozulan belgelerin temiz bir
+     * kütüphaneyle gerçekten düzelip düzelmediğini görmek.
+     */
+    private fun confirmReloadDocs() {
+        val roots = listOf(
+            java.io.File(FolderImporter.DEFAULT_DIR),
+            java.io.File("/sdcard/Download/3.DONEM"),
+            java.io.File("/sdcard/3.DONEM"),
+            java.io.File("/sdcard/3.DÖNEM")
+        ).filter { it.isDirectory && it.canRead() }
+        if (roots.isEmpty()) {
+            Toast.makeText(this, R.string.reload_klasor_yok, Toast.LENGTH_LONG).show()
+            return
+        }
+        val count = DocReload.docBookCount(this)
+        val root = roots.first()
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.reload_baslik)
+            .setMessage(getString(R.string.reload_aciklama, count, root.absolutePath))
+            .setPositiveButton(R.string.reload_basla) { _, _ -> runReloadDocs(root) }
+            .setNeutralButton(R.string.reload_tumu) { _, _ -> confirmFullReload(root) }
+            .setNegativeButton(R.string.iptal, null)
+            .show()
+    }
+
+    /** v39 — MÜKERRER: yalnız birebir aynı içerikli dosyalar (SHA-256). */
+    private fun confirmDedup() {
+        val groups = try { Dedup.scan(this, BookStore.loadBooks(this)) } catch (_: Throwable) { emptyList() }
+        if (groups.isEmpty()) {
+            Toast.makeText(this, R.string.dedup_temiz, Toast.LENGTH_LONG).show()
+            return
+        }
+        val total = groups.sumOf { it.remove.size }
+        val sample = groups.take(5).joinToString("\n") { "• ${it.title} (${it.remove.size + 1} kopya)" }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.dedup_baslik)
+            .setMessage(getString(R.string.dedup_aciklama) + "\n\n$total kopya silinecek:\n$sample")
+            .setPositiveButton(R.string.sil) { _, _ -> runDedup() }
+            .setNegativeButton(R.string.iptal, null)
+            .show()
+    }
+
+    private fun runDedup() {
+        val dlg = android.app.ProgressDialog(this).apply {
+            setMessage(getString(R.string.dedup_baslik))
+            setCancelable(false)
+            show()
+        }
+        val ctx = applicationContext
+        Thread {
+            val rep = try { Dedup.run(ctx) } catch (t: Throwable) {
+                BookStore.logError(ctx, "Dedup.run", t); null
+            }
+            runOnUiThread {
+                runCatching { dlg.dismiss() }
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.dedup_baslik)
+                    .setMessage(if (rep == null) getString(R.string.dedup_temiz) else Dedup.summary(rep))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+        }.start()
+    }
+
+    /**
+     * v39 — RAFLARI ONAR: kitap kimlikleri yenilendiğinde boş kalan rafları
+     * ders bağlarına ve dosya uzantısına göre yeniden doldurur. Silmez.
+     */
+    private fun repairShelves() {
+        Toast.makeText(this, R.string.reload_calisiyor, Toast.LENGTH_SHORT).show()
+        val ctx = applicationContext
+        Thread {
+            val ok = try { ShelfRepair.reconcile(ctx) } catch (_: Throwable) { false }
+            val shelves = try { ShelfManager.shelvesOf(ctx) } catch (_: Throwable) { emptyList() }
+            val placed = shelves.sumOf { it.bookIds.size }
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    if (!ok) getString(R.string.raf_onar_bos)
+                    else getString(R.string.raf_onar_bitti, shelves.size, placed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }.start()
+    }
+
+    /**
+     * v37 — TAM SIFIRLAMA: Kur'an dışındaki TÜM kitaplar (PDF dâhil) silinir,
+     * klasörden yeniden aktarılır. "Hocanın slaytıyla birebir aynı PDF"
+     * kütüphanesi kurmak için kullanılır.
+     */
+    private fun confirmFullReload(root: java.io.File) {
+        val total = try { BookStore.loadBooks(this).size } catch (_: Throwable) { 0 }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.reload_tumu_baslik)
+            .setMessage(getString(R.string.reload_tumu_aciklama, total, root.absolutePath))
+            .setPositiveButton(R.string.reload_basla) { _, _ -> runFullReload(root) }
+            .setNegativeButton(R.string.iptal, null)
+            .show()
+    }
+
+    private fun runFullReload(root: java.io.File) {
+        val dlg = android.app.ProgressDialog(this).apply {
+            setMessage(getString(R.string.reload_calisiyor))
+            setCancelable(false)
+            show()
+        }
+        DocReload.runFull(
+            this,
+            root,
+            onProgress = { text, done, total ->
+                runOnUiThread { runCatching { dlg.setMessage("$text  ($done/$total)") } }
+            }
+        ) { rep ->
+            runOnUiThread {
+                runCatching { dlg.dismiss() }
+                val msg = DocReload.summary(rep) +
+                    if (rep.details.isEmpty()) "" else "\n\n" + rep.details.take(12).joinToString("\n")
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.reload_bitti)
+                    .setMessage(msg)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+        }
+    }
+
+    private fun runReloadDocs(root: java.io.File) {
+        val dlg = android.app.ProgressDialog(this).apply {
+            setMessage(getString(R.string.reload_calisiyor))
+            setCancelable(false)
+            show()
+        }
+        DocReload.run(
+            this,
+            root,
+            onProgress = { text, done, total ->
+                runOnUiThread { runCatching { dlg.setMessage("$text  ($done/$total)") } }
+            }
+        ) { rep ->
+            runOnUiThread {
+                runCatching { dlg.dismiss() }
+                val msg = DocReload.summary(rep) +
+                    if (rep.details.isEmpty()) "" else "\n\n" + rep.details.take(12).joinToString("\n")
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.reload_bitti)
+                    .setMessage(msg)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+        }
+    }
+
     /** v36.3 — lamba sesi satırı. */
+    /**
+     * v42 — Seyir Defteri görüntüleyici.
+     * Son 400 olay, monospace + kaydırılabilir; kopyala / temizle.
+     */
+    private fun showSeyirDefteri() {
+        try {
+            val (count, bytes) = SeyirDefteri.ozet(this)
+            val body = SeyirDefteri.son(this, 400)
+                .ifBlank { getString(R.string.seyir_bos) }
+            val tv = android.widget.TextView(this).apply {
+                text = body
+                typeface = android.graphics.Typeface.MONOSPACE
+                textSize = 10.5f
+                setPadding(28, 18, 28, 18)
+                setTextIsSelectable(true)
+            }
+            val scroll = android.widget.ScrollView(this).apply { addView(tv) }
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Seyir Defteri · $count kayıt · ${bytes / 1024} KB")
+                .setView(scroll)
+                .setPositiveButton(R.string.seyir_kopyala) { _, _ ->
+                    try {
+                        val cm = getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                            as android.content.ClipboardManager
+                        cm.setPrimaryClip(
+                            android.content.ClipData.newPlainText("Umay Seyir Defteri", body)
+                        )
+                        Toast.makeText(this, "Kopyalandı", Toast.LENGTH_SHORT).show()
+                    } catch (_: Throwable) { }
+                }
+                .setNeutralButton(R.string.seyir_temizle) { _, _ ->
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle(R.string.seyir_temizle)
+                        .setMessage("Tüm kayıtlar silinsin mi? Bu işlem geri alınamaz.")
+                        .setPositiveButton("Sil") { _, _ ->
+                            SeyirDefteri.temizle(this)
+                            SeyirDefteri.yaz(this, "UYGULAMA", "seyir defteri temizlendi")
+                            Toast.makeText(this, R.string.seyir_kapandi, Toast.LENGTH_SHORT).show()
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        } catch (t: Throwable) {
+            BookStore.logError(this, "showSeyirDefteri", t)
+            Toast.makeText(this, "Açılamadı: ${t.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /** Sınav geri sayımı satırının yazısı: açık/kapalı. */
+    private fun paintExamCountdownRow() {
+        try {
+            val on = ExamCountdownService.enabled(this)
+            binding.btnExamCountdown.text = getString(
+                if (on) R.string.ayar_sinav_sayaci_acik else R.string.ayar_sinav_sayaci_kapali
+            )
+        } catch (_: Throwable) {
+        }
+    }
+
     private fun paintLampSoundRow() {
         try {
             val on = AppPrefs.getBool(this, AppPrefs.KEY_LAMP_SOUND, true)

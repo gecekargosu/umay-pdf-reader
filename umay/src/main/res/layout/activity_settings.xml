@@ -341,6 +341,12 @@
                 android:id="@+id/btnAlarmSound"
                 style="@style/SettingsRow"
                 android:text="@string/alarm_sound_pick" />
+
+            <!-- v5.14 — sınav geri sayımı bildirimini kapatma -->
+            <TextView
+                android:id="@+id/btnExamCountdown"
+                style="@style/SettingsRow"
+                android:text="@string/ayar_sinav_sayaci" />
         </LinearLayout>
 
         <!-- ══════════ 4. YAPAY ZEKÂ ══════════ -->
@@ -435,10 +441,10 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- ══════════ 5. VERİ, YEDEK & GÜVENLİK ══════════ -->
+        <!-- ══ 5a. GÜVENLİK (v45 — kasa "veri" içinde kayboluyordu) ══ -->
         <TextView
             style="@style/SettingsSection"
-            android:text="@string/sec_veri" />
+            android:text="@string/sec_guvenlik" />
 
         <LinearLayout style="@style/SettingsCard">
 
@@ -447,10 +453,19 @@
                 style="@style/SettingsRow"
                 android:layout_marginTop="0dp"
                 android:text="@string/kasa_baslik" />
+        </LinearLayout>
+
+        <!-- ══ 5b. VERİLERİM (yedek, transkript, istatistik) ══ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_veri" />
+
+        <LinearLayout style="@style/SettingsCard">
 
             <TextView
                 android:id="@+id/btnBackup"
                 style="@style/SettingsRow"
+                android:layout_marginTop="0dp"
                 android:text="@string/backup_title" />
 
             <TextView
@@ -462,10 +477,19 @@
                 android:id="@+id/btnStats"
                 style="@style/SettingsRow"
                 android:text="@string/stats_title" />
+        </LinearLayout>
+
+        <!-- ══ 5c. BAKIM VE TEŞHİS (v45 — teknik satırlar ayrıldı) ══ -->
+        <TextView
+            style="@style/SettingsSection"
+            android:text="@string/sec_bakim" />
+
+        <LinearLayout style="@style/SettingsCard">
 
             <TextView
                 android:id="@+id/btnDiag"
                 style="@style/SettingsRowAccent"
+                android:layout_marginTop="0dp"
                 android:text="@string/diag_run" />
 
             <TextView
@@ -484,6 +508,36 @@
                 android:id="@+id/btnLampSound"
                 style="@style/SettingsRow"
                 android:text="@string/ayar_lamp_ses" />
+
+            <!-- v42 — SEYİR DEFTERİ: programın otomatik tuttuğu günlük -->
+            <TextView
+                android:id="@+id/btnSeyirDefteri"
+                style="@style/SettingsRow"
+                android:text="@string/seyir_defteri" />
+
+            <!-- v36.9 — bozuk belgeleri orijinalinden yeniden üret -->
+            <TextView
+                android:id="@+id/btnRepairBooks"
+                style="@style/SettingsRow"
+                android:text="@string/onar_satir" />
+
+            <!-- v37 — DOCX/PPTX kitaplarını kaldır + orijinalinden yeniden yükle -->
+            <TextView
+                android:id="@+id/btnReloadDocs"
+                style="@style/SettingsRow"
+                android:text="@string/reload_satir" />
+
+            <!-- v39 — boş kalmış rafları ders/uzantı bilgisinden yeniden doldur -->
+            <TextView
+                android:id="@+id/btnRepairShelves"
+                style="@style/SettingsRow"
+                android:text="@string/raf_onar_satir" />
+
+            <!-- v39 — birebir aynı dosyaları bul ve kopyalarını sil -->
+            <TextView
+                android:id="@+id/btnDedup"
+                style="@style/SettingsRow"
+                android:text="@string/dedup_satir" />
         </LinearLayout>
 
         <!-- ══════════ 6. HAKKINDA & GÜNCELLEME ══════════ -->

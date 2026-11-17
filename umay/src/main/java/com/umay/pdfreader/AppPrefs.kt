@@ -35,6 +35,8 @@ object AppPrefs {
     const val KEY_TTS_MODE = "tts_mode"  // builtin | edge (doğal neural ses)
     /** v36.3 — durum lambaları sarı/kırmızıya dönerken sesli uyarı çalsın mı? */
     const val KEY_LAMP_SOUND = "lamp_sound"
+    /** v5.14 — SINAV GERİ SAYIMI bildirimi açık mı? (varsayılan: açık) */
+    const val KEY_EXAM_COUNTDOWN = "exam_countdown"
     // v5 (ADIM C): Edge Neural mümkünken mekanik yerleşik ses kullanılmasın mı?
     // (İnternet YOKSA çevrimdışı okuma için yerleşik yine de kullanılır.)
     const val KEY_TTS_NO_BUILTIN = "tts_no_builtin"
@@ -295,7 +297,9 @@ object AppPrefs {
      * dönüyordu → AI ilk denemede ölüyordu. Canlı ölçümde 200/2.5 sn veren
      * "gemini-3.5-flash" varsayılan yapıldı; FALLBACK_MODELS yedeği duruyor.
      */
-    const val BUILTIN_API_MODEL = "gemini-3.5-flash"
+    // v42 — canlı ölçümle çalıştığı doğrulanan model (0,6 sn yanıt).
+    // Eski "gemini-3.5-flash" 429 (kota) döndürüyordu.
+    const val BUILTIN_API_MODEL = "gemini-flash-lite-latest"
 
     fun warmApiCache(ctx: Context) {
         // v13 (A4): önce etkin sağlayıcı belirlenir; gömülü anahtar YALNIZ

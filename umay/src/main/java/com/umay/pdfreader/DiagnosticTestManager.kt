@@ -57,7 +57,9 @@ object DiagnosticTestManager {
      * Böylece "38" gibi şişkin bir sayı yerine gerçekten sınanan özellik sayısı görünür.
      */
     enum class Tier(val label: String) {
-        ASSET("varlık"), FUNC("işlev"), E2E("uçtan uca")
+        ASSET("varlık"), FUNC("işlev"), E2E("uçtan uca"),
+        /** v36.7 — ORTAM/cihaz durumu: uygulamanın hatası değil; lambayı yakmaz. */
+        ENV("cihaz")
     }
 
     /**
@@ -75,8 +77,19 @@ object DiagnosticTestManager {
         "Zorunlu izinler"
     )
 
-    fun tierOf(title: String): Tier =
-        if (title in ASSET_TITLES) Tier.ASSET else Tier.FUNC
+    /** v36.7 — cihaz/ortam satırları (K1): bilgi, sayaçlara ve lambaya girmez. */
+    private val ENV_TITLES = setOf(
+        "Ses akışı", "Güç tasarrufu", "Ağ tipi",
+        // v44 — Gemini erişimi (kota/anahtar/çevrimdışı) uygulama hatası değil,
+        // ortam durumudur: raporda "!" olarak görünür, sarı lambayı yakmaz.
+        "Gemini API"
+    )
+
+    fun tierOf(title: String): Tier = when {
+        title in ENV_TITLES -> Tier.ENV
+        title in ASSET_TITLES -> Tier.ASSET
+        else -> Tier.FUNC
+    }
 
     data class Item(
         val group: String,
@@ -161,6 +174,66 @@ object DiagnosticTestManager {
             styleMessage(d, report)
         } catch (t: Throwable) {
             BookStore.logError(ctx, "DiagnosticTestManager.showLast", t)
+        }
+    }
+
+    /**
+     * v41 — "SARI LAMBA YANDI, NEDEN?"
+     *
+     * Kullanıcı geri bildirimi: lamba yandı ama sebep görünmüyordu. Raporda
+     * 40+ satırın içinde kayboluyordu. Bu diyalog YALNIZ sorunları gösterir:
+     * hangi bileşen, ne oldu, ne yapmalı. Sorun yoksa bunu da söyler.
+     */
+    fun problemsText(report: String): String {
+        val out = ArrayList<String>(8)
+        var group = ""
+        for (raw in report.lines()) {
+            val line = raw.trim()
+            if (line.startsWith("──") && line.endsWith("──")) {
+                group = line.trim('─', ' ')
+                continue
+            }
+            if (line.startsWith("!") || line.startsWith("✗")) {
+                val body = line.removePrefix("!").removePrefix("✗").trim()
+                out.add("•${if (group.isNotBlank()) " [$group]" else ""} $body")
+            }
+        }
+        return out.joinToString("\n\n")
+    }
+
+    fun showProblems(ctx: Activity) {
+        val report = lastReport(ctx)
+        if (report.isBlank()) {
+            runAndShow(ctx)
+            return
+        }
+        val body = problemsText(report)
+        try {
+            val d = android.app.AlertDialog.Builder(ctx)
+                .setTitle(
+                    if (body.isBlank()) "✓ Sorun yok" else "! Dikkat gerektiren durumlar"
+                )
+                .setMessage(
+                    if (body.isBlank()) {
+                        "Tüm denetimler temiz.\nSon denetim: ${
+                            java.text.SimpleDateFormat("dd MMM HH:mm", Locale("tr", "TR"))
+                                .format(java.util.Date(lastRunAt(ctx)))
+                        }"
+                    } else body
+                )
+                .setPositiveButton("Tam rapor") { _, _ -> showLastOrRun(ctx) }
+                .setNeutralButton("Yeniden test") { _, _ -> runAndShow(ctx) }
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+            d.show()
+            try {
+                d.findViewById<android.widget.TextView>(android.R.id.message)?.apply {
+                    setTextIsSelectable(true)
+                    textSize = 13f
+                }
+            } catch (_: Throwable) { }
+        } catch (t: Throwable) {
+            BookStore.logError(ctx, "diagShowProblems", t)
         }
     }
 
@@ -251,6 +324,9 @@ object DiagnosticTestManager {
                 Item("YAPAY ZEKÂ", "Gemini API", Status.WARN, "çevrimdışı — test atlandı (okuma etkilenmez)")
             } else {
                 val (s, d) = testGemini(ctx)
+                // v44 — "AI kotası doldu (429)" uygulamanın hatası değil, geçici
+                // ortam durumu: raporda görünür ama sarı lambayı yakmaz
+                // (kademe ENV_TITLES içinde tanımlı).
                 Item("YAPAY ZEKÂ", "Gemini API", s, d)
             }
         }
@@ -259,8 +335,9 @@ object DiagnosticTestManager {
             val has = !AppPrefs.lastApiKey.isNullOrBlank()
             Item(
                 "YAPAY ZEKÂ", "AI anahtarı",
-                if (has) Status.OK else Status.WARN,
-                if (has) "kayıtlı (model: ${AppPrefs.lastApiModel})" else "anahtar yok — sohbet/özet çalışmaz"
+                if (has) Status.OK else Status.INFO,
+                if (has) "kayıtlı (model: ${AppPrefs.lastApiModel})"
+                else "anahtar yok — Ayarlar → Yapay zekâ'dan eklenebilir (okuma etkilenmez)"
             )
         }
 
@@ -421,8 +498,13 @@ object DiagnosticTestManager {
             val books = BookStore.loadBooks(ctx)
             var missing = 0
             var emptyText = 0
+            var docBooks = 0
             for (b in books) {
-                if (!BookStore.sourceFile(ctx, b.id).exists()) missing++
+                // v39 — belge modunda kaynak `source.<uzantı>`dır (source.pdf yok).
+                val has = BookStore.sourceFile(ctx, b.id).exists() ||
+                    BookStore.sourceDoc(ctx, b.id) != null
+                if (!has) missing++
+                if (BookStore.isDocumentBook(ctx, b.id)) docBooks++
                 if (b.pageCount > 0 && BookStore.pageFile(ctx, b.id, 0).length() == 0L) emptyText++
             }
             val status = when {
@@ -432,8 +514,66 @@ object DiagnosticTestManager {
             }
             Item(
                 "KÜTÜPHANE", "Kitap dosyaları", status,
-                "${books.size} kitap · kaynağı eksik: $missing · metni henüz çıkarılmamış: $emptyText"
+                "${books.size} kitap (orijinali saklanan belge: $docBooks) · " +
+                    "kaynağı eksik: $missing · metni henüz çıkarılmamış: $emptyText"
             )
+        }
+        // v37 — BELGE DÖNÜŞÜMÜ: bozuk DOCX/PPTX dönüşümü lambayı sarı yaksın.
+        // (Eski hâlde 44 kitap çöp metinle duruyordu ama tanılama yeşil diyordu.)
+        guard("KÜTÜPHANE", "Belge dönüşümü") {
+            val books = BookStore.loadBooks(ctx)
+            val broken = BookRepair.brokenBooks(ctx, books)
+            val status = when {
+                books.isEmpty() -> Status.INFO
+                broken.isNotEmpty() -> Status.WARN
+                else -> Status.OK
+            }
+            Item(
+                "KÜTÜPHANE", "Belge dönüşümü", status,
+                if (broken.isEmpty()) {
+                    "${books.size} kitabın metni okunabilir · DOCX/PPTX orijinaliyle saklanır " +
+                        "(PDF'e çevrilmez, grafikler korunur)"
+                } else {
+                    "${broken.size} belge okunamıyor (ör. ${broken.first()}) — " +
+                        "Ayarlar → Bozuk belgeleri onar"
+                }
+            )
+        }
+        // v41 — OKUNABİLİRLİK (arka plan ön hazırlık kayıtları).
+        // Kullanıcı geri bildirimi: "sarı lamba yandı, neden bilmiyorum".
+        // Ön hazırlık 269 okunamaz sayfa bulduğu hâlde bu hiçbir yerde
+        // görünmüyordu. Artık uyarı olarak yazılıyor ve HANGİ kitap olduğu,
+        // ne yapılacağı (AR/OCR) söyleniyor.
+        guard("KÜTÜPHANE", "Okunabilirlik (ön hazırlık)") {
+            val books = BookStore.loadBooks(ctx).associateBy { it.id }
+            // v44 — SİLİNMİŞ KİTAPLARIN KAYITLARI SAYILMAZ: kullanıcı belgeyi
+            // sildi ama ön hazırlık kaydı kalıp sarı lamba yakıyordu. Burada
+            // hem süzülür hem de bayat kayıtlar kendiliğinden temizlenir.
+            val issues = PrepStore.issues(ctx)
+            issues.map { it.bookId }.distinct()
+                .filter { it.isNotEmpty() && it !in books }
+                .forEach { stale -> try { PrepStore.forgetBook(ctx, stale) } catch (_: Throwable) {} }
+            val live = issues.filter { it.bookId in books }
+            val real = live.filter { it.kind != PrepAudit.Kind.ARABIC }
+            if (real.isEmpty()) {
+                Item(
+                    "KÜTÜPHANE", "Okunabilirlik (ön hazırlık)", Status.OK,
+                    "denetlenen sayfalarda okunamayan metin yok"
+                )
+            } else {
+                val perBook = real.groupBy { it.bookId }.map { (id, list) ->
+                    val name = books[id]?.title ?: "silinmiş kitap"
+                    "$name: ${list.size} sayfa"
+                }
+                val kindOf = real.groupingBy { it.kind }.eachCount()
+                    .entries.joinToString(" · ") { "${it.value} ${it.key.label}" }
+                Item(
+                    "KÜTÜPHANE", "Okunabilirlik (ön hazırlık)", Status.WARN,
+                    "${real.size} sayfa okunamaz ($kindOf)\n  " +
+                        perBook.joinToString("\n  ") +
+                        "\n  Çözüm: kitabı aç → AR (Arapça OCR) düğmesi; boş sayfalar için tara/OCR."
+                )
+            }
         }
         guard("KÜTÜPHANE", "Kütüphane boyutu") {
             val dir = BookStore.booksDir(ctx)
@@ -446,22 +586,43 @@ object DiagnosticTestManager {
         }
         guard("KÜTÜPHANE", "Raflar") {
             val shelves = ShelfManager.shelvesOf(ctx)
-            val ids = BookStore.loadBooks(ctx).map { it.id }.toSet()
+            val books = BookStore.loadBooks(ctx)
+            val ids = books.map { it.id }.toSet()
             val ghost = shelves.sumOf { s -> s.bookIds.count { it !in ids } }
+            // v39 — kitaplık doluyken, içine kitap GİRMESİ GEREKEN boş raf da
+            // bir hatadır ("yeşil lamba ama raflar boş" durumu).
+            val expected = mapOf(
+                "shelf_ders_kitaplari" to books.count {
+                    val c = ShelfRepair.categoryOf(it.title)
+                    c == "book" || c == "doc"
+                },
+                "shelf_ders_slayt_notlar" to books.count { ShelfRepair.categoryOf(it.title) == "slide" },
+                "shelf_cihang_taramalari" to books.count { ShelfRepair.categoryOf(it.title) == "scan" }
+            )
+            val empty = shelves.count {
+                it.bookIds.isEmpty() && (expected[it.id] ?: 0) > 0
+            }
+            val status = if (ghost > 0 || (books.isNotEmpty() && empty > 0)) Status.WARN
+            else Status.OK
             Item(
-                "KÜTÜPHANE", "Raflar",
-                if (ghost > 0) Status.WARN else Status.OK,
-                "${shelves.size} raf · silinmiş kitaba bağlı kayıt: $ghost"
+                "KÜTÜPHANE", "Raflar", status,
+                "${shelves.size} raf · boş: $empty · silinmiş kitaba bağlı kayıt: $ghost" +
+                    if (empty > 0 && books.isNotEmpty()) " — Ayarlar → Rafları onar" else ""
             )
         }
         guard("KÜTÜPHANE", "Favoriler") {
             val ids = BookStore.loadBooks(ctx).map { it.id }.toSet()
+            // v41 — silinmiş kitaba bağlı favori kaydı otomatik temizlenir
+            // (eski hâlde kalıcı "geçersiz" uyarısı olarak duruyordu).
+            val cleaned = FavoritesStore.prune(ctx, ids)
             val fav = FavoritesStore.ids(ctx)
             val ghost = fav.count { it !in ids }
             Item(
                 "KÜTÜPHANE", "Favoriler",
                 if (ghost > 0) Status.WARN else Status.OK,
-                "${fav.size} favori${if (ghost > 0) " · $ghost geçersiz" else ""}"
+                "${fav.size} favori" +
+                    (if (cleaned > 0) " · $cleaned eski kayıt temizlendi" else "") +
+                    (if (ghost > 0) " · $ghost geçersiz" else "")
             )
         }
         guard("KÜTÜPHANE", "Okuma konumları") {
@@ -691,6 +852,17 @@ object DiagnosticTestManager {
                 "punto=$size"
             )
         }
+        // v5.14 — sınav geri sayımı: kullanıcı kapatabilsin; kapalıyken
+        // servis ve bildirim hiç başlamaz.
+        guard("BİLDİRİM", "Sınav geri sayımı") {
+            val on = AppPrefs.getBool(ctx, AppPrefs.KEY_EXAM_COUNTDOWN, true)
+            Item(
+                "BİLDİRİM", "Sınav geri sayımı",
+                Status.OK,
+                if (on) "açık · sessiz bildirim · Ayarlar'dan kapatılabilir"
+                else "kapalı · hiç bildirim gösterilmez"
+            )
+        }
 
         // ══ 8. ÇEVRİMDIŞI & GÜVENLİK ═══════════════════════════
         guard("ÇEVRİMDIŞI", "Ağ durumu") {
@@ -799,6 +971,57 @@ object DiagnosticTestManager {
             )
         }
 
+        // ══ 10. CİHAZ / ORTAM (K1 — 39-KAPSAM-ANALIZI.md) ═══════
+        // Bunlar UYGULAMANIN hatası değil, ORTAMIN durumudur: bilgi satırı
+        // olarak raporlanır, sarı lambayı yakmaz. Kullanıcı "neden ses
+        // gelmiyor / neden arka planda durdu" sorusunun cevabını burada görür.
+        guard("CİHAZ", "Ses akışı") {
+            val am = ctx.getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager
+            val notif = am?.getStreamVolume(android.media.AudioManager.STREAM_NOTIFICATION) ?: -1
+            val notifMax = am?.getStreamMaxVolume(android.media.AudioManager.STREAM_NOTIFICATION) ?: -1
+            val music = am?.getStreamVolume(android.media.AudioManager.STREAM_MUSIC) ?: -1
+            val ring = am?.ringerMode ?: -1
+            val modeTxt = when (ring) {
+                android.media.AudioManager.RINGER_MODE_SILENT -> "sessiz"
+                android.media.AudioManager.RINGER_MODE_VIBRATE -> "titreşim"
+                android.media.AudioManager.RINGER_MODE_NORMAL -> "normal"
+                else -> "?"
+            }
+            Item(
+                "CİHAZ", "Ses akışı", Status.INFO,
+                if (notif <= 0)
+                    "bildirim sesi KAPALI ($notif/$notifMax · zil: $modeTxt) — lamba uyarı sesi ve ders alarmı duyulmaz"
+                else "bildirim $notif/$notifMax · medya $music · zil: $modeTxt"
+            )
+        }
+        guard("CİHAZ", "Güç tasarrufu") {
+            val pm = ctx.getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+            val lowPower = pm?.isPowerSaveMode == true
+            val ignoring = pm?.isIgnoringBatteryOptimizations(ctx.packageName) == true
+            Item(
+                "CİHAZ", "Güç tasarrufu", Status.INFO,
+                (if (lowPower) "pil tasarrufu AÇIK (arka plan işleri gecikebilir)" else "pil tasarrufu kapalı") +
+                    " · muafiyet: " + (if (ignoring) "var" else "yok")
+            )
+        }
+        guard("CİHAZ", "Ağ tipi") {
+            val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+            val caps = cm?.getNetworkCapabilities(cm.activeNetwork)
+            val type = when {
+                caps == null -> "bağlantı yok"
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) -> "Wi-Fi"
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) -> "mobil veri"
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET) -> "Ethernet"
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN) -> "VPN"
+                else -> "diğer"
+            }
+            val metered = caps?.let { !it.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_NOT_METERED) } == true
+            Item(
+                "CİHAZ", "Ağ tipi", Status.INFO,
+                type + if (metered) " · tarifeli (mobil veri) — ses/OCR trafiği kotadan düşer" else ""
+            )
+        }
+
         out
     }
 
@@ -864,7 +1087,23 @@ object DiagnosticTestManager {
         AppPrefs.warmApiCache(ctx)
         val key = AppPrefs.lastApiKey
         val model = AppPrefs.lastApiModel
-        if (key.isNullOrBlank()) return Status.FAIL to "API anahtarı yok (Ayarlar'dan girin)"
+        // v43 — KOTA KORUMASI: tanılama 2 dakikada bir çalışıyor; her turda
+        // gerçek API çağrısı yapmak ücretsiz kotayı tüketiyor ve lambayı
+        // "kırmızı"ya çeviriyordu. Sonuç 1 saat önbelleklenir.
+        val cachedAt = AppPrefs.getLong(ctx, "diag_ai_at", 0L)
+        val cachedState = AppPrefs.getString(ctx, "diag_ai_state", "")
+        val cachedDetail = AppPrefs.getString(ctx, "diag_ai_detail", "")
+        if (System.currentTimeMillis() - cachedAt < 3_600_000L && cachedState.isNotBlank()) {
+            return (if (cachedState == "OK") Status.OK else Status.WARN) to
+                "$cachedDetail (1 saatlik önbellek)"
+        }
+        // v41 — ANAHTARSIZKEN AĞA ÇIKMA. Eski hâlde 20 sn bekleniyor, her
+        // 2 dakikada bir boşa istek atılıyor ve sarı lamba "sebepsiz" yanıyordu.
+        // Anahtar yoksa bu bir HATA değil, isteğe bağlı özelliğin kapalı olması:
+        // mavi (bilgi) satırı yazılır, lamba yanmaz; okuma/ses hiç etkilenmez.
+        if (key.isNullOrBlank()) {
+            return Status.INFO to "anahtar yok — sohbet/özet kapalı (okuma ve sesli dinleme etkilenmez)"
+        }
         val out = arrayOfNulls<Pair<Status, String>>(1)
         val latch = java.util.concurrent.CountDownLatch(1)
         Thread({
@@ -872,14 +1111,28 @@ object DiagnosticTestManager {
                 val answer = ApiClient.ask("Merhaba, test mesajı. Tek kelime cevap ver.", emptyList())
                 out[0] = Status.OK to "anahtar çalışıyor (model: $model · yanıt: ${answer.take(30)}…)"
             } catch (e: Exception) {
-                out[0] = Status.FAIL to "AI hatası: ${e.message?.take(120) ?: "bilinmeyen"}"
+                val msg = e.message ?: "bilinmeyen"
+                // v43 — kota/limit = HATA değil UYARI (kırmızı yakmayız)
+                val quota = msg.contains("kota", true) || msg.contains("429") ||
+                    msg.contains("limit", true) || msg.contains("quota", true)
+                out[0] = (if (quota) Status.WARN else Status.FAIL) to
+                    "${if (quota) "AI kotası" else "AI hatası"}: ${msg.take(120)}"
             } finally {
                 latch.countDown()
             }
         }, "umay-diag-ai").apply { isDaemon = true }.start()
         val done = latch.await(20, java.util.concurrent.TimeUnit.SECONDS)
-        return if (done) out[0] ?: (Status.WARN to "bilinmeyen sonuç")
+        val result = if (done) out[0] ?: (Status.WARN to "bilinmeyen sonuç")
         else Status.WARN to "20 sn içinde yanıt gelmedi — ağ/anahtar"
+        // 429 → uyarı (kota), 401/403 → hata; sonucu 1 saat sakla
+        try {
+            val st = result.first
+            val detail = result.second
+            AppPrefs.putLong(ctx, "diag_ai_at", System.currentTimeMillis())
+            AppPrefs.putString(ctx, "diag_ai_state", if (st == Status.OK) "OK" else "WARN")
+            AppPrefs.putString(ctx, "diag_ai_detail", detail.take(180))
+        } catch (_: Throwable) { }
+        return result
     }
 
     private fun testLibraryDb(ctx: Context): Pair<Status, String> {
@@ -937,7 +1190,9 @@ object DiagnosticTestManager {
             // Varlık uyarıları raporda görünmeye devam eder, lambayı yakmaz.
             AppPrefs.putInt(
                 ctx, KEY_LAST_WARN,
-                items.count { it.status == Status.WARN && it.tier != Tier.ASSET }
+                items.count {
+                    it.status == Status.WARN && it.tier != Tier.ASSET && it.tier != Tier.ENV
+                }
             )
             AppPrefs.putInt(
                 ctx, KEY_LAST_ASSET_WARN,
@@ -965,14 +1220,17 @@ object DiagnosticTestManager {
             .format(java.util.Date())
         val fail = items.count { it.status == Status.FAIL }
         val warn = items.count { it.status == Status.WARN }
-        val ok = items.count { it.status == Status.OK && it.tier != Tier.ASSET }
+        val ok = items.count {
+            it.status == Status.OK && it.tier != Tier.ASSET && it.tier != Tier.ENV
+        }
         val asset = items.count { it.status == Status.OK && it.tier == Tier.ASSET }
         val e2e = items.count { it.tier == Tier.E2E }
+        val env = items.count { it.tier == Tier.ENV }
         sb.appendLine("═══ UMAY ÖZELLİK KÜNYESİ ═══")
         sb.appendLine("Tarih: $now")
         sb.appendLine("Sonuç: ✓ $ok işlev geçti · ! $warn uyarı · ✗ $fail hata")
         val assetWarn = items.count { it.status == Status.WARN && it.tier == Tier.ASSET }
-        sb.appendLine("Kademe: varlık $asset (yeşil sayıya katılmaz) · uçtan uca $e2e")
+        sb.appendLine("Kademe: varlık $asset (yeşil sayıya katılmaz) · cihaz $env · uçtan uca $e2e")
         if (assetWarn > 0) {
             sb.appendLine(
                 "Not: $assetWarn varlık uyarısı var (dosya/kayıt/ayar düzeyi) — sarı lambayı yakmaz."

@@ -116,6 +116,42 @@ object CourseStore {
 
     data class DocWithBook(val doc: CourseDoc, val book: Book?)
 
+    /**
+     * v44 — AYNI DERSİN İKİ KAYDI (gerçek olay).
+     *
+     * Aktarma, klasör adı `Tubitak_2209_A` ile ders adı `Tübitak 2209-A`
+     * eşleşmediği için **ikinci bir ders** açmıştı: kaynaklar yeni derste,
+     * kullanıcının açtığı eski ders ise boş görünüyordu.
+     * Burada adları eşleşen (noktalama/alt çizgi farkı yok sayılır) dersler
+     * birleştirilir: kaynaklar korunan derse taşınır, boş kopya silinir.
+     * @return birleştirilen ders sayısı
+     */
+    fun mergeDuplicateCourses(ctx: Context): Int = safe(ctx, "mergeDuplicateCourses", 0) {
+        var merged = 0
+        val groups = courses(ctx).groupBy { TextUtil.matchKey(it.name) }
+        groups.values.forEach { list ->
+            if (list.size < 2) return@forEach
+            // En eski kayıt korunur (kullanıcının oluşturduğu ders)
+            val keep = list.minByOrNull { it.createdAt } ?: return@forEach
+            list.filter { it.id != keep.id }.forEach { dup ->
+                try {
+                    docsOf(ctx, dup.id).forEach { d ->
+                        addDocs(ctx, keep.id, listOf(d.doc.bookId), d.doc.category)
+                    }
+                    deleteCourse(ctx, dup.id)
+                    merged++
+                    SeyirDefteri.yaz(
+                        ctx, "DERSLER", "yinelenen ders birleşti",
+                        "${dup.name} → ${keep.name}"
+                    )
+                } catch (t: Throwable) {
+                    BookStore.logError(ctx, "mergeCourses/${dup.id}", t)
+                }
+            }
+        }
+        merged
+    }
+
     /** Derse bağlı kaynaklar + kitap künyesi (kitap silinmişse null). */
     fun docsOf(ctx: Context, courseId: String): List<DocWithBook> =
         safe(ctx, "docsOf", emptyList()) {

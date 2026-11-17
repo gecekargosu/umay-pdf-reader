@@ -602,6 +602,8 @@ class CourseDetailActivity : AppCompatActivity() {
                     Academy.formatDateTime(hw.dueMillis, en) + " • " +
                         Academy.countdownPhrase(days, en)
                 card.setOnClickListener { homeworkMenu(hw) }
+                // v45 — teslimi 1 haftadan az kaldıysa kart yanıp söner
+                if (!hw.done && days in 0..7) blinkView(card)
                 row.addView(card)
             }
             val scroll = HorizontalScrollView(this).apply {
@@ -901,6 +903,24 @@ class CourseDetailActivity : AppCompatActivity() {
     }
 
 
+    // v45 — yanıp sönen uyarı (Handler: animasyon ölçeği 0 olan cihazlarda da çalışır)
+    private val blinkHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val blinkingViews = java.util.WeakHashMap<android.view.View, Runnable>()
+
+    private fun blinkView(v: android.view.View) {
+        try {
+            blinkingViews.remove(v)?.let { blinkHandler.removeCallbacks(it) }
+            val run = object : Runnable {
+                override fun run() {
+                    v.alpha = if (v.alpha < 0.85f) 1f else 0.35f
+                    blinkHandler.postDelayed(this, 620L)
+                }
+            }
+            blinkingViews[v] = run
+            blinkHandler.post(run)
+        } catch (_: Throwable) { }
+    }
+
     private fun refreshExams() {
         binding.examList.removeAllViews()
         val now = System.currentTimeMillis()
@@ -917,7 +937,7 @@ class CourseDetailActivity : AppCompatActivity() {
             }
             val sub = Academy.formatDateTime(exam.atMillis, en) + " • " +
                 Academy.countdownPhrase(days, en) + " • " + meta
-            addRow(
+            val row = addRow(
                 binding.examList, exam.title, sub,
                 onAction = {
                     CourseStore.deleteExam(this, exam.id)
@@ -926,6 +946,8 @@ class CourseDetailActivity : AppCompatActivity() {
                 // v5: sınav geri sayımı = ANA vurgu (sıcak turuncu)
                 highlight = true
             )
+            // v45 — 1 haftadan az kaldıysa satır yanıp söner (kullanıcı isteği)
+            if (days in 0..7) blinkView(row)
         }
     }
 
