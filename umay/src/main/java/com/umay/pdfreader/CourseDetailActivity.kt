@@ -1022,16 +1022,38 @@ class CourseDetailActivity : AppCompatActivity() {
                     Academy.countdownPhrase(Academy.daysLeft(next.atMillis, now), en) + ")"
             }
 
-            // Yaklaşan proje/ödev teslimi
+            // Yaklaşan proje/ödev teslimi — v5.16: PROJE TÜRÜ SINAVLAR da
+            // sayılır. 7 Aralık proje teslimi sınav olarak girildiği için
+            // yalnızca homework tablosuna bakmak "kayıt yok" diyordu.
             val hw = CourseStore.homeworkOf(this, courseId)
                 .filter { !it.done }
                 .minByOrNull { it.dueMillis }
-            binding.examHomeworkLine.text = if (hw == null) {
+            val projExam = CourseStore.examsOf(this, courseId)
+                .filter {
+                    it.atMillis >= now - 24L * 60 * 60 * 1000 &&
+                        (it.type.equals("Proje", ignoreCase = true) ||
+                            it.title.contains("Proje", ignoreCase = true))
+                }
+                .minByOrNull { it.atMillis }
+            val dueTitle: String?
+            val dueMillis: Long
+            when {
+                hw != null && (projExam == null || hw.dueMillis <= projExam.atMillis) -> {
+                    dueTitle = hw.title; dueMillis = hw.dueMillis
+                }
+                projExam != null -> {
+                    dueTitle = projExam.title; dueMillis = projExam.atMillis
+                }
+                else -> {
+                    dueTitle = null; dueMillis = 0L
+                }
+            }
+            binding.examHomeworkLine.text = if (dueTitle == null) {
                 getString(R.string.exam_homework) + ": " + getString(R.string.exam_none)
             } else {
-                getString(R.string.exam_homework) + ": " + hw.title + " · " +
-                    Academy.formatDate(hw.dueMillis, en) + " (" +
-                    Academy.countdownPhrase(Academy.daysLeft(hw.dueMillis, now), en) + ")"
+                getString(R.string.exam_homework) + ": " + dueTitle + " · " +
+                    Academy.formatDateTime(dueMillis, en) + " (" +
+                    Academy.countdownPhrase(Academy.daysLeft(dueMillis, now), en) + ")"
             }
         } catch (t: Throwable) {
             BookStore.logError(this, "examPanel", t)

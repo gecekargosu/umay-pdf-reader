@@ -113,6 +113,7 @@ class MonthCalendarView @JvmOverloads constructor(
     fun prevMonth() {
         shown.add(Calendar.MONTH, -1)
         marks = emptyMap()
+        requestLayout()
         invalidate()
         onMonthChange?.invoke(shown.timeInMillis)
     }
@@ -120,6 +121,7 @@ class MonthCalendarView @JvmOverloads constructor(
     fun nextMonth() {
         shown.add(Calendar.MONTH, 1)
         marks = emptyMap()
+        requestLayout()
         invalidate()
         onMonthChange?.invoke(shown.timeInMillis)
     }
@@ -213,6 +215,31 @@ class MonthCalendarView @JvmOverloads constructor(
             }
         } catch (_: Throwable) {
         }
+    }
+
+    /**
+     * v5.16 — ÖLÇÜ DÜZELTMESİ.
+     *
+     * View.onMeasure varsayılanı `wrap_content` için AT_MOST ölçüsünün
+     * tamamını alır; takvim, kalan ekran yüksekliğini kaplayıp altındaki
+     * "sınav sonuçları" panelini ekran dışına itiyor ve sayfa kaymıyordu
+     * (kullanıcının "takvimin altı boş" şikâyetinin kök nedeni).
+     * Burada gerçek içerik yüksekliği hesaplanır: başlık + 6 satır.
+     */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val d = resources.displayMetrics.density
+        val desiredW = MeasureSpec.getSize(widthMeasureSpec)
+        // Ayın kaç SATIR gerektirdiği hesaplanır (4/5/6); böylece boş satır
+        // için yer ayrılmaz — "takvimin altı boş" görüntüsü oluşmaz.
+        val firstDow = shown.get(Calendar.DAY_OF_WEEK) - 1
+        val maxDay = shown.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val rows = ((firstDow + maxDay + 6) / 7).coerceIn(4, 6)
+        // pad(16) + başlık/hafta günleri(110) + rows*62 + alt pad(16)
+        val desiredH = ((16f + 110f + rows * 62f + 16f) * d).toInt()
+        setMeasuredDimension(
+            resolveSize(desiredW, widthMeasureSpec),
+            resolveSize(desiredH, heightMeasureSpec)
+        )
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
