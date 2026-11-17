@@ -347,6 +347,11 @@
                 android:id="@+id/btnExamCountdown"
                 style="@style/SettingsRow"
                 android:text="@string/ayar_sinav_sayaci" />
+
+            <TextView
+                android:id="@+id/btnPrayer"
+                style="@style/SettingsRow"
+                android:text="@string/ayar_namaz" />
         </LinearLayout>
 
         <!-- ══════════ 4. YAPAY ZEKÂ ══════════ -->

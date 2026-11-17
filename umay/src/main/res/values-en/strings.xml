@@ -842,4 +842,34 @@
     <string name="exam_next">Next exam</string>
     <string name="exam_homework">Project/assignment due</string>
     <string name="exam_none">none</string>
+
+    <!-- v5.18 - Prayer times -->
+    <string name="prayer_title">Prayer times</string>
+    <string name="prayer_on">Prayer alerts: ON</string>
+    <string name="prayer_off">Prayer alerts: OFF - tap to enable</string>
+    <string name="prayer_city">City</string>
+    <string name="prayer_city_fmt">City: %1$s</string>
+    <string name="prayer_pre">Before prayer</string>
+    <string name="prayer_pre_fmt">Before prayer: %1$d min</string>
+    <string name="prayer_pre_off">Before prayer: off</string>
+    <string name="prayer_end">Before window ends</string>
+    <string name="prayer_end_fmt">Before window ends: %1$d min</string>
+    <string name="prayer_end_off">Before window ends: off</string>
+    <string name="prayer_min_fmt">%1$d minutes</string>
+    <string name="prayer_sound_on">Sound: ON</string>
+    <string name="prayer_sound_off">Sound: OFF</string>
+    <string name="prayer_today">"TODAY'S TIMES"</string>
+    <string name="prayer_sunrise">Sunrise</string>
+    <string name="prayer_next_off">Prayer alerts are off</string>
+    <string name="prayer_next_none">Next prayer could not be calculated</string>
+    <string name="prayer_next_fmt">Next: %1$s - %2$s - in %3$s</string>
+    <string name="prayer_tomorrow">tomorrow</string>
+    <string name="prayer_note">Calculated offline with the Diyanet method for %1$s; may differ by +-2 min. Alerts need no internet.</string>
+    <string name="ayar_namaz">Prayer times</string>
+    <string name="ayar_namaz_acik">Prayer times: ON - %1$s</string>
+    <string name="ayar_namaz_kapali">Prayer times: OFF</string>
+    <string name="prayer_card_title">Prayer - %1$s</string>
+    <string name="prayer_card_off">Off - tap to enable</string>
+    <string name="prayer_card_fmt">Next: %1$s - %2$s - %3$s</string>
+    <string name="prayer_test">Send test alert</string>
 </resources>

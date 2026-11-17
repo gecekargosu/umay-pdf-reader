@@ -370,6 +370,16 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             }
         }
         // v5.16 — ana sayfa yarışma rafı (kapaklı, yatay kaydırmalı)
+        // v5.18 - NAMAZ VAKITLERI: ana sayfa seridi
+        binding.prayerCard.setOnClickListener {
+            try {
+                startActivity(Intent(this, PrayerActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "prayerCard", t)
+            }
+        }
+        renderPrayerCard()
+
         renderCompetitionShelf()
 
         // Arka plan takibi (6 saatte bir) + açılışta sessiz kontrol
@@ -764,6 +774,9 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         try { refreshNowPlaying() } catch (_: Throwable) { }
         // v43 — Kampüs rozeti (yeni duyuru sayısı)
         try { updateCampusBadge() } catch (_: Throwable) { }
+        // v5.18 - namaz vakitleri: plani tazele + seridi guncelle
+        try { PrayerTimes.ensureScheduled(this) } catch (_: Throwable) {}
+        try { renderPrayerCard() } catch (_: Throwable) {}
         // v12: ana ekran widget'ını tazele (sıradaki ders bilgisi güncellensin)
         try { UmayWidgetProvider.refreshAll(this) } catch (_: Throwable) {}
         // v13 (T7): yaklaşan sınav varsa canlı geri sayım bildirimini sürdür
@@ -1196,6 +1209,31 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
      * Kartın içindeki yatay listeye güncel programların kapaklarını basar;
      * kapağa dokununca yarışmanın resmî sitesi açılır (detaylı inceleme).
      */
+    /** v5.18 - ana sayfa namaz seridi: siradaki vakit ve kalan sure. */
+    private fun renderPrayerCard() {
+        try {
+            if (!PrayerTimes.isOn(this)) {
+                binding.prayerCardTitle.text = getString(R.string.prayer_title)
+                binding.prayerCardSub.text = getString(R.string.prayer_card_off)
+                return
+            }
+            val n = PrayerTimes.next(this)
+            binding.prayerCardTitle.text = getString(R.string.prayer_card_title, PrayerTimes.city(this).name)
+            binding.prayerCardSub.text = if (n == null) {
+                getString(R.string.prayer_next_none)
+            } else {
+                getString(
+                    R.string.prayer_card_fmt,
+                    PrayerTimes.label(this, n.vakit),
+                    (if (n.tomorrow) getString(R.string.prayer_tomorrow) + " " else "") + PrayerTimes.fmt(n.at),
+                    PrayerTimes.remaining(n.at.timeInMillis - System.currentTimeMillis())
+                )
+            }
+        } catch (t: Throwable) {
+            BookStore.logError(this, "renderPrayerCard", t)
+        }
+    }
+
     private fun renderCompetitionShelf() {
         try {
             val row = binding.compHomeList

@@ -209,6 +209,13 @@
             android:label="@string/yarisma_baslik"
             android:screenOrientation="portrait" />
 
+        <!-- v5.18 - Namaz vakitleri: sehir, uyari araliklari, bugunun vakitleri -->
+        <activity
+            android:name=".PrayerActivity"
+            android:exported="false"
+            android:label="@string/prayer_title"
+            android:screenOrientation="portrait" />
+
         <!-- v13 (T8) — Derin dosya tarayıcı (tüm cihaz + SD kart) -->
         <activity
             android:name=".DeepDocumentPickerActivity"
@@ -326,6 +333,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_info" />
         </receiver>
+        <receiver android:name=".PrayerAlertReceiver" android:exported="false" />
+
     </application>
 
 </manifest>

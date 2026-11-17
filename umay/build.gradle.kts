@@ -30,8 +30,8 @@ android {
         // v24 (28 Eki 2026, AŞAMA 1): ⭐ Favoriler rafı + bildirim/alarm izin
         // merkezi (HyperOS yönlendirmesi) + kapak negatif önbelleği +
         // ders-kaynak backfill — 5.5 / code 23
-        versionCode = 34
-        versionName = "5.17"
+        versionCode = 35
+        versionName = "5.18"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -205,6 +205,9 @@ dependencies {
     // ── ML Kit (Çeviri, OCR, Sertifika) ──
     implementation("com.google.mlkit:translate:17.0.3")
     implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // ── Namaz vakitleri (çevrimdışı astronomik hesap, Adhan) ──
+    implementation("com.batoulapps.adhan:adhan:1.2.1")
 
     // ── OkHttp (Network) ──
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

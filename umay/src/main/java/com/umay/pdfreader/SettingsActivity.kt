@@ -160,6 +160,16 @@ class SettingsActivity : AppCompatActivity() {
         }
         paintExamCountdownRow()
 
+        // v5.18 - NAMAZ VAKİTLERİ: şehir + uyarı aralıkları ekranı
+        binding.btnPrayer.setOnClickListener {
+            try {
+                startActivity(Intent(this, PrayerActivity::class.java))
+            } catch (t: Throwable) {
+                BookStore.logError(this, "btnPrayer", t)
+            }
+        }
+        paintPrayerRow()
+
         // v42 — SEYİR DEFTERİ: programın kendi tuttuğu, kullanıcıya açık günlük
         binding.btnSeyirDefteri.setOnClickListener { showSeyirDefteri() }
 
@@ -853,6 +863,18 @@ class SettingsActivity : AppCompatActivity() {
             val on = ExamCountdownService.enabled(this)
             binding.btnExamCountdown.text = getString(
                 if (on) R.string.ayar_sinav_sayaci_acik else R.string.ayar_sinav_sayaci_kapali
+            )
+        } catch (_: Throwable) {
+        }
+    }
+
+    /** v5.18 - namaz vakitleri satırı: açık/kapalı + şehir. */
+    private fun paintPrayerRow() {
+        try {
+            val on = PrayerTimes.isOn(this)
+            binding.btnPrayer.text = getString(
+                if (on) R.string.ayar_namaz_acik else R.string.ayar_namaz_kapali,
+                PrayerTimes.city(this).name
             )
         } catch (_: Throwable) {
         }

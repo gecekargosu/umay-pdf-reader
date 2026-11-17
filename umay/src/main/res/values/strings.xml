@@ -869,4 +869,34 @@
     <string name="exam_next">Sıradaki sınav</string>
     <string name="exam_homework">Proje/ödev teslimi</string>
     <string name="exam_none">kayıt yok</string>
+
+    <!-- v5.18 - Namaz vakitleri -->
+    <string name="prayer_title">Namaz vakitleri</string>
+    <string name="prayer_on">Vakit uyarıları: AÇIK</string>
+    <string name="prayer_off">Vakit uyarıları: KAPALI — açmak için dokun</string>
+    <string name="prayer_city">Şehir</string>
+    <string name="prayer_city_fmt">Şehir: %1$s</string>
+    <string name="prayer_pre">Vakitten önce</string>
+    <string name="prayer_pre_fmt">Vakitten önce: %1$d dk</string>
+    <string name="prayer_pre_off">Vakitten önce: kapalı</string>
+    <string name="prayer_end">Vakit bitmeden</string>
+    <string name="prayer_end_fmt">Vakit bitmeden: %1$d dk</string>
+    <string name="prayer_end_off">Vakit bitmeden: kapalı</string>
+    <string name="prayer_min_fmt">%1$d dakika</string>
+    <string name="prayer_sound_on">Ses: AÇIK</string>
+    <string name="prayer_sound_off">Ses: KAPALI</string>
+    <string name="prayer_today">BUGÜNÜN VAKİTLERİ</string>
+    <string name="prayer_sunrise">Güneş</string>
+    <string name="prayer_next_off">Vakit uyarıları kapalı</string>
+    <string name="prayer_next_none">Sıradaki vakit hesaplanamadı</string>
+    <string name="prayer_next_fmt">Sıradaki: %1$s · %2$s · %3$s sonra</string>
+    <string name="prayer_tomorrow">yarın</string>
+    <string name="prayer_note">%1$s için Diyanet yöntemiyle çevrimdışı hesaplanır; ±2 dk sapma olabilir. Uyarılar internet gerektirmez.</string>
+    <string name="ayar_namaz">Namaz vakitleri</string>
+    <string name="ayar_namaz_acik">Namaz vakitleri: AÇIK · %1$s</string>
+    <string name="ayar_namaz_kapali">Namaz vakitleri: KAPALI</string>
+    <string name="prayer_card_title">Namaz · %1$s</string>
+    <string name="prayer_card_off">Kapalı · açmak için dokun</string>
+    <string name="prayer_card_fmt">Sıradaki: %1$s · %2$s · %3$s</string>
+    <string name="prayer_test">Test uyarısı gönder</string>
 </resources>
