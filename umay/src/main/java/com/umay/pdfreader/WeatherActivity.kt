@@ -37,6 +37,19 @@ class WeatherActivity : AppCompatActivity() {
                 .show()
         }
         binding.btnRefresh.setOnClickListener { load(force = true) }
+
+        for ((row, alert) in listOf(
+            binding.rowWarnRain to WeatherAlert.RAIN,
+            binding.rowWarnStorm to WeatherAlert.STORM,
+            binding.rowWarnSnow to WeatherAlert.SNOW
+        )) {
+            row.setOnClickListener {
+                AppPrefs.putBool(this, alert.key, !WeatherStore.isAlertEnabled(this, alert))
+                paintAlerts()
+                WeatherStore.cached(this, WeatherStore.cityId(this))?.let { paint(it) }
+            }
+        }
+        paintAlerts()
         load(force = false)
     }
 
@@ -63,6 +76,17 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
+    private fun paintAlerts() {
+        val on = getString(R.string.weather_warn_on)
+        val off = getString(R.string.weather_warn_off)
+        binding.rowWarnRain.text = getString(R.string.weather_warn_rain_row) + ": " +
+            if (WeatherStore.isAlertEnabled(this, WeatherAlert.RAIN)) on else off
+        binding.rowWarnStorm.text = getString(R.string.weather_warn_storm_row) + ": " +
+            if (WeatherStore.isAlertEnabled(this, WeatherAlert.STORM)) on else off
+        binding.rowWarnSnow.text = getString(R.string.weather_warn_snow_row) + ": " +
+            if (WeatherStore.isAlertEnabled(this, WeatherAlert.SNOW)) on else off
+    }
+
     private fun paint(d: WeatherData) {
         binding.rowCity.text = getString(R.string.weather_city_fmt, d.cityName)
         binding.updatedText.text = getString(
@@ -85,12 +109,12 @@ class WeatherActivity : AppCompatActivity() {
         if (details.isEmpty()) today?.let { details.add("${it.min}° / ${it.max}°") }
         binding.currentDetails.text = details.joinToString(" · ")
 
-        val rainToday = d.days.firstOrNull()?.takeIf { WeatherStore.isRain(it.conditionCode) }
-        if (rainToday != null) {
+        val alerts = if (today != null) WeatherStore.activeAlerts(this, today) else emptyList()
+        if (alerts.isNotEmpty()) {
             binding.warningText.visibility = View.VISIBLE
             binding.warningText.text = getString(
-                R.string.weather_rain_warn,
-                WeatherStore.condition(rainToday.conditionCode)
+                R.string.weather_warn_fmt,
+                alerts.joinToString(" · ") { it.label } + " · " + WeatherStore.condition(today?.conditionCode.orEmpty())
             )
         } else {
             binding.warningText.visibility = View.GONE

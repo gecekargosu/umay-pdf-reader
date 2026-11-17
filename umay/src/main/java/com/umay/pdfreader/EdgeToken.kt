@@ -372,4 +372,60 @@ object EdgeToken {
         val shaHex = digest.joinToString("") { String.format(java.util.Locale.US, "%02X", it) }
         return "$csHex-$shaHex"
     }
+
+    // ── Birim test kancaları (üretim akışını değiştirmez) ──
+    internal fun digestForTest(data: ByteArray): ByteArray = sha256Digest(data)
+
+    internal fun cs64DebugForTest(data: ByteArray, digest: ByteArray): LongArray {
+        val cs = cs64Digest(data, digest)
+        return longArrayOf(0L, 0L, cs[0], cs[1])
+    }
+
+    internal fun cs64TermsForTest(data: ByteArray, digest: ByteArray): LongArray {
+        var keyA = ((digest[0].toLong() and 0xFF) or
+            ((digest[1].toLong() and 0xFF) shl 8) or
+            ((digest[2].toLong() and 0xFF) shl 16) or
+            ((digest[3].toLong() and 0xFF) shl 24)) or 1L
+        var keyB = ((digest[4].toLong() and 0xFF) or
+            ((digest[5].toLong() and 0xFF) shl 8) or
+            ((digest[6].toLong() and 0xFF) shl 16) or
+            ((digest[7].toLong() and 0xFF) shl 24)) or 1L
+        keyA = keyA and MASK
+        keyB = keyB and MASK
+        val factors = longArrayOf((keyA * CS64_FACTOR) and MASK, (keyB * CS64_FACTOR) and MASK)
+        val terms = ArrayList<Long>()
+        val offsets = ArrayList<Long>()
+        for (i in 0 until 14) {
+            terms.add((CS64_COEFFICIENTS[i * 2] * factors[i % 2]) and MASK)
+            offsets.add(CS64_OFFSETS[i])
+        }
+        val words = ArrayList<Long>()
+        val src = byteArrayOf(0) + data
+        val paddedLen = src.size + ((4 - src.size % 4) % 4)
+        var p = 0
+        while (p < paddedLen) {
+            var v = 0L
+            for (k in 0 until 4) {
+                val b = if (p + k < src.size) (src[p + k].toLong() and 0xFF) else 0L
+                v = v or (b shl (8 * k))
+            }
+            words.add(v)
+            p += 4
+        }
+        if (words.size % 2 == 1) words.add(0L)
+        for ((index, word) in words.withIndex()) {
+            var term = (word * (if (index % 2 == 0) keyA else keyB)) and MASK
+            var offset = (rol16(word) * (if (index % 2 == 0) 0xEF0569FBL else 0xC31713DBL)) and MASK
+            if (index == 0) {
+                term = (term + CS64_ADJUSTMENT0 * factors[0]) and MASK
+                offset = (offset + CS64_ADJUSTMENT1) and MASK
+            }
+            terms.add(term)
+            offsets.add(offset)
+        }
+        return longArrayOf(
+            terms[0], terms[14], offsets[14] and 0xFFFFFFFFL,
+            terms.size.toLong(), words.size.toLong()
+        )
+    }
 }

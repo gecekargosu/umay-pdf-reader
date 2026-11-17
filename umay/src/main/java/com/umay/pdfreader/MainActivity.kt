@@ -12,6 +12,7 @@ import android.os.Bundle
 import kotlin.math.roundToInt
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -392,6 +393,13 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 BookStore.logError(this, "weatherCard", t)
             }
         }
+
+        // v5.20 - TV widget kutuları
+        binding.tvHeader.setOnClickListener { openTvScreen(com.umay.pdfreader.tv.MainActivity::class.java) }
+        binding.tvTileLive.setOnClickListener { openTvScreen(com.umay.pdfreader.tv.MainActivity::class.java) }
+        binding.tvTileRadio.setOnClickListener { openTvScreen(com.umay.pdfreader.tv.RadioActivity::class.java) }
+        binding.tvTileMulti.setOnClickListener { openTvScreen(com.umay.pdfreader.tv.MultiActivity::class.java) }
+        binding.tvTileRecords.setOnClickListener { openTvScreen(com.umay.pdfreader.tv.RecordingsActivity::class.java) }
         renderWeatherCard()
 
         // v5.19 - UMAY MULTI TV: canli TV + radyo penceresi
@@ -1257,19 +1265,29 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         try {
             val today = d?.days?.firstOrNull()
             if (d == null || today == null) {
-                binding.weatherCardSub.text = getString(R.string.weather_card_off)
+                binding.weatherIcon.text = "\u26C5"
+                binding.weatherTemp.text = "\u2014"
+                binding.weatherCond.text = getString(R.string.weather_card_off)
+                binding.weatherRange.text = ""
+                binding.weatherUpdated.text = ""
+                binding.weatherWarnLine.visibility = View.GONE
                 return
             }
-            val temp = d.now?.temp?.roundToInt() ?: today.max
-            binding.weatherCardSub.text = if (WeatherStore.isRain(today.conditionCode)) {
-                getString(R.string.weather_card_rain, today.min, today.max)
+            val code = d.now?.conditionCode?.takeIf { it.isNotBlank() } ?: today.conditionCode
+            binding.weatherIcon.text = WeatherStore.icon(code)
+            binding.weatherTemp.text = "${d.now?.temp?.roundToInt() ?: today.max}\u00B0"
+            binding.weatherCond.text = WeatherStore.condition(code)
+            binding.weatherRange.text = "${today.min}\u00B0 / ${today.max}\u00B0"
+            binding.weatherUpdated.text = WeatherStore.updatedText(d.fetchedAt)
+
+            val alerts = WeatherStore.activeAlerts(this, today)
+            if (alerts.isEmpty()) {
+                binding.weatherWarnLine.visibility = View.GONE
             } else {
-                getString(
-                    R.string.weather_card_fmt,
-                    temp,
-                    WeatherStore.condition(today.conditionCode),
-                    today.min,
-                    today.max
+                binding.weatherWarnLine.visibility = View.VISIBLE
+                binding.weatherWarnLine.text = getString(
+                    R.string.weather_warn_fmt,
+                    alerts.joinToString(" \u00B7 ") { it.label }
                 )
             }
         } catch (t: Throwable) {
@@ -1277,24 +1295,64 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         }
     }
 
+    /** v5.20 - TV widget kutularından ilgili ekranı açar. */
+    private fun openTvScreen(cls: Class<*>) {
+        try {
+            startActivity(Intent(this, cls))
+        } catch (t: Throwable) {
+            BookStore.logError(this, "openTvScreen", t)
+        }
+    }
+
     private fun renderPrayerCard() {
         try {
-            if (!PrayerTimes.isOn(this)) {
-                binding.prayerCardTitle.text = getString(R.string.prayer_title)
-                binding.prayerCardSub.text = getString(R.string.prayer_card_off)
-                return
-            }
-            val n = PrayerTimes.next(this)
-            binding.prayerCardTitle.text = getString(R.string.prayer_card_title, PrayerTimes.city(this).name)
-            binding.prayerCardSub.text = if (n == null) {
-                getString(R.string.prayer_next_none)
-            } else {
-                getString(
+            val city = PrayerTimes.city(this)
+            val on = PrayerTimes.isOn(this)
+            val next = PrayerTimes.next(this)
+            binding.prayerCardTitle.text = getString(R.string.prayer_card_title, city.name)
+            binding.prayerCardSub.text = when {
+                !on -> getString(R.string.prayer_card_off)
+                next == null -> getString(R.string.prayer_next_none)
+                else -> getString(
                     R.string.prayer_card_fmt,
-                    PrayerTimes.label(this, n.vakit),
-                    (if (n.tomorrow) getString(R.string.prayer_tomorrow) + " " else "") + PrayerTimes.fmt(n.at),
-                    PrayerTimes.remaining(n.at.timeInMillis - System.currentTimeMillis())
+                    PrayerTimes.label(this, next.vakit),
+                    (if (next.tomorrow) getString(R.string.prayer_tomorrow) + " " else "") + PrayerTimes.fmt(next.at),
+                    PrayerTimes.remaining(next.at.timeInMillis - System.currentTimeMillis())
                 )
+            }
+
+            binding.prayerTimesRow.removeAllViews()
+            val times = PrayerTimes.today(this)
+            val order = listOf(Vakit.FAJR, Vakit.DHUHR, Vakit.ASR, Vakit.MAGHRIB, Vakit.ISHA)
+            val d = resources.displayMetrics.density
+            for (v in order) {
+                val at = times[v] ?: continue
+                val active = on && next?.vakit == v
+                val col = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    setPadding(0, (6 * d).toInt(), 0, (6 * d).toInt())
+                    if (active) setBackgroundResource(R.drawable.bg_time_active)
+                }
+                val label = TextView(this).apply {
+                    text = PrayerTimes.label(this@MainActivity, v)
+                    textSize = 9.5f
+                    gravity = Gravity.CENTER
+                    setTextColor(getColor(if (active) R.color.umay_accent else R.color.umay_text))
+                    alpha = if (active) 1f else 0.7f
+                }
+                val time = TextView(this).apply {
+                    text = PrayerTimes.fmt(at)
+                    textSize = 13f
+                    gravity = Gravity.CENTER
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    setTextColor(getColor(if (active) R.color.umay_accent else R.color.umay_text))
+                    setPadding(0, (2 * d).toInt(), 0, 0)
+                }
+                col.addView(label)
+                col.addView(time)
+                binding.prayerTimesRow.addView(col)
             }
         } catch (t: Throwable) {
             BookStore.logError(this, "renderPrayerCard", t)

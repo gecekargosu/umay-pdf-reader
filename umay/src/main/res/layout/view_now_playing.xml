@@ -8,6 +8,7 @@
      • Ekolayzır çubukları gerçek RMS yerine "çalıyor mu" durumuna bağlı
        zamanlayıcıyla hareket eder (okuma servisi PCM vermiyor). -->
 <com.umay.pdfreader.NeonCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/npCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -158,7 +159,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/onceki"
             android:src="@drawable/ic_prev"
-            android:tint="@color/umay_accent" />
+            app:tint="@color/umay_accent" />
 
         <ImageButton
             android:id="@+id/npPlay"
@@ -168,7 +169,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/oynat"
             android:src="@drawable/ic_play"
-            android:tint="@color/umay_orange" />
+            app:tint="@color/umay_orange" />
 
         <ImageButton
             android:id="@+id/npNext"
@@ -178,7 +179,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/sonraki"
             android:src="@drawable/ic_next"
-            android:tint="@color/umay_accent" />
+            app:tint="@color/umay_accent" />
 
         <ImageButton
             android:id="@+id/npStop"
@@ -188,7 +189,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/bildirim_durdur"
             android:src="@drawable/ic_stop"
-            android:tint="@color/umay_danger" />
+            app:tint="@color/umay_danger" />
 
         <TextView
             android:id="@+id/npTapHint"

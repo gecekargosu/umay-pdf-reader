@@ -916,4 +916,22 @@
     <string name="weather_card_off">Dokun → 5 günlük tahmin</string>
     <string name="weather_card_fmt">%1$d° · %2$s · %3$d°/%4$d°</string>
     <string name="weather_card_rain">⚠️ Bugün yağış · %1$d°/%2$d°</string>
+    <string name="card_open_all">Tümü ›</string>
+    <string name="tv_tile_live">Canlı TV</string>
+    <string name="tv_tile_radio">Radyo</string>
+    <string name="tv_tile_multi">4’lü</string>
+    <string name="tv_tile_rec">Kayıtlar</string>
+    <string name="weather_card_open">5 gün ›</string>
+    <string name="weather_warn_none">Uyarı yok</string>
+    <string name="weather_warn_fmt">⚠️ %1$s</string>
+    <string name="weather_warn_rain">Yağmur</string>
+    <string name="weather_warn_storm">Fırtına</string>
+    <string name="weather_warn_snow">Kar</string>
+    <string name="weather_warn_title">Hava uyarıları</string>
+    <string name="weather_warn_hint">Seçtiğin türler ana ekranda ve günde bir kez bildirimde gösterilir.</string>
+    <string name="weather_warn_rain_row">Yağmur uyarısı</string>
+    <string name="weather_warn_storm_row">Fırtına uyarısı</string>
+    <string name="weather_warn_snow_row">Kar uyarısı</string>
+    <string name="weather_warn_on">AÇIK</string>
+    <string name="weather_warn_off">KAPALI</string>
 </resources>

@@ -18,6 +18,13 @@ class UmayApp : Application() {
     override fun onCreate() {
         super.onCreate()
         initPdfBox(this)
+
+        // v5.20 - gunde bir kez MGM hava uyarisi bildirimi
+        try {
+            WeatherAlertWorker.schedule(this)
+        } catch (t: Throwable) {
+            Log.e("UmayApp", "WeatherAlertWorker planlanamadi", t)
+        }
         // v6 (Aşama 4) — AdMob: G sınıfı güvenli reklam yapılandırması + SDK init
         // (hata olsa bile uygulama açılmaya devam eder)
         try {

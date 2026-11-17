@@ -185,6 +185,50 @@
                 android:paddingEnd="14dp"
                 android:paddingBottom="4dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_hero_card"
+                android:orientation="vertical"
+                android:paddingStart="14dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weather_warn_title"
+                    android:textColor="@color/umay_accent"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/rowWarnRain"
+                    style="@style/SettingsRow"
+                    android:text="@string/weather_warn_rain_row" />
+
+                <TextView
+                    android:id="@+id/rowWarnStorm"
+                    style="@style/SettingsRow"
+                    android:text="@string/weather_warn_storm_row" />
+
+                <TextView
+                    android:id="@+id/rowWarnSnow"
+                    style="@style/SettingsRow"
+                    android:text="@string/weather_warn_snow_row" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:alpha="0.6"
+                    android:text="@string/weather_warn_hint"
+                    android:textColor="@color/umay_text"
+                    android:textSize="10.5sp" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
