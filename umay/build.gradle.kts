@@ -30,8 +30,8 @@ android {
         // v24 (28 Eki 2026, AŞAMA 1): ⭐ Favoriler rafı + bildirim/alarm izin
         // merkezi (HyperOS yönlendirmesi) + kapak negatif önbelleği +
         // ders-kaynak backfill — 5.5 / code 23
-        versionCode = 38
-        versionName = "5.21"
+        versionCode = 39
+        versionName = "5.22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

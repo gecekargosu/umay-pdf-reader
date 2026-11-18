@@ -15,15 +15,15 @@ eklendi. Tek uygulama, tek APK.
 Telefonda bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
 “Yine de yükle” uyarısı normaldir (uygulama Play Store dışında dağıtılıyor).
 
-**Sürüm:** 5.21 (kod 38) · Android 8.0+ · ~72 MB
+**Sürüm:** 5.22 (kod 39) · Android 8.0+ · ~63 MB
 
 ## 📸 Ekran Görüntüleri (gerçek cihaz)
 
-| v5.21 — canlı ana ekran (güneş ışınları, geri sayım, mini TV) | v5.21 — ayrı çerçeveler + kasa kartı |
+| v5.22 — ders içi ses kaydı listesi | v5.22 — uygulama içi oynatıcı |
 |---|---|
-| ![Canlı ana ekran](docs/screenshots/umay-521-ana-ekran.jpg) | ![Yarışma ve kasa](docs/screenshots/umay-521-yarisma-kasa.jpg) |
+| ![Ses kayıtları](docs/screenshots/umay-522-ses-kayitlari.jpg) | ![Oynatıcı](docs/screenshots/umay-522-oynatici.jpg) |
 
-![Raflar](docs/screenshots/umay-521-raflar.jpg)
+![Ana ekran](docs/screenshots/umay-522-ana-ekran.jpg)
 
 
 | Ana ekran — namaz, TV ve hava widget’ları | Hava durumu + uyarı ayarları |
@@ -37,6 +37,28 @@ Telefonda bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
 | PDF okuyucu (140 sayfa) | Kurulum rehberleri |
 |---|---|
 | ![Okuyucu](docs/screenshots/umay-520-okuyucu.jpg) | [`docs/kurulum/`](docs/kurulum) |
+
+## ✨ 5.22 — ders içi ses kaydı, proje tarihleri, raf temizliği
+
+- **Her dersin içinde ses kaydı** — ders sayfasındaki **SES KAYITLARI +**
+  düğmesi artık iki seçenek sunar: *“🎙 Şimdi kayıt yap”* (uygulamadan
+  çıkmadan, saniye sayacıyla) veya *“📁 Cihazdan ses dosyası seç”*.
+  Kayıtlar “BLG203 Veri Yapıları · 18.11.2026 03:21” gibi ders adı + tarihle
+  listelenir; dokununca **uygulama içi oynatıcı** açılır (oynat/duraklat,
+  10 sn geri/ileri, zaman çubuğu). Telefonun kayıt uygulamasına gerek yok.
+- **Proje ödevleri tarihleriyle** — BLG203 ve BLG205 dönem projeleri
+  (final 18.12.2026 17:00, sunum 23.12.2026 09:00 Lab B101) ve Makine
+  Öğrenmesi NMF ödevi derslerin **Ödev & Projeler** bölümüne eklendi;
+  mevcut hatırlatma sistemiyle (0–3 gün kala) bildirim verir.
+- **Raflar konusuna göre süzüldü** — “Dini kitaplar” rafında artık yalnız
+  Kur’an/meal var; Tübitak rafında yalnız 2209-A proje dosyaları. Her ders
+  rafı yalnız kendi dersinin belgelerini tutar. Yanlış raftaki kitap
+  **silinmez**, yalnız o raftan çıkarılır (tek seferlik kürasyon).
+- **Tübitak dokümanı PDF olarak eklendi** — verilen Google Docs belgesi
+  (8 sayfa) uygulamanın içine gömüldü ve “Tübitak 2209-A” rafına yerleştirildi.
+- **Güneş artık sayfaya çakılı değil** — sağ üstteki sabit güneş kaldırıldı;
+  güneş yalnız hava kartındaki ikonda nefes alır gibi parlar, sayfada ise
+  soldan sağa süzülen, parlayıp sönen ışık dalgaları geçer.
 
 ## ✨ 5.21 — hareketli kartlar
 

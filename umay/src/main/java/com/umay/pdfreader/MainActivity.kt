@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
     private var prayerNextAt = 0L
     private var prayerNextLabel = ""
     private var prayerActiveCol: android.view.View? = null
+    /** v5.22 — hava kartındaki güneş ikonu nefes alır. */
+    private var weatherPulse: android.animation.AnimatorSet? = null
 
     private val prayerTick = object : Runnable {
         override fun run() {
@@ -124,6 +126,10 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         try { binding.weatherFx.alpha = 0.62f } catch (_: Throwable) {}
+        // v5.22 — raf kürasyonu + proje ödevleri + Tübitak dokümanı (tek sefer)
+        try { ShelfCurator.runOnce(this) } catch (_: Throwable) {}
+        try { ProjectSeed.applyOnce(this) } catch (_: Throwable) {}
+        try { TubitakDoc.ensureImported(this) } catch (_: Throwable) {}
         EdgeToEdge.apply(this, binding.root)  // SDK 36 edge-to-edge
         // v40 — ANA SAYFA SIRASI: "İlk sırada dinlenen kitap, onun altında
         // dersler kısmı." Bu sıra artık XML'de (activity_main.xml): Derslerim
@@ -977,6 +983,7 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v5.21 — namaz geri sayımı ve hava efektleri arka planda durur (pil)
         try { binding.root.removeCallbacks(prayerTick) } catch (_: Throwable) { }
         try { binding.weatherFx.pauseFx() } catch (_: Throwable) { }
+        try { weatherPulse?.cancel() } catch (_: Throwable) { }
         try { (binding.competitionWindow.background as? NeonFrameDrawable)?.setAnimated(false) } catch (_: Throwable) { }
         try { (binding.vaultCard.background as? NeonFrameDrawable)?.setAnimated(false) } catch (_: Throwable) { }
     }
@@ -1337,6 +1344,7 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             binding.weatherRange.text = "${today.min}\u00B0 / ${today.max}\u00B0"
             binding.weatherUpdated.text = WeatherStore.updatedText(d.fetchedAt)
 
+            startWeatherPulse()
             val alerts = WeatherStore.activeAlerts(this, today)
             if (alerts.isEmpty()) {
                 binding.weatherWarnLine.visibility = View.GONE
@@ -1350,6 +1358,27 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         } catch (t: Throwable) {
             BookStore.logError(this, "paintWeatherCard", t)
         }
+    }
+
+    /** v5.22 — hava kartındaki güneş/ikon yumuşakça parlar (sayfada sabit güneş yok). */
+    private fun startWeatherPulse() {
+        try {
+            weatherPulse?.cancel()
+            val a = android.animation.ObjectAnimator.ofFloat(binding.weatherIcon, "alpha", 0.72f, 1f)
+            val sx = android.animation.ObjectAnimator.ofFloat(binding.weatherIcon, "scaleX", 1f, 1.10f)
+            val sy = android.animation.ObjectAnimator.ofFloat(binding.weatherIcon, "scaleY", 1f, 1.10f)
+            listOf(a, sx, sy).forEach {
+                it.repeatCount = android.animation.ValueAnimator.INFINITE
+                it.repeatMode = android.animation.ValueAnimator.REVERSE
+            }
+            weatherPulse = android.animation.AnimatorSet().apply {
+                playTogether(a, sx, sy)
+                duration = 1700
+                startDelay = 400
+                interpolator = android.view.animation.AccelerateDecelerateInterpolator()
+                start()
+            }
+        } catch (_: Throwable) { }
     }
 
     /** v5.20 - TV widget kutularından ilgili ekranı açar. */

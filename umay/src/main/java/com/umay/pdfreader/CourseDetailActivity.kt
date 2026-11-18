@@ -250,6 +250,19 @@ class CourseDetailActivity : AppCompatActivity() {
 
     // ── v33 — SES KAYITLARI RAFI ────────────────────────────────
 
+    // v5.22 — ders içinde ses kaydı (cihazın kayıt uygulamasına gitmeden)
+    private var recorder: android.media.MediaRecorder? = null
+    private var recFile: java.io.File? = null
+    private var recStartedAt = 0L
+    private var recDialog: AlertDialog? = null
+    private val recHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    private val micPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) startRecording()
+            else Toast.makeText(this, "Mikrofon izni verilmedi", Toast.LENGTH_LONG).show()
+        }
+
     private val audioPicker =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri == null) return@registerForActivityResult
@@ -294,18 +307,7 @@ class CourseDetailActivity : AppCompatActivity() {
         }
         header.findViewById<TextView>(R.id.shelfAdd)?.apply {
             visibility = View.VISIBLE
-            setOnClickListener {
-                try {
-                    audioPicker.launch(arrayOf("audio/*"))
-                } catch (t: Throwable) {
-                    BookStore.logError(this@CourseDetailActivity, "audioPicker", t)
-                    Toast.makeText(
-                        this@CourseDetailActivity,
-                        "Ses dosyası seçici açılamadı",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+            setOnClickListener { showAudioAddDialog() }
         }
         block.addView(header)
 
@@ -361,24 +363,247 @@ class CourseDetailActivity : AppCompatActivity() {
         binding.courseShelfContainer.addView(block)
     }
 
-    /** Ses kaydını cihazın oynatıcısında açar (çevrimdışı da çalışır). */
+    // ── v5.22 — DERS İÇİNDE SES KAYDI ──────────────────────────
+
+    /** "+" düğmesi: cihazdan seç veya hemen kaydet. */
+    private fun showAudioAddDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.shelf_audio))
+            .setItems(
+                arrayOf("🎙  Şimdi kayıt yap", "📁  Cihazdan ses dosyası seç")
+            ) { _, which ->
+                if (which == 1) {
+                    try { audioPicker.launch(arrayOf("audio/*")) } catch (t: Throwable) {
+                        BookStore.logError(this, "audioPicker", t)
+                        Toast.makeText(this, "Seçici açılamadı", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    val ok = androidx.core.content.ContextCompat.checkSelfPermission(
+                        this, android.Manifest.permission.RECORD_AUDIO
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    if (ok) startRecording()
+                    else micPermission.launch(android.Manifest.permission.RECORD_AUDIO)
+                }
+            }
+            .setNegativeButton(R.string.iptal, null)
+            .show()
+    }
+
+    private fun startRecording() {
+        try {
+            val dir = java.io.File(cacheDir, "rec").apply { mkdirs() }
+            val f = java.io.File(dir, "rec_${System.currentTimeMillis()}.m4a")
+            val r = if (android.os.Build.VERSION.SDK_INT >= 31)
+                android.media.MediaRecorder(this) else android.media.MediaRecorder()
+            r.setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
+            r.setOutputFormat(android.media.MediaRecorder.OutputFormat.MPEG_4)
+            r.setAudioEncoder(android.media.MediaRecorder.AudioEncoder.AAC)
+            r.setAudioEncodingBitRate(96_000)
+            r.setAudioSamplingRate(44_100)
+            r.setOutputFile(f.absolutePath)
+            r.prepare()
+            r.start()
+            recorder = r
+            recFile = f
+            recStartedAt = System.currentTimeMillis()
+
+            val msg = TextView(this).apply {
+                text = "● Kayıt sürüyor · 00:00"
+                textSize = 16f
+                setPadding(48, 36, 48, 12)
+            }
+            val tick = object : Runnable {
+                override fun run() {
+                    val sec = (System.currentTimeMillis() - recStartedAt) / 1000
+                    msg.text = "● Kayıt sürüyor · %02d:%02d".format(sec / 60, sec % 60)
+                    recHandler.postDelayed(this, 500L)
+                }
+            }
+            recHandler.post(tick)
+            recDialog = AlertDialog.Builder(this)
+                .setTitle("Ses kaydı")
+                .setView(msg)
+                .setPositiveButton("Durdur ve kaydet") { _, _ -> stopRecording(true) }
+                .setNegativeButton("Vazgeç") { _, _ -> stopRecording(false) }
+                .setOnCancelListener { stopRecording(false) }
+                .setCancelable(false)
+                .show()
+        } catch (t: Throwable) {
+            BookStore.logError(this, "startRecording", t)
+            try { recorder?.release() } catch (_: Throwable) { }
+            recorder = null
+            Toast.makeText(this, "Kayıt başlatılamadı", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun stopRecording(save: Boolean) {
+        try { recHandler.removeCallbacksAndMessages(null) } catch (_: Throwable) { }
+        try { recDialog?.dismiss() } catch (_: Throwable) { }
+        recDialog = null
+        val r = recorder
+        recorder = null
+        try {
+            r?.stop()
+        } catch (_: Throwable) {
+            // çok kısa kayıt: stop() hata verir
+        }
+        try { r?.release() } catch (_: Throwable) { }
+
+        val f = recFile
+        recFile = null
+        if (f == null || !f.exists()) return
+        val ms = System.currentTimeMillis() - recStartedAt
+        if (!save || f.length() < 1_500L || ms < 800L) {
+            try { f.delete() } catch (_: Throwable) { }
+            if (!save) Toast.makeText(this, "Kayıt iptal edildi", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(this, "Kayıt çok kısa", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val dst = java.io.File(CourseAudioStore.audioDir(this), "rec_${System.currentTimeMillis()}.m4a")
+        val moved = try { f.renameTo(dst) } catch (_: Throwable) { false }
+        if (!moved) {
+            try { f.copyTo(dst, overwrite = true); f.delete() } catch (_: Throwable) { }
+        }
+        val courseName = try { CourseStore.course(this, courseId)?.name } catch (_: Throwable) { null }
+        val stamp = java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale("tr", "TR"))
+            .format(java.util.Date())
+        val title = ((courseName ?: "Ders") + " · " + stamp)
+        val clip = CourseAudioStore.addExisting(this, courseId, dst, title)
+        if (clip != null) {
+            Toast.makeText(this, "Kayıt derse eklendi ✓", Toast.LENGTH_SHORT).show()
+            refreshShelves()
+        } else {
+            Toast.makeText(this, "Kayıt eklenemedi", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onDestroy() {
+        stopAudio()
+        try {
+            recorder?.let {
+                try { it.stop() } catch (_: Throwable) { }
+                try { it.release() } catch (_: Throwable) { }
+            }
+            recorder = null
+            recFile?.delete()
+        } catch (_: Throwable) { }
+        super.onDestroy()
+    }
+
+    /** v5.22 — kayıt uygulamaya gitmeden, uygulama içinde dinlenir. */
+    private var audioPlayer: android.media.MediaPlayer? = null
+    private var audioTick: Runnable? = null
+
     private fun openAudio(c: CourseAudioStore.Clip) {
         try {
             val f = CourseAudioStore.existingFile(this, c) ?: run {
                 Toast.makeText(this, "Ses dosyası bulunamadı", Toast.LENGTH_LONG).show()
                 return
             }
-            val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", f)
-            startActivity(
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "audio/*")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            stopAudio()
+            val mp = android.media.MediaPlayer()
+            mp.setDataSource(f.absolutePath)
+            mp.prepare()
+            audioPlayer = mp
+
+            val root = android.widget.LinearLayout(this).apply {
+                orientation = android.widget.LinearLayout.VERTICAL
+                setPadding(56, 40, 56, 12)
+            }
+            val name = TextView(this).apply {
+                text = c.title
+                textSize = 17f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            }
+            val pos = TextView(this).apply {
+                text = "00:00 / " + CourseAudioStore.formatDuration(mp.duration.toLong())
+                textSize = 14f
+                setPadding(0, 16, 0, 8)
+            }
+            val bar = android.widget.SeekBar(this).apply { max = mp.duration.coerceAtLeast(1) }
+            bar.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: android.widget.SeekBar?, v: Int, fromUser: Boolean) {
+                    if (fromUser) try { mp.seekTo(v) } catch (_: Throwable) { }
                 }
-            )
+                override fun onStartTrackingTouch(sb: android.widget.SeekBar?) { }
+                override fun onStopTrackingTouch(sb: android.widget.SeekBar?) { }
+            })
+            val row = android.widget.LinearLayout(this).apply {
+                orientation = android.widget.LinearLayout.HORIZONTAL
+                setPadding(0, 24, 0, 0)
+            }
+            val play = android.widget.Button(this).apply { text = "⏸ Durdur" }
+            val back = android.widget.Button(this).apply { text = "↺ 10 sn" }
+            val fwd = android.widget.Button(this).apply { text = "10 sn ↻" }
+            listOf(back, play, fwd).forEach {
+                row.addView(it, android.widget.LinearLayout.LayoutParams(0, -2, 1f))
+            }
+            root.addView(name)
+            root.addView(pos)
+            root.addView(bar)
+            root.addView(row)
+
+            val tick = object : Runnable {
+                override fun run() {
+                    try {
+                        if (mp.isPlaying) {
+                            bar.progress = mp.currentPosition
+                        }
+                        pos.text = CourseAudioStore.formatDuration(mp.currentPosition.toLong()) +
+                            " / " + CourseAudioStore.formatDuration(mp.duration.toLong())
+                        recHandler.postDelayed(this, 400L)
+                    } catch (_: Throwable) { }
+                }
+            }
+            audioTick = tick
+            recHandler.post(tick)
+
+            play.setOnClickListener {
+                try {
+                    if (mp.isPlaying) { mp.pause(); play.text = "▶ Devam" }
+                    else { mp.start(); play.text = "⏸ Durdur" }
+                } catch (_: Throwable) { }
+            }
+            back.setOnClickListener {
+                try { mp.seekTo((mp.currentPosition - 10_000).coerceAtLeast(0)); } catch (_: Throwable) { }
+            }
+            fwd.setOnClickListener {
+                try { mp.seekTo((mp.currentPosition + 10_000).coerceAtMost(mp.duration)); } catch (_: Throwable) { }
+            }
+            mp.setOnCompletionListener { play.text = "▶ Tekrar" }
+
+            val dlg = AlertDialog.Builder(this)
+                .setTitle("🎧 Ses kaydı")
+                .setView(root)
+                .setPositiveButton("Kapat", null)
+                .create()
+            dlg.setOnDismissListener { stopAudio() }
+            dlg.show()
+            mp.start()
         } catch (t: Throwable) {
             BookStore.logError(this, "openAudio", t)
-            Toast.makeText(this, "Ses kaydı açılamadı", Toast.LENGTH_LONG).show()
+            stopAudio()
+            // son çare: cihazın oynatıcısı
+            try {
+                val f = CourseAudioStore.existingFile(this, c) ?: return
+                val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", f)
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "audio/*")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                })
+            } catch (_: Throwable) {
+                Toast.makeText(this, "Ses kaydı açılamadı", Toast.LENGTH_LONG).show()
+            }
         }
+    }
+
+    private fun stopAudio() {
+        audioTick?.let { try { recHandler.removeCallbacks(it) } catch (_: Throwable) { } }
+        audioTick = null
+        try { audioPlayer?.stop() } catch (_: Throwable) { }
+        try { audioPlayer?.release() } catch (_: Throwable) { }
+        audioPlayer = null
     }
 
     // ── v24 — VİDEO RAFI ────────────────────────────────────────

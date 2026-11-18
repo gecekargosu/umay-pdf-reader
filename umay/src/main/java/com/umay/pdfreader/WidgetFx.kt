@@ -131,9 +131,9 @@ class WeatherFxView @JvmOverloads constructor(
         val h = height.toFloat()
         if (w <= 0f || h <= 0f) return
         when (mode) {
-            WeatherMode.SUNNY -> drawSun(canvas, w, h, 0.13f)
+            WeatherMode.SUNNY -> drawLightWaves(canvas, w, h, 1f)
             WeatherMode.PARTLY -> {
-                drawSun(canvas, w, h, 0.10f)
+                drawLightWaves(canvas, w, h, 0.55f)
                 drawClouds(canvas, w, h, 3, 0.050f)
             }
             WeatherMode.CLOUDY -> drawClouds(canvas, w, h, 5, 0.075f)
@@ -143,35 +143,47 @@ class WeatherFxView @JvmOverloads constructor(
         }
     }
 
-    /** Sağ üstte yumuşak güneş + dönen ışınlar. */
-    private fun drawSun(canvas: Canvas, w: Float, h: Float, yRatio: Float) {
-        val cx = w * 0.86f
-        val cy = h * yRatio
-        val r = min(w, h) * 0.075f
-        paint.shader = RadialGradient(
-            cx, cy, r * 3.2f,
-            intArrayOf(Color.argb(90, 255, 196, 64), Color.argb(24, 255, 170, 40), Color.TRANSPARENT),
-            floatArrayOf(0.2f, 0.55f, 1f), Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(cx, cy, r * 3.2f, paint)
-        paint.shader = null
+    /**
+     * v5.22 — GÜNEŞ ARTIK EKRANA ÇAKILI DEĞİL.
+     *
+     * Kullanıcı: "güneş sabit kalırsa sayfayı kaydırdığımda orda duruyor".
+     * Bu yüzden güneş yalnızca hava kartındaki ikonda parlar; sayfada ise
+     * çapraz ışık dalgaları soldan sağa geçer, parlar ve söner.
+     */
+    private fun drawLightWaves(canvas: Canvas, w: Float, h: Float, intensity: Float) {
         paint.style = Paint.Style.FILL
-        paint.color = Color.argb(150, 255, 205, 90)
-        canvas.drawCircle(cx, cy, r * 0.55f, paint)
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 3f
-        val base = phase * 0.7f
-        for (i in 0 until 12) {
-            val a = base + i * Math.PI.toFloat() / 6f
-            val inner = r * (0.85f + 0.06f * sin(phase * 2f + i))
-            val outer = r * (1.5f + 0.18f * sin(phase * 1.4f + i))
-            paint.color = Color.argb(120, 255, 210, 110)
-            canvas.drawLine(
-                cx + cos(a) * inner, cy + sin(a) * inner,
-                cx + cos(a) * outer, cy + sin(a) * outer, paint
+        val now = phase
+        for (i in 0 until 3) {
+            val cycle = ((now * 0.06f + i * 0.37f) % 1f)
+            val alpha = (sin(cycle * Math.PI).toFloat().coerceAtLeast(0f)) * 52f * intensity
+            if (alpha < 2f) continue
+            val bandWidth = w * 0.42f
+            val cx = -bandWidth + (w + bandWidth * 2f) * cycle
+            paint.shader = LinearGradient(
+                cx - bandWidth / 2f, 0f, cx + bandWidth / 2f, h,
+                intArrayOf(
+                    Color.TRANSPARENT,
+                    Color.argb(alpha.toInt(), 255, 226, 140),
+                    Color.TRANSPARENT
+                ),
+                floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP
             )
+            canvas.save()
+            canvas.rotate(-18f, w / 2f, h / 2f)
+            canvas.drawRect(cx - bandWidth, -h, cx + bandWidth, h * 2f, paint)
+            canvas.restore()
         }
-        paint.style = Paint.Style.FILL
+        paint.shader = null
+        // hafif parıltılar (soldan sağa süzülür, söner)
+        repeat(5) { i ->
+            val cycle = ((now * 0.035f + i * 0.21f) % 1f)
+            val a = (sin(cycle * Math.PI).toFloat().coerceAtLeast(0f)) * 120f * intensity
+            if (a < 4f) return@repeat
+            val x = (w * (0.1f + 0.8f * ((cycle + i * 0.13f) % 1f)))
+            val y = h * (0.18f + 0.55f * ((i * 0.19f + cycle * 0.3f) % 1f))
+            paint.color = Color.argb(a.toInt(), 255, 240, 190)
+            canvas.drawCircle(x, y, 2.5f + 2f * sin(now + i), paint)
+        }
     }
 
     private fun drawClouds(canvas: Canvas, w: Float, h: Float, count: Int, alpha: Float) {
