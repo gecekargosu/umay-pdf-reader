@@ -5,12 +5,17 @@
      raflar (başlık şeridi + yatay kitaplar) → araçlar.
      KURAL: sabit yükseklikli yer tutucular kullanılır (progressText) ki içerik
      değişimi sayfayı aşağı-yukarı zıplatmasın (BUG-005). -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_root"
-    android:orientation="vertical">
+    android:background="@drawable/bg_gradient_root">
+
+    <LinearLayout
+        android:id="@+id/homeRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/homeScroll"
@@ -218,7 +223,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_hero_card"
+                android:background="@drawable/bg_card_prayer"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
@@ -286,7 +291,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_hero_card"
+                android:background="@drawable/bg_card_tv"
                 android:orientation="vertical"
                 android:padding="12dp">
 
@@ -359,11 +364,9 @@
                         android:paddingTop="10dp"
                         android:paddingBottom="9dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="&#x1F4FA;"
-                            android:textSize="22sp" />
+                        <com.umay.pdfreader.TvMiniView
+                            android:layout_width="52dp"
+                            android:layout_height="30dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -388,11 +391,9 @@
                         android:paddingTop="10dp"
                         android:paddingBottom="9dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="&#x1F4FB;"
-                            android:textSize="22sp" />
+                        <com.umay.pdfreader.RadioMiniView
+                            android:layout_width="52dp"
+                            android:layout_height="30dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -469,7 +470,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_hero_card"
+                android:background="@drawable/bg_card_weather"
                 android:clickable="true"
                 android:focusable="true"
                 android:orientation="vertical"
@@ -1280,65 +1281,63 @@
                 android:textColor="@color/umay_accent"
                 android:textSize="12.5sp"
                 android:textStyle="bold" />
+            </LinearLayout>
+            <!-- /toolsPanel -->
 
-
-            <!-- v5.16 — PROJE YARIŞMALARI PENCERESİ: kasanın hemen üstünde,
-                 kapaklı yatay raf. Karta dokun → yarışmanın resmî sitesi;
-                 başlığa dokun → son başvuru tarihine göre tam liste. -->
-            <LinearLayout
+            <!-- v5.16 — PROJE YARIŞMALARI: KENDİ NEON ÇERÇEVESİ -->
+            <com.umay.pdfreader.NeonCardLayout
                 android:id="@+id/competitionWindow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:background="@drawable/bg_hero_card"
-                android:elevation="4dp"
+                android:background="@drawable/bg_panel"
                 android:orientation="vertical"
                 android:padding="12dp">
 
-            <LinearLayout
-                android:id="@+id/competitionCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_avatar_circle"
-                    android:contentDescription="@string/yarisma_baslik"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_trophy"
-                    app:tint="@color/umay_accent" />
-
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/competitionCard"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/yarisma_baslik"
-                        android:textColor="@color/umay_text"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:contentDescription="@string/yarisma_baslik"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_trophy"
+                        app:tint="@color/umay_accent" />
 
-                    <TextView
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:maxLines="2"
-                        android:text="@string/yarisma_ipucu"
-                        android:textColor="@color/umay_text_dim"
-                        android:textSize="11.5sp" />
-                </LinearLayout>
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/yarisma_baslik"
+                            android:textColor="@color/umay_text"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:maxLines="2"
+                            android:text="@string/yarisma_ipucu"
+                            android:textColor="@color/umay_text_dim"
+                            android:textSize="11.5sp" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1351,88 +1350,88 @@
                         android:textColor="@color/umay_accent"
                         android:textSize="12.5sp"
                         android:textStyle="bold" />
-            </LinearLayout>
+                </LinearLayout>
 
-            <!-- Güncel yarışmalar: kapak rozetli, yatay kaydırmalı raf -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:clipToPadding="false"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/compHomeList"
-                    android:layout_width="wrap_content"
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
-            </LinearLayout>
+                    android:layout_marginTop="10dp"
+                    android:clipToPadding="false"
+                    android:scrollbars="none">
 
-            <!-- v5.7 — GİZLİ KASA: ana sayfanın en altında, kilitli alan -->
-            <LinearLayout
+                    <LinearLayout
+                        android:id="@+id/compHomeList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+            </com.umay.pdfreader.NeonCardLayout>
+
+            <!-- v5.21 — GİZLİ KASA: satır değil, kendi çerçeveli kartı -->
+            <com.umay.pdfreader.NeonCardLayout
                 android:id="@+id/vaultCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:background="@drawable/bg_hero_card"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_vault"
                 android:clickable="true"
-                android:elevation="4dp"
                 android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="14dp">
-
-                <!-- v21 — gerçek kasa ikonu (emoji yerine vektör çizim) -->
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_avatar_circle"
-                    android:contentDescription="@string/kasa_baslik"
-                    android:padding="8dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_safe"
-                    app:tint="@color/umay_orange" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/kasa_baslik"
-                        android:textColor="@color/umay_text"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                    <ImageView
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:contentDescription="@string/kasa_baslik"
+                        android:padding="9dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_safe"
+                        app:tint="@color/umay_orange" />
 
-                    <TextView
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/kasa_ipucu"
-                        android:textColor="@color/umay_text_dim"
-                        android:textSize="11.5sp" />
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/kasa_baslik"
+                            android:textColor="@color/umay_text"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:text="@string/kasa_ipucu"
+                            android:textColor="@color/umay_text_dim"
+                            android:textSize="11.5sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/vaultOpen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:layout_marginTop="12dp"
                     android:background="@drawable/bg_button_secondary"
                     android:gravity="center"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
                     android:text="@string/kasa_ac"
                     android:textColor="@color/umay_orange"
-                    android:textSize="12.5sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
-            </LinearLayout>
-            </LinearLayout>
-            <!-- /toolsPanel -->
+            </com.umay.pdfreader.NeonCardLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -1442,4 +1441,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/umay_frame" />
-</LinearLayout>
+    </LinearLayout>
+
+    <com.umay.pdfreader.WeatherFxView
+        android:id="@+id/weatherFx"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

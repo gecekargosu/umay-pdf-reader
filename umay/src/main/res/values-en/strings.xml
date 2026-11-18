@@ -926,4 +926,5 @@
     <string name="campus_uptodate">Nothing new — the list is up to date.</string>
     <string name="campus_close">Close</string>
     <string name="campus_open">🏫 Campus announcements</string>
+    <string name="prayer_card_count">Next: %1$s · %2$s left</string>
 </resources>

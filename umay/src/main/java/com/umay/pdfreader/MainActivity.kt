@@ -41,6 +41,35 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
 
     /** v5.6 — "EN SON OKUNAN" kartında gezilen kitaplar (en yeni → eski). */
     private var heroBooks: List<Book> = emptyList()
+    /** v5.21 — namaz kartı canlı geri sayım. */
+    private var prayerNextAt = 0L
+    private var prayerNextLabel = ""
+    private var prayerActiveCol: android.view.View? = null
+
+    private val prayerTick = object : Runnable {
+        override fun run() {
+            try {
+                if (prayerNextAt > 0L) {
+                    val left = prayerNextAt - System.currentTimeMillis()
+                    if (left > 0) {
+                        binding.prayerCardSub.text = getString(
+                            R.string.prayer_card_count,
+                            prayerNextLabel,
+                            String.format(java.util.Locale.US, "%02d:%02d:%02d",
+                                left / 3_600_000, (left / 60_000) % 60, (left / 1000) % 60)
+                        )
+                    }
+                }
+                val pulse = 0.72f + 0.28f * (0.5f + 0.5f * kotlin.math.sin(
+                    System.currentTimeMillis() / 420.0
+                ).toFloat())
+                prayerActiveCol?.alpha = pulse
+            } catch (_: Throwable) {
+            }
+            binding.root.postDelayed(this, 1000L)
+        }
+    }
+
     /** v5.6 — Kahraman kartta seçili kitabın `heroBooks` içindeki indeksi. */
     private var heroIndex = 0
 
@@ -94,6 +123,7 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        try { binding.weatherFx.alpha = 0.62f } catch (_: Throwable) {}
         EdgeToEdge.apply(this, binding.root)  // SDK 36 edge-to-edge
         // v40 — ANA SAYFA SIRASI: "İlk sırada dinlenen kitap, onun altında
         // dersler kısmı." Bu sıra artık XML'de (activity_main.xml): Derslerim
@@ -808,6 +838,8 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v5.18 - namaz vakitleri: plani tazele + seridi guncelle
         try { PrayerTimes.ensureScheduled(this) } catch (_: Throwable) {}
         try { renderPrayerCard() } catch (_: Throwable) {}
+        try { binding.root.post(prayerTick) } catch (_: Throwable) {}
+        try { binding.weatherFx.resumeFx() } catch (_: Throwable) {}
         try { renderWeatherCard() } catch (_: Throwable) {}
         // v12: ana ekran widget'ını tazele (sıradaki ders bilgisi güncellensin)
         try { UmayWidgetProvider.refreshAll(this) } catch (_: Throwable) {}
@@ -942,6 +974,11 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
         // v41 — "şu an dinlenen" ekolayzırı da arka planda durur
         npHandler.removeCallbacks(npAnim)
         try { npFrame?.setAnimated(false) } catch (_: Throwable) { }
+        // v5.21 — namaz geri sayımı ve hava efektleri arka planda durur (pil)
+        try { binding.root.removeCallbacks(prayerTick) } catch (_: Throwable) { }
+        try { binding.weatherFx.pauseFx() } catch (_: Throwable) { }
+        try { (binding.competitionWindow.background as? NeonFrameDrawable)?.setAnimated(false) } catch (_: Throwable) { }
+        try { (binding.vaultCard.background as? NeonFrameDrawable)?.setAnimated(false) } catch (_: Throwable) { }
     }
 
     // ── v24 — NEON ÇERÇEVELER ────────────────────────────────
@@ -1125,6 +1162,24 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 getColor(R.color.umay_shelf_neon_2)
             )
             binding.toolsPanel.background = NeonFrameDrawable(18f, 2f, toolsColors, false)
+            val compColors = intArrayOf(
+                getColor(R.color.umay_shelf_neon_1),
+                getColor(R.color.umay_shelf_neon_3),
+                getColor(R.color.umay_shelf_neon_0),
+                getColor(R.color.umay_shelf_neon_1)
+            )
+            val compFrame = NeonFrameDrawable(18f, 2f, compColors, true)
+            compFrame.setAnimated(true)
+            binding.competitionWindow.background = compFrame
+            val vaultColors = intArrayOf(
+                getColor(R.color.umay_orange),
+                getColor(R.color.umay_shelf_neon_1),
+                getColor(R.color.umay_orange),
+                getColor(R.color.umay_shelf_neon_1)
+            )
+            val vaultFrame = NeonFrameDrawable(18f, 2f, vaultColors, true)
+            vaultFrame.setAnimated(true)
+            binding.vaultCard.background = vaultFrame
         } catch (t: Throwable) {
             BookStore.logError(this, "applyNeonFrames/tools", t)
         }
@@ -1271,9 +1326,11 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 binding.weatherRange.text = ""
                 binding.weatherUpdated.text = ""
                 binding.weatherWarnLine.visibility = View.GONE
+                try { binding.weatherFx.mode = WeatherMode.PARTLY } catch (_: Throwable) {}
                 return
             }
             val code = d.now?.conditionCode?.takeIf { it.isNotBlank() } ?: today.conditionCode
+            try { binding.weatherFx.mode = WeatherModeFx.of(code) } catch (_: Throwable) {}
             binding.weatherIcon.text = WeatherStore.icon(code)
             binding.weatherTemp.text = "${d.now?.temp?.roundToInt() ?: today.max}\u00B0"
             binding.weatherCond.text = WeatherStore.condition(code)
@@ -1310,6 +1367,8 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
             val on = PrayerTimes.isOn(this)
             val next = PrayerTimes.next(this)
             binding.prayerCardTitle.text = getString(R.string.prayer_card_title, city.name)
+            prayerNextAt = if (on && next != null) next.at.timeInMillis else 0L
+            prayerNextLabel = if (on && next != null) PrayerTimes.label(this, next.vakit) else ""
             binding.prayerCardSub.text = when {
                 !on -> getString(R.string.prayer_card_off)
                 next == null -> getString(R.string.prayer_next_none)
@@ -1352,8 +1411,11 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 }
                 col.addView(label)
                 col.addView(time)
+                if (active) prayerActiveCol = col
                 binding.prayerTimesRow.addView(col)
             }
+            binding.root.removeCallbacks(prayerTick)
+            binding.root.post(prayerTick)
         } catch (t: Throwable) {
             BookStore.logError(this, "renderPrayerCard", t)
         }
@@ -1436,6 +1498,17 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
     }
 
     /** Arama filtresi + sıralama uygular (Türkçe karakter duyarsız). */
+    /** Aynı ada sahip mükerrer kitapları raf içinde tek kez gösterir. */
+    private fun dedupeTitles(list: List<Book>): List<Book> {
+        val seen = HashSet<String>(list.size)
+        val out = ArrayList<Book>(list.size)
+        for (b in list) {
+            val key = TextUtil.normalize(b.title).replace(" ", "")
+            if (seen.add(key)) out.add(b)
+        }
+        return out
+    }
+
     private fun applyFilter() {
         val q = binding.searchInput.text.toString().trim()
         var filtered = if (q.isEmpty()) books else books.filter { book ->
@@ -1503,21 +1576,17 @@ class MainActivity : AppCompatActivity(), ExtractionBus.Listener {
                 else -> cihangTaramalari.add(book)   // uzantısız/bilinmeyen: kaybolmasın
             }
         }
-        // v21 — DERS KAYNAKLARI ANA SAYFADA DA GÖRÜNSÜN.
-        // Derslere eklenen her kaynak, "Ders Kitapları" rafında da listelenir
-        // (kullanıcı isteği). Dosya kopyalanmaz; aynı Book nesnesi gösterilir.
-        try {
-            val linkedIds = CourseStore.allLinkedBookIds(this)
-            if (linkedIds.isNotEmpty()) {
-                val shown = dersKitaplari.map { it.id }.toHashSet()
-                for (book in all) {
-                    if (book.id in linkedIds && shown.add(book.id)) dersKitaplari.add(book)
-                }
-            }
-        } catch (t: Throwable) {
-            BookStore.logError(this, "fillShelves/linked", t)
-        }
-        val lists = listOf(dersKitaplari, dersSlaytlar, cihangTaramalari)
+        // v5.21 — KULLANICI GERİ BİLDİRİMİ: ders kaynakları kendi ders rafında
+        // kalır. Eski "linkedIds" bloğu her ders belgesini "Ders Kitapları"
+        // rafına da kopyalıyor, raflar birbirine karışıyordu. Kaldırıldı.
+        //
+        // Ayrıca aynı kitap birden çok kez eklenmişse (mükerrer kayıt) raf
+        // içinde TEK kez gösterilir; hangi kopyanın kalacağı sıralamaya bağlı.
+        val lists = listOf(
+            dedupeTitles(dersKitaplari),
+            dedupeTitles(dersSlaytlar),
+            dedupeTitles(cihangTaramalari)
+        )
         val libraryEmpty = all.isEmpty()
         // v41 — BOŞ RAF GİZLENMEZ (kullanıcı: "ben silmeden bazı raflar
         // kendiliğinden kayboldu"). Kök neden: buradaki eski kural, herhangi

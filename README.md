@@ -15,9 +15,16 @@ eklendi. Tek uygulama, tek APK.
 Telefonda bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
 “Yine de yükle” uyarısı normaldir (uygulama Play Store dışında dağıtılıyor).
 
-**Sürüm:** 5.20 (kod 37) · Android 8.0+ · ~72 MB
+**Sürüm:** 5.21 (kod 38) · Android 8.0+ · ~72 MB
 
 ## 📸 Ekran Görüntüleri (gerçek cihaz)
+
+| v5.21 — canlı ana ekran (güneş ışınları, geri sayım, mini TV) | v5.21 — ayrı çerçeveler + kasa kartı |
+|---|---|
+| ![Canlı ana ekran](docs/screenshots/umay-521-ana-ekran.jpg) | ![Yarışma ve kasa](docs/screenshots/umay-521-yarisma-kasa.jpg) |
+
+![Raflar](docs/screenshots/umay-521-raflar.jpg)
+
 
 | Ana ekran — namaz, TV ve hava widget’ları | Hava durumu + uyarı ayarları |
 |---|---|
@@ -30,6 +37,24 @@ Telefonda bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
 | PDF okuyucu (140 sayfa) | Kurulum rehberleri |
 |---|---|
 | ![Okuyucu](docs/screenshots/umay-520-okuyucu.jpg) | [`docs/kurulum/`](docs/kurulum) |
+
+## ✨ 5.21 — hareketli kartlar
+
+- **Hava efektleri tüm ekranda** — MGM hadise koduna göre güneş ışınları,
+  süzülen bulutlar, yağmur damlaları, kar taneleri ve fırtınada kısa şimşek.
+  Katman dokunmayı engellemez, arka planda durur (pil dostu).
+- **Namaz kartında canlı geri sayım** — sıradaki vakte kalan süre
+  `ss:dd:ss` olarak her saniye güncellenir; aktif vakit sütunu nefes alır gibi
+  ışıldar.
+- **UMAY Multi TV kutusunda mini çizgi film** — küçük ekranda güneş, tepeler
+  ve zıplayan karakter; **radyo kutusunda** yükselen nota ve ekolayzır
+  çubukları.
+- **Üç karta üç ayrı kimlik** — namaz zümrüt gece, TV mor stüdyo, hava
+  gökyüzü mavisi; farklı köşe yarıçapı ve çerçeve.
+- **Araçlar ile Proje Yarışmaları ayrı ışıldayan çerçevelerde** (artık aynı
+  panelde değil).
+- **Gizli Kasa satır değil kart** — altın çerçeveli kart + tam genişlik
+  “Kasayı Aç” düğmesi.
 
 ## ✨ 5.20 ile gelenler
 
@@ -49,6 +74,16 @@ Telefonda bağlantıya dokun → dosya iner → üzerine dokun → **Yükle**.
   internet yoksa son veri.
 - Widget kartları satır değil: namazda tüm vakitler, TV’de mini kutular,
   havada büyük sıcaklık ve uyarı şeridi.
+
+## 🔧 5.21 raf onarımı
+
+- Ders kaynakları artık **yalnız kendi ders rafında** görünür; eski sürüm
+  her ders belgesini “Sık Kullanılanlar/Ders Kitapları” rafına da kopyalıyordu.
+- Aynı ada sahip mükerrer kayıtlar raf içinde **tek kez** gösterilir.
+- Uygulama açılışında eksik belgeleri/boş rafları **yeniden doldurma
+  kaldırıldı** — kullanıcının sildiği kitap geri gelmez.
+- “Dini kitaplar” rafındaki yanlış belge temizlendi, `kuran_meali.pdf`
+  yerine kondu.
 
 ## Özellikler
 

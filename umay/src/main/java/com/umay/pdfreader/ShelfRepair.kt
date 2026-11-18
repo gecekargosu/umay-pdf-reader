@@ -102,35 +102,13 @@ object ShelfRepair {
                 // Ders rafı = o dersin belgeleri. Eksik olanlar EKLENİR
                 // (kullanıcının çıkardıkları silinmez — yalnız ekleme yapılır).
                 val courseId = courseForShelf(sh, courses)
-                if (courseId != null) {
-                    val missing = docsByCourse[courseId].orEmpty().distinct()
-                        .filter { it !in sh.bookIds }
-                    if (missing.isNotEmpty()) {
-                        sh.bookIds.addAll(missing)
-                        changed = true
-                    }
-                    return@forEach
-                }
+                // v5.21 — KULLANICI ŞİKAYETİ: "sildiğim kitaplar geri geliyor".
+                // Eski kod, ders rafında eksik her belgeyi ve boş kalan her
+                // yerleşik rafı HER AÇILIŞTA yeniden dolduruyordu. Artık onarım
+                // yalnızca asılı (silinmiş kitap) kimlikleri temizler; kullanıcı
+                // bir kitabı raftan çıkardıysa orada kalmaz.
+                if (courseId != null) return@forEach
                 if (sh.bookIds.isNotEmpty()) return@forEach
-                val fill: List<String> = when (sh.id) {
-                    "shelf_ders_kitaplari" ->
-                        books.filter {
-                            val c = categoryOf(it.title)
-                            c == "book" || c == "doc"
-                        }.map { it.id }
-                    "shelf_ders_slayt_notlar" ->
-                        books.filter { categoryOf(it.title) == "slide" }.map { it.id }
-                    "shelf_cihang_taramalari" ->
-                        books.filter { categoryOf(it.title) == "scan" }.map { it.id }
-                    ShelfManager.SHELF_READING ->
-                        books.filter { isReadingBook(it.title) }.map { it.id }
-                    else -> emptyList()
-                }
-                val newIds = fill.distinct()
-                if (newIds.isNotEmpty()) {
-                    sh.bookIds.addAll(newIds)
-                    changed = true
-                }
             }
 
             if (changed) ShelfManager.save(ctx, fresh)

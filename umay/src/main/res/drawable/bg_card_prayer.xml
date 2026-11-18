@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- v5.21 — Namaz kartı: zümrüt gece / cami silueti havası -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:angle="135" android:startColor="#07241F" android:centerColor="#0A2233" android:endColor="#061421" />
+    <corners android:radius="20dp" />
+    <stroke android:width="1dp" android:color="#1E8F7A" />
+</shape>

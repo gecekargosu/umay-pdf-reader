@@ -934,4 +934,5 @@
     <string name="weather_warn_snow_row">Kar uyarısı</string>
     <string name="weather_warn_on">AÇIK</string>
     <string name="weather_warn_off">KAPALI</string>
+    <string name="prayer_card_count">Sıradaki: %1$s · %2$s kaldı</string>
 </resources>
